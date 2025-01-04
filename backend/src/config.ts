@@ -1,0 +1,3 @@
+const { SIEM_URL, SIEM_USER, SIEM_PASSWORD, PORT } = process.env;
+
+export { SIEM_URL, SIEM_USER, SIEM_PASSWORD, PORT };

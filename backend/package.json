@@ -1,0 +1,29 @@
+{
+  "name": "scrapper_despacho",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --env-file=.env dist/src/index.js",
+    "build": "npx tsc",
+    "dev": "tsnd --respawn --env-file=.env src/index.ts",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "5.0.0",
+    "convert-csv-to-json": "^2.50.0",
+    "cors": "^2.8.5",
+    "express": "4.21.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1",
+    "@types/node": "22.10.3",
+    "ts-node-dev": "2.0.0",
+    "typescript": "5.7.2"
+  }
+}
