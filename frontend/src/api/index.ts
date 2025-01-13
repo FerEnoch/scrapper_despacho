@@ -40,7 +40,7 @@ export const api = {
       }
       return {
         message: responseData.message ?? "",
-        data: [],
+        data: responseData.data ?? [],
       };
     } catch (error) {
       console.log("🚀 ~ uploadFile ~ error:", error);

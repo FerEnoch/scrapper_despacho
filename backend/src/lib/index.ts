@@ -8,30 +8,25 @@ import {
 } from "../config";
 
 const validateRawData = (files: RawFile[]) => {
-  const validFiles = files.every((item) => {
+  return files.every((item) => {
     // Check if 'Número' property exists and matches the regex
     return (
       FILE_NUMBER_COLUMN_VALID_NAME in item &&
       FILE_NUMBER_COLUMN_VALIDATION_REGEX.test(
-        item[FILE_NUMBER_COLUMN_VALID_NAME]
+        item[FILE_NUMBER_COLUMN_VALID_NAME].trim()
       )
     );
   });
-  return validFiles;
 };
 
 const getInvalidFiles = (files: RawFile[]) => {
-  const invalidFiles = files.filter((file) => {
-    !validateRawData([file]);
-  });
-  return invalidFiles;
+  return files.filter((file) => !validateRawData([file]));
 };
 
 export async function parseRawFiles(
   files: RawFile[]
 ): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
   const isValid = validateRawData(files);
-  console.log({ ok: isValid});
   if (!isValid) {
     return Promise.resolve({
       ok: isValid,

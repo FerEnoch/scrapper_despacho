@@ -57,18 +57,21 @@ export default function App() {
       formData
     )) as ApiResponseStats<FileStats | FileEndedStats | RawFile>;
 
-    console.log("🚀 ~ onSubmit ~ message:", message);
+    console.log("🚀 ~ onSubmit ~ message:", message, apiResponseData);
 
     if (message === "Invalid raw data") {
+      formData.delete("file");
+
       setIsError(true);
       setErrorFiles(apiResponseData as RawFile[]);
+      setIsLoading(false);
+      return;
     }
 
     setFilesData(apiResponseData as Array<FileStats | FileEndedStats>);
     setIsLoading(false);
   };
 
-  console.log(errorFiles);
   return (
     <>
       <Card
@@ -110,7 +113,10 @@ export default function App() {
                         type="file"
                         id="file"
                         placeholder="expedientes.csv"
-                        onChange={(e) => field.onChange(e.target.files?.[0])}
+                        onChange={(e) => {
+                          setIsError(false);
+                          field.onChange(e.target.files?.[0]);
+                        }}
                         onBlur={field.onBlur}
                         name={field.name}
                         ref={field.ref}
@@ -129,9 +135,8 @@ export default function App() {
           {isError && (
             <FilesStatsFetchingError
               dialogTitle="Error"
-              dialogDescription={
-                ERROR_DIALOG_MESSAGE + " \n" + errorFiles.join("\n")
-              }
+              dialogDescription={ERROR_DIALOG_MESSAGE}
+              errorFiles={errorFiles}
             />
           )}
         </CardContent>
