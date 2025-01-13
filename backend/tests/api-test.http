@@ -1,4 +1,6 @@
-POST https://h9nn1667-3000.brs.devtunnels.ms/files/stats HTTP/1.1
+GET https://h9nn1667-3000.brs.devtunnels.ms/files/stats HTTP/1.1
+
+POST https://h9nn1667-3000.brs.devtunnels.ms/files HTTP/1.1
 
 {
     "

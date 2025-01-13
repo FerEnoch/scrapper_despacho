@@ -1,5 +1,5 @@
 {
-  "name": "scrapper_despacho",
+  "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -14,14 +14,18 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "5.0.0",
-    "convert-csv-to-json": "^2.50.0",
-    "cors": "^2.8.5",
-    "express": "4.21.2"
+    "convert-csv-to-json": "2.50.0",
+    "cors": "2.8.5",
+    "express": "4.21.2",
+    "express-fileupload": "1.5.1",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "@playwright/test": "1.49.1",
+    "@types/cors": "2.8.17",
+    "@types/express": "5.0.0",
+    "@types/express-fileupload": "^1.5.1",
+    "@types/morgan": "^1.9.9",
     "@types/node": "22.10.3",
     "ts-node-dev": "2.0.0",
     "typescript": "5.7.2"

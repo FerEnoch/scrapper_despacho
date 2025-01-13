@@ -6,6 +6,7 @@ node_modules/
 */blob-report/
 */playwright/.cache/
 */sample_data
+*/uploads
 
 */.env
 */.env.local

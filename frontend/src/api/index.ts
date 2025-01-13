@@ -1,18 +1,20 @@
-const API_BASE_URL = import.meta.env.VITE_FILES_API_URL;
+import { API_BASE_URL } from "@/config";
+import {
+  ApiResponseStats,
+  FileEndedStats,
+  FileStats,
+  RawFile,
+} from "@/models/types";
 
 export const api = {
-  getFilesStats: async (formData: FormData) => {
+  getFilesStats: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/stats`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        body: formData,
+      const response = await fetch(`${API_BASE_URL}/files/stats`, {
+        method: "GET",
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = (await response.json()) as ApiResponseStats<FileStats>;
         return data;
       }
     } catch (error) {
@@ -22,33 +24,50 @@ export const api = {
 
   uploadFile: async (formData: FormData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/end`, {
+      const response = await fetch(`${API_BASE_URL}/files`, {
         method: "POST",
         headers: {
-          "Content-Type": "multipart/form-data",
+          encyType: "multipart/form-data",
         },
         body: formData,
       });
 
+      const responseData = (await response.json()) as ApiResponseStats<
+        FileStats | RawFile
+      >;
       if (response.ok) {
-        const data = await response.json();
-        return data;
+        return responseData;
       }
+      return {
+        message: responseData.message ?? "",
+        data: [],
+      };
     } catch (error) {
-      console.log("🚀 ~ onSubmit ~ error:", error);
+      console.log("🚀 ~ uploadFile ~ error:", error);
     }
   },
 
-  endFileyId: async (id: string) => {
+  endFiles: async (files: FileStats[]) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/end/${id}`);
+      const response = await fetch(`${API_BASE_URL}/files/end`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(files),
+      });
 
+      const responseData =
+        (await response.json()) as ApiResponseStats<FileEndedStats>;
       if (response.ok) {
-        const data = await response.json();
-        return data;
+        return responseData;
       }
+      return {
+        message: responseData.message ?? "",
+        data: [],
+      };
     } catch (error) {
-      console.log("🚀 ~ endFileyId ~ error:", error);
+      console.log("🚀 ~ endFiles ~ error:", error);
     }
   },
 };

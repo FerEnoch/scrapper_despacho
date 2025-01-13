@@ -3,12 +3,11 @@ export type RawFile = {
   [key: string]: string; // Other properties are not important
 };
 
-export type FileId = {
+export type FileStats = {
   num: string;
-  org?: string;
-  rep?: string;
-  digv?: string;
-  completeNum?: string;
+  title: string;
+  prevStatus: string;
+  location: string;
 };
 
 export type FileEndedStats = {
@@ -23,9 +22,7 @@ export type FileEndedStats = {
   };
 };
 
-export type FileStats = {
-  num: string;
-  title: string;
-  prevStatus: string;
-  location: string;
+export type ApiResponseStats<T> = {
+  message: string;
+  data?: T[];
 };
