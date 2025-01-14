@@ -35,11 +35,11 @@ import {
   CARD_TEXT,
   INVALID_DATA_ERROR_MSG,
 } from "./config/constants";
-// import { apiResponseExample } from "./sample-api-response";
+import { MagnifyingGlass } from "react-loader-spinner";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSerching, setIsSearching] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -55,7 +55,7 @@ export default function App() {
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
+    setIsSearching(true);
     setIsError(false);
     setErrorFiles([]);
     const formData = new FormData();
@@ -68,7 +68,7 @@ export default function App() {
     console.log("🚀 ~ onSubmit ~ message:", message, apiResponseData);
 
     if (message === ERRORS.API_ERROR) {
-      setIsLoading(false);
+      setIsSearching(false);
       setErrorMsg(API_ERROR_MSG);
       setIsError(true);
       setFilesData([]);
@@ -80,13 +80,13 @@ export default function App() {
       setErrorMsg(INVALID_DATA_ERROR_MSG);
       setIsError(true);
       setErrorFiles(apiResponseData as RawFile[]);
-      setIsLoading(false);
+      setIsSearching(false);
       setFilesData([]);
       return;
     }
 
     setFilesData(apiResponseData as FileStats[]);
-    setIsLoading(false);
+    setIsSearching(false);
   };
 
   const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
@@ -155,9 +155,23 @@ export default function App() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading}>
-                Buscar en SIEM
-              </Button>
+              <div className="flex justify-start items-center space-x-2">
+                <Button type="submit" disabled={isSerching}>
+                  Buscar en SIEM
+                </Button>
+                {isSerching && (
+                  <MagnifyingGlass
+                    visible={true}
+                    height="42"
+                    width="42"
+                    ariaLabel="magnifying-glass-loading"
+                    wrapperStyle={{}}
+                    wrapperClass="magnifying-glass-wrapper"
+                    glassColor="#c0efff"
+                    color="#15803d"
+                  />
+                )}
+              </div>
             </form>
           </Form>
           {isError && (
@@ -169,7 +183,7 @@ export default function App() {
           )}
         </CardContent>
       </Card>
-      {filesData && !isLoading && (
+      {filesData && !isSerching && (
         <DataTable
           columns={Columns}
           data={filesData}
@@ -177,7 +191,7 @@ export default function App() {
           onDataChange={onDataChange}
         />
       )}
-      {isLoading && <TableSkeleton />}
+      {isSerching && <TableSkeleton />}
     </>
   );
 }
