@@ -24,13 +24,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "./api";
-import { ApiResponseStats, RawFile } from "./models/types";
+import { ApiResponseStats, ERRORS, RawFile } from "./models/types";
 import { FileStats } from "./models/types";
 import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
 import { FilesStatsFetchingError } from "./components/alert/AlertDialog";
-import { CARD_TEXT, ERROR_DIALOG_MESSAGE } from "./config/constants";
+import {
+  API_ERROR_MSG,
+  CARD_TEXT,
+  INVALID_DATA_ERROR_MSG,
+} from "./config/constants";
 // import { apiResponseExample } from "./sample-api-response";
 
 export default function App() {
@@ -38,6 +42,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string>("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,12 +66,21 @@ export default function App() {
 
     console.log("🚀 ~ onSubmit ~ message:", message, apiResponseData);
 
-    if (message === "Invalid raw data") {
-      formData.delete("file");
+    if (message === ERRORS.API_ERROR) {
+      setIsLoading(false);
+      setErrorMsg(API_ERROR_MSG);
+      setIsError(true);
+      setFilesData([]);
+      return;
+    }
 
+    if (message === ERRORS.INVALID_DATA) {
+      formData.delete("file");
+      setErrorMsg(INVALID_DATA_ERROR_MSG);
       setIsError(true);
       setErrorFiles(apiResponseData as RawFile[]);
       setIsLoading(false);
+      setFilesData([]);
       return;
     }
 
@@ -148,7 +162,7 @@ export default function App() {
           {isError && (
             <FilesStatsFetchingError
               dialogTitle="Error"
-              dialogDescription={ERROR_DIALOG_MESSAGE}
+              dialogDescription={errorMsg}
               errorFiles={errorFiles}
             />
           )}

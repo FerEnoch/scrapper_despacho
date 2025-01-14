@@ -4,7 +4,7 @@ import { RawFile } from "@/models/types";
 interface FilesStatsFetchingErrorProps {
   dialogTitle: string;
   dialogDescription: string;
-  errorFiles: RawFile[];
+  errorFiles: RawFile[] | null;
 }
 
 export function FilesStatsFetchingError({
@@ -16,7 +16,7 @@ export function FilesStatsFetchingError({
     <Alert>
       <AlertTitle>{dialogTitle}</AlertTitle>
       <AlertDescription>{dialogDescription} </AlertDescription>
-      {errorFiles.length > 0 && (
+      {errorFiles && errorFiles.length > 0 && (
         <div className="mt-2 text-red-500">
           <AlertDescription>
             {errorFiles.map((file) => (

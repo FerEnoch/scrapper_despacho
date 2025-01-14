@@ -1,9 +1,5 @@
 import { API_BASE_URL } from "@/config";
-import {
-  ApiResponseStats,
-  FileStats,
-  RawFile,
-} from "@/models/types";
+import { ApiResponseStats, ERRORS, FileStats, RawFile } from "@/models/types";
 
 export const api = {
   getFilesStats: async () => {
@@ -43,6 +39,10 @@ export const api = {
       };
     } catch (error) {
       console.log("🚀 ~ uploadFile ~ error:", error);
+      return {
+        message: ERRORS.API_ERROR,
+        data: [],
+      };
     }
   },
 

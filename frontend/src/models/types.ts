@@ -28,3 +28,8 @@ export type ApiResponseStats<T> = {
   message: string;
   data?: T[];
 };
+
+export enum ERRORS {
+  API_ERROR = "API_ERROR",
+  INVALID_DATA = "Invalid raw data",
+}
