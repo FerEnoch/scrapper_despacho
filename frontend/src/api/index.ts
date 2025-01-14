@@ -1,7 +1,6 @@
 import { API_BASE_URL } from "@/config";
 import {
   ApiResponseStats,
-  FileEndedStats,
   FileStats,
   RawFile,
 } from "@/models/types";
@@ -58,7 +57,7 @@ export const api = {
       });
 
       const responseData =
-        (await response.json()) as ApiResponseStats<FileEndedStats>;
+        (await response.json()) as ApiResponseStats<FileStats>;
       if (response.ok) {
         return responseData;
       }

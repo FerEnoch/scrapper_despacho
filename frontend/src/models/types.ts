@@ -1,3 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { RowData } from "@tanstack/react-table";
+
+declare module "@tanstack/react-table" {
+  interface TableMeta<TData extends RowData> {
+    updateData: (rowIndex: number, value: FileStats) => void;
+  }
+}
+
 export type RawFile = {
   Número: string;
   [key: string]: string; // Other properties are not important
@@ -8,17 +17,10 @@ export type FileStats = {
   title: string;
   prevStatus: string;
   location: string;
-};
-
-export type FileEndedStats = {
-  num: string;
-  location: string;
-  title: string;
-  prevStatus: string;
-  newStatus: {
-    status: string;
-    message: string;
-    detail: string;
+  newStatus?: {
+    status?: string;
+    message?: string;
+    detail?: string;
   };
 };
 

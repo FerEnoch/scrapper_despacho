@@ -24,7 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "./api";
-import { ApiResponseStats, FileEndedStats, RawFile } from "./models/types";
+import { ApiResponseStats, RawFile } from "./models/types";
 import { FileStats } from "./models/types";
 import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
@@ -34,9 +34,7 @@ import { CARD_TEXT, ERROR_DIALOG_MESSAGE } from "./config/constants";
 // import { apiResponseExample } from "./sample-api-response";
 
 export default function App() {
-  const [filesData, setFilesData] = useState<FileStats[] | FileEndedStats[]>(
-    []
-  );
+  const [filesData, setFilesData] = useState<FileStats[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
@@ -47,6 +45,10 @@ export default function App() {
     },
   });
 
+  const onDataChange = (data: FileStats[]) => {
+    setFilesData(data);
+  };
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     setIsError(false);
@@ -55,7 +57,7 @@ export default function App() {
 
     const { message, data: apiResponseData } = (await api.uploadFile(
       formData
-    )) as ApiResponseStats<FileStats | FileEndedStats | RawFile>;
+    )) as ApiResponseStats<FileStats | RawFile>;
 
     console.log("🚀 ~ onSubmit ~ message:", message, apiResponseData);
 
@@ -68,13 +70,11 @@ export default function App() {
       return;
     }
 
-    setFilesData(apiResponseData as Array<FileStats | FileEndedStats>);
+    setFilesData(apiResponseData as FileStats[]);
     setIsLoading(false);
   };
 
-  const onEndFilesClick = (
-    apiResponseData: ApiResponseStats<FileEndedStats>
-  ) => {
+  const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
     console.log("🚀 ~ onEndFilesClick ~ apiResponseData:", apiResponseData);
 
     // update state with response
@@ -86,7 +86,7 @@ export default function App() {
       );
 
       return updatedFile ? updatedFile : currentFile;
-    }) as Array<FileEndedStats | FileStats>;
+    }) as FileStats[];
 
     setFilesData(newState);
   };
@@ -100,10 +100,10 @@ export default function App() {
       "
       >
         <CardHeader>
-          <CardTitle className="text-2xl">Santa Fe Hábitat</CardTitle>
+          <CardTitle className="text-3xl">Santa Fe Hábitat</CardTitle>
 
-          <CardDescription className="leading-snug">
-            <p className="text-sm text-gray-600">{CARD_TEXT}</p>
+          <CardDescription>
+            <p className="text-sm leading-8 text-gray-600">{CARD_TEXT}</p>
           </CardDescription>
         </CardHeader>
 
@@ -159,6 +159,7 @@ export default function App() {
           columns={Columns}
           data={filesData}
           onEndFilesClick={onEndFilesClick}
+          onDataChange={onDataChange}
         />
       )}
       {isLoading && <TableSkeleton />}

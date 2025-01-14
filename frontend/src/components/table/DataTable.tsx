@@ -22,19 +22,21 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { api } from "@/api";
-import { ApiResponseStats, FileEndedStats, FileStats } from "@/models/types";
+import { ApiResponseStats, FileStats } from "@/models/types";
 import { TableSkeleton } from "./TableSkeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onEndFilesClick: (apiResponseData: ApiResponseStats<FileEndedStats>) => void;
+  onEndFilesClick: (apiResponseData: ApiResponseStats<FileStats>) => void;
+  onDataChange: (data: FileStats[]) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   onEndFilesClick,
+  onDataChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -55,6 +57,18 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
       rowSelection,
+    },
+    meta: {
+      updateData: (rowIndex: number, value: FileStats) => {
+        const newData = [...data].map((file, index) => {
+          if (index === rowIndex) {
+            return value;
+          }
+          return file;
+        }) as FileStats[];
+
+        onDataChange(newData);
+      },
     },
   });
 

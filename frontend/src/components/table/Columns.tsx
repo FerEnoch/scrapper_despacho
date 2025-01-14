@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { FileEndedStats, FileStats } from "../../models/types";
+import { FileStats } from "../../models/types";
 import { Button } from "../ui/button";
 import { SIEM_URL_FILE_ID } from "@/config";
 import { ArrowUpDown } from "lucide-react";
@@ -7,7 +7,8 @@ import { Checkbox } from "../ui/checkbox";
 import { api } from "@/api";
 import { getMessageColor, getStatusColor } from "@/lib/utils";
 
-export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
+// TO DO -> make a component  / inc. useMemo() ?
+export const Columns: ColumnDef<FileStats>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -94,9 +95,7 @@ export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
       );
     },
     cell: ({ row }) => {
-      const newStatus = row.getValue("newStatus") as
-        | FileEndedStats["newStatus"]
-        | undefined;
+      const newStatus = row.getValue("newStatus") as FileStats["newStatus"];
 
       if (!newStatus) return <></>;
 
@@ -106,7 +105,7 @@ export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
       const messageColor = getMessageColor(message);
 
       return (
-        <p
+        <div
           className={`
           text-xs font-medium ${statusColor}
           flex flex-col space-between gap-2 
@@ -127,17 +126,20 @@ export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
               <span className={`${statusColor}`}>{detail}</span>
             </p>
           )}
-        </p>
+        </div>
       );
     },
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const fileStatus = row.getValue("prevStatus");
-      const disabled = fileStatus === "FINALIZADO";
+    cell: ({ row, table }) => {
+      const isEnded = row.getValue("prevStatus") === "FINALIZADO";
+      const isSelected = row.getIsSelected();
+      const disabled = isEnded || !isSelected;
 
       const handleEndFilesClick = async () => {
+        if (!isSelected) return;
+
         const selectedNum = row.getValue("num");
         const selectedTitle = row.getValue("title");
         const selectedPrevStatus = row.getValue("prevStatus");
@@ -150,8 +152,13 @@ export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
           location: selectedLocation,
         };
 
-        const response = await api.endFiles([selectedValues] as FileStats[]);
-        console.log("Ending response:", response);
+        const apiResponse = await api.endFiles([selectedValues] as FileStats[]);
+        const [updatedFileStats] = apiResponse?.data || [null];
+
+        console.log("🚀 ~ handleEndFilesClick ~ apiResponse:", apiResponse);
+
+        if (!updatedFileStats) return;
+        table.options.meta?.updateData(row.index, updatedFileStats);
       };
 
       return (
