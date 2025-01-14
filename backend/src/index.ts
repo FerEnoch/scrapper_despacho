@@ -68,7 +68,7 @@ app.post("/files", async (req, res) => {
     const jsonData = await convertToJson(data);
     const { ok, parsedData } = await parseRawFiles(jsonData);
     if (!ok) {
-      console.log("🚀 ~ Invalid raw data", parsedData);
+      console.log("🚀 ~ Invalid raw data", parsedData.length);
       res.status(400).json({
         message: "Invalid raw data",
         data: parsedData as RawFile[],

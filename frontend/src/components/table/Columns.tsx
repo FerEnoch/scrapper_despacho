@@ -5,6 +5,7 @@ import { SIEM_URL_FILE_ID } from "@/config";
 import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { api } from "@/api";
+import { getMessageColor, getStatusColor } from "@/lib/utils";
 
 export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
   {
@@ -66,20 +67,7 @@ export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
     },
     cell: ({ row }) => {
       const fileStatus = row.getValue("prevStatus") as string;
-      let statusColor;
-      switch (fileStatus) {
-        case "EN CURSO":
-          statusColor = "text-green-700";
-          break;
-        case "FINALIZADO":
-          statusColor = "text-red-700";
-          break;
-        case "SISTEMA ANTERIOR":
-          statusColor = "text-yellow-600";
-          break;
-        default:
-          statusColor = "text-gray-500";
-      }
+      const statusColor = getStatusColor(fileStatus);
 
       return (
         <span className={`text-xs font-medium ${statusColor}`}>
@@ -114,20 +102,8 @@ export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
 
       const { status = "", message = "", detail = "" } = newStatus;
 
-      let statusColor;
-      switch (status) {
-        case "EN CURSO":
-          statusColor = "text-green-700";
-          break;
-        case "FINALIZADO":
-          statusColor = "text-red-700";
-          break;
-        case "SISTEMA ANTERIOR":
-          statusColor = "text-yellow-600";
-          break;
-        default:
-          statusColor = "text-gray-500";
-      }
+      const statusColor = getStatusColor(status);
+      const messageColor = getMessageColor(message);
 
       return (
         <p
@@ -137,13 +113,13 @@ export const Columns: ColumnDef<FileStats | FileEndedStats>[] = [
         `}
         >
           {status && (
-            <p className="text-pretty">
+            <p className="text-xs leading-6">
               <span className={`text-xs ${statusColor}`}>{status}</span>
             </p>
           )}
           {message && (
-            <p className="text-pretty text-xs leading-6">
-              <span className={`${statusColor}`}>{message}</span>
+            <p className="text-xs leading-6">
+              <span className={`${messageColor}`}>{message}</span>
             </p>
           )}
           {detail && (

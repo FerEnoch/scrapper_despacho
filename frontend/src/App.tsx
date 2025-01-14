@@ -76,20 +76,19 @@ export default function App() {
     apiResponseData: ApiResponseStats<FileEndedStats>
   ) => {
     console.log("🚀 ~ onEndFilesClick ~ apiResponseData:", apiResponseData);
-    // update state with response
 
+    // update state with response
     const newState = filesData.map((currentFile) => {
       if (!apiResponseData.data) return currentFile;
 
-      for (const updatedFile of apiResponseData.data) {
-        if (updatedFile.num === currentFile.num) {
-          return updatedFile;
-        }
-        return currentFile;
-      }
+      const updatedFile = apiResponseData.data.find(
+        (file) => file.num === currentFile.num
+      );
+
+      return updatedFile ? updatedFile : currentFile;
     }) as Array<FileEndedStats | FileStats>;
 
-    setFilesData(newState ?? []);
+    setFilesData(newState);
   };
 
   return (
