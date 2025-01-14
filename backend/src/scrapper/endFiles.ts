@@ -18,7 +18,7 @@ export async function endFiles({ files }: { files: FileStats[] }) {
   }
 
   const { newPage, browser } = await getBrowserContext();
-  await newPage.goto(`${SIEM_BASE_URL}/${LOGIN_PATH}`);
+  await newPage.goto(`${SIEM_BASE_URL}${LOGIN_PATH}`);
 
   const siemPage = await login({
     user: SIEM_USER,
@@ -35,16 +35,7 @@ export async function endFiles({ files }: { files: FileStats[] }) {
 
   for await (const file of filesToEnd) {
     const [{ num }] = parseFileStats([file]);
-    /* do not abstract process */
-    // const statsPage = await getStatsPage({ file: fileId, page: siemPage });
-    // const { completeNum, rep, num, digv } = fileId;
-    // await siemPage.fill("input[id='repa']", rep || "");
-    // await siemPage.fill("input[id='numero']", num || "");
-    // await siemPage.fill("input[id='dv']", digv || "");
-    // await siemPage.click("input[id='buscar_nro']");
-    // await siemPage.waitForLoadState();
-
-    await siemPage.goto(`${SIEM_BASE_URL}/${FILE_STATS_PATH}${num}`);
+    await siemPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
 
     // await siemPage.screenshot({
     //   path: `./uploads/screenshots/checkpoint-1.png`,
@@ -63,28 +54,22 @@ export async function endFiles({ files }: { files: FileStats[] }) {
 
     const message = (await siemPage.locator("h2").textContent()) ?? "";
     const detail = (await siemPage.locator("h3").textContent()) ?? "";
-
-    // await siemPage.locator("#volver").click();
-    // await siemPage.waitForLoadState();
-    // await siemPage.click("a[href='expediente_buscar.php']");
     // await siemPage.waitForLoadState();
 
-    const { prevStatus: status } = await collectData({
-      file,
+    const fileNewData = await collectData({
+      file: {
+        ...file,
+        num, // only middle long number
+      },
       page: newPage,
     });
-    
-    const { num: number, location, prevStatus, title } = file;
 
     updatedFile = {
-      num: number,
-      location,
-      title,
-      prevStatus,
+      ...file,
       newStatus: {
-        status,
+        status: fileNewData?.prevStatus ?? "",
         message,
-        detail
+        detail,
       },
     };
     result.push(updatedFile);
@@ -92,12 +77,9 @@ export async function endFiles({ files }: { files: FileStats[] }) {
     } catch (error) {
       console.log("🚀 ~ endFile ~ error:", error);
       updatedFile = {
-        num: number,
-        location,
-        title,
-        prevStatus,
+        ...file,
         newStatus: {
-          status,
+          status: fileNewData?.prevStatus ?? "",
           message,
           detail,
         },

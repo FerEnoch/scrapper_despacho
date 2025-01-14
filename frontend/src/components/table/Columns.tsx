@@ -111,11 +111,6 @@ export const Columns: ColumnDef<FileStats>[] = [
           flex flex-col space-between gap-2 
         `}
         >
-          {status && (
-            <p className="text-xs leading-6">
-              <span className={`text-xs ${statusColor}`}>{status}</span>
-            </p>
-          )}
           {message && (
             <p className="text-xs leading-6">
               <span className={`${messageColor}`}>{message}</span>

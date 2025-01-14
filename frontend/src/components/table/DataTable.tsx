@@ -62,7 +62,10 @@ export function DataTable<TData, TValue>({
       updateData: (rowIndex: number, value: FileStats) => {
         const newData = [...data].map((file, index) => {
           if (index === rowIndex) {
-            return value;
+            return {
+              ...value,
+              prevStatus: value.newStatus?.status ?? "",
+            };
           }
           return file;
         }) as FileStats[];

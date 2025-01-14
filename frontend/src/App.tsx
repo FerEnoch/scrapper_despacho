@@ -57,6 +57,7 @@ export default function App() {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     setIsError(false);
+    setErrorFiles([]);
     const formData = new FormData();
     formData.append("file", data.file);
 

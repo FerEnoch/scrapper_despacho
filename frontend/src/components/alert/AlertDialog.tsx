@@ -19,8 +19,8 @@ export function FilesStatsFetchingError({
       {errorFiles && errorFiles.length > 0 && (
         <div className="mt-2 text-red-500">
           <AlertDescription>
-            {errorFiles.map((file) => (
-              <p key={file["Número"]}>{file["Número"]}</p>
+            {errorFiles.map((file, index) => (
+              <p key={file["Número"] + index}>{file["Número"]}</p>
             ))}
           </AlertDescription>
         </div>

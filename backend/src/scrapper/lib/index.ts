@@ -53,20 +53,9 @@ export async function collectData({
   file: FileId;
   page: Page;
 }) {
-  /* do not abstract process */
-  // const fileStatsPage = await getStatsPage({ file, page });
-  // const { completeNum, rep, num, digv } = file;
-  // await siempPage.fill("input[id='repa']", rep || "");
-  // await siempPage.fill("input[id='numero']", num || "");
-  // await siempPage.fill("input[id='dv']", digv || "");
-  // await siempPage.waitForSelector("input[id='buscar_nro']", {
-  //   state: "visible",
-  // });
-  // await siempPage.click("input[id='buscar_nro']");
-  // await siempPage.waitForLoadState("domcontentloaded");
-  const { num } = file;
   try {
-    await siempPage.goto(`${SIEM_BASE_URL}/${FILE_STATS_PATH}${num}`);
+    const { num } = file;
+    await siempPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
   } catch (error) {
     console.log("🚀 ~ Fail to fetch file data:", file, error);
     return {

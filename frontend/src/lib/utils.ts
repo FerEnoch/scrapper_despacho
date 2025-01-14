@@ -26,7 +26,7 @@ export function getStatusColor(status: string) {
 export function getMessageColor(message: string) {
   let messageColor;
   switch (message) {
-    case "OK":
+    case "Operación Finalizada":
       messageColor = "text-green-700";
       break;
     case "ERROR":
