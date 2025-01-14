@@ -30,13 +30,13 @@ import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
 import { FilesStatsFetchingError } from "./components/alert/AlertDialog";
-import { ERROR_DIALOG_MESSAGE } from "./config/constants";
+import { CARD_TEXT, ERROR_DIALOG_MESSAGE } from "./config/constants";
 // import { apiResponseExample } from "./sample-api-response";
 
 export default function App() {
-  const [filesData, setFilesData] = useState<
-    FileStats[] | FileEndedStats[] | undefined
-  >([]);
+  const [filesData, setFilesData] = useState<FileStats[] | FileEndedStats[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
@@ -72,6 +72,26 @@ export default function App() {
     setIsLoading(false);
   };
 
+  const onEndFilesClick = (
+    apiResponseData: ApiResponseStats<FileEndedStats>
+  ) => {
+    console.log("🚀 ~ onEndFilesClick ~ apiResponseData:", apiResponseData);
+    // update state with response
+
+    const newState = filesData.map((currentFile) => {
+      if (!apiResponseData.data) return currentFile;
+
+      for (const updatedFile of apiResponseData.data) {
+        if (updatedFile.num === currentFile.num) {
+          return updatedFile;
+        }
+        return currentFile;
+      }
+    }) as Array<FileEndedStats | FileStats>;
+
+    setFilesData(newState ?? []);
+  };
+
   return (
     <>
       <Card
@@ -84,13 +104,7 @@ export default function App() {
           <CardTitle className="text-2xl">Santa Fe Hábitat</CardTitle>
 
           <CardDescription className="leading-snug">
-            <p>
-              Carga un archivo .csv que contenga una columna "Número" con el
-              número completo de expediente SIEM.
-            </p>
-            <p>
-              Podrás visualizar su estado actual y finalizar su tramitación.
-            </p>
+            <p className="text-sm text-gray-600">{CARD_TEXT}</p>
           </CardDescription>
         </CardHeader>
 
@@ -142,7 +156,11 @@ export default function App() {
         </CardContent>
       </Card>
       {filesData && !isLoading && (
-        <DataTable columns={Columns} data={filesData} />
+        <DataTable
+          columns={Columns}
+          data={filesData}
+          onEndFilesClick={onEndFilesClick}
+        />
       )}
       {isLoading && <TableSkeleton />}
     </>

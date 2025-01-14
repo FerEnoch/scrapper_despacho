@@ -16,8 +16,8 @@ export type FileEndedStats = {
   location: string;
   title: string;
   prevStatus: string;
-  newStatus: string;
-  siemMessage: {
+  newStatus: {
+    status: string;
     message: string;
     detail: string;
   };

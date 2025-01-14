@@ -69,21 +69,22 @@ export async function endFiles({ files }: { files: FileStats[] }) {
     // await siemPage.click("a[href='expediente_buscar.php']");
     // await siemPage.waitForLoadState();
 
-    const { num: number, location, prevStatus, title } = file;
-    const { prevStatus: newStatus = "" } = await collectData({
+    const { prevStatus: status } = await collectData({
       file,
       page: newPage,
     });
+    
+    const { num: number, location, prevStatus, title } = file;
 
     updatedFile = {
       num: number,
       location,
       title,
       prevStatus,
-      newStatus,
-      siemMessage: {
+      newStatus: {
+        status,
         message,
-        detail,
+        detail
       },
     };
     result.push(updatedFile);
@@ -95,8 +96,8 @@ export async function endFiles({ files }: { files: FileStats[] }) {
         location,
         title,
         prevStatus,
-        newStatus,
-        siemMessage: {
+        newStatus: {
+          status,
           message,
           detail,
         },

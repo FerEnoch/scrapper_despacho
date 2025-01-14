@@ -22,17 +22,19 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { api } from "@/api";
-import { FileStats } from "@/models/types";
+import { ApiResponseStats, FileEndedStats, FileStats } from "@/models/types";
 import { TableSkeleton } from "./TableSkeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onEndFilesClick: (apiResponseData: ApiResponseStats<FileEndedStats>) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onEndFilesClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -56,26 +58,31 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  const handleEndFilesClick = async () => {
+  const handleEndFiles = async () => {
     setIsLoading(true);
     const selectedValues = table
       .getSelectedRowModel()
       .rows.map(({ original }) => original);
 
-    if (selectedValues.length === 0) return;
+    if (selectedValues.length === 0) {
+      setIsLoading(false);
+      return;
+    }
 
     const response = await api.endFiles(selectedValues as FileStats[]);
-    console.log("Ending response:", response);
+    if (!response) return;
+
+    onEndFilesClick(response);
     setIsLoading(false);
   };
 
   return (
-    <>
+    <div className="mx-auto max-w-[90%] xl:max-w-[80%]">
       <div className="flex items-center justify-between px-4 py-4">
         <Button
           className="bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400"
           disabled={isLoading}
-          onClick={handleEndFilesClick}
+          onClick={handleEndFiles}
         >
           Finalizar expedientes
         </Button>
@@ -177,6 +184,6 @@ export function DataTable<TData, TValue>({
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }
