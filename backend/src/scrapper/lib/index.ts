@@ -2,6 +2,7 @@ import { chromium } from "playwright";
 import { Page } from "@playwright/test";
 import { FileId } from "../../types";
 import { FILE_STATS_PATH, SIEM_BASE_URL } from "../../config";
+import { NO_RESULTS_GENERIC_MSG } from "../../config/constants";
 
 export async function login({
   user,
@@ -27,25 +28,6 @@ export async function getBrowserContext() {
   return { newPage, browser };
 }
 
-// export async function getStatsPage({
-//   file,
-//   page,
-// }: {
-//   file: FileId;
-//   page: Page;
-// }) {
-//   const { completeNum, rep, num, digv } = file;
-
-//   await page.fill("input[id='repa']", rep || "");
-//   await page.fill("input[id='numero']", num || "");
-//   await page.fill("input[id='dv']", digv || "");
-
-//   await page.locator("input[id='buscar_nro']").click();
-//   await page.waitForLoadState("domcontentloaded");
-
-//   return page;
-// }
-
 export async function collectData({
   file,
   page: siempPage,
@@ -61,8 +43,8 @@ export async function collectData({
     return {
       num: file.completeNum ?? "",
       title: "",
-      prevStatus: "No se pudo obtener datos",
-      location: "No se pudo obtener datos",
+      prevStatus: NO_RESULTS_GENERIC_MSG,
+      location: NO_RESULTS_GENERIC_MSG,
     };
   }
 
@@ -78,14 +60,17 @@ export async function collectData({
     locationRow = await siempPage.$("tr:has-text('Ubicado en:')");
   }
 
-  const rawTitle = (await titleRow?.textContent()) ?? "";
-  const rawStatus = (await statusRow?.textContent()) ?? "";
-  const rawLocation = (await locationRow?.textContent()) ?? "";
+  const rawTitle = await titleRow?.textContent();
+  const rawStatus = await statusRow?.textContent();
+  const rawLocation = await locationRow?.textContent();
 
   return {
     num: file.completeNum ?? "",
-    title: rawTitle.slice(12).trim(),
-    prevStatus: rawStatus.slice(18).replace("\n", "").replace("\t", "").trim(),
-    location: rawLocation.slice(15).replace("\n", "").trim(),
+    title: rawTitle?.slice(12).trim() ?? NO_RESULTS_GENERIC_MSG,
+    prevStatus:
+      rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ??
+      NO_RESULTS_GENERIC_MSG,
+    location:
+      rawLocation?.slice(15).replace("\n", "").trim() ?? NO_RESULTS_GENERIC_MSG,
   };
 }

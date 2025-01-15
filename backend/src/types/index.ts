@@ -1,6 +1,6 @@
 export type RawFile = {
   Número: string;
-  [key: string]: string; // Other properties are not important
+  [key: string]: string | undefined; // Other properties are optional
 };
 
 export type FileId = {

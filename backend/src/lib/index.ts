@@ -5,32 +5,41 @@ import { RawFile, FileId, FileStats } from "../types";
 import {
   FILE_NUMBER_COLUMN_VALID_NAME,
   FILE_NUMBER_COLUMN_VALIDATION_REGEX,
-} from "../config";
+  FILE_NUMBER_COLUMN_VALIDATION_REGEX_NO_LETTERS,
+} from "../config/constants";
 
-const validateRawData = (files: RawFile[]) => {
+const validateRawData = (
+  files: RawFile[],
+  withLetters: boolean | undefined
+) => {
+  const validationRegex = withLetters
+    ? FILE_NUMBER_COLUMN_VALIDATION_REGEX
+    : FILE_NUMBER_COLUMN_VALIDATION_REGEX_NO_LETTERS;
   return files.every((item) => {
     // Check if 'Número' property exists and matches the regex
     return (
       FILE_NUMBER_COLUMN_VALID_NAME in item &&
-      FILE_NUMBER_COLUMN_VALIDATION_REGEX.test(
-        item[FILE_NUMBER_COLUMN_VALID_NAME].trim()
-      )
+      validationRegex.test(item[FILE_NUMBER_COLUMN_VALID_NAME].trim())
     );
   });
 };
 
-const getInvalidFiles = (files: RawFile[]) => {
-  return files.filter((file) => !validateRawData([file]));
+const getInvalidFiles = (
+  files: RawFile[],
+  withLetters: boolean | undefined
+) => {
+  return files.filter((file) => !validateRawData([file], withLetters));
 };
 
 export async function parseRawFiles(
-  files: RawFile[]
+  files: RawFile[],
+  withLetters: boolean = true
 ): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
-  const isValid = validateRawData(files);
+  const isValid = validateRawData(files, withLetters);
   if (!isValid) {
     return Promise.resolve({
       ok: isValid,
-      parsedData: getInvalidFiles(files),
+      parsedData: getInvalidFiles(files, withLetters),
     });
   }
 
