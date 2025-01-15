@@ -24,7 +24,7 @@ import { Input } from "../ui/input";
 import { api } from "@/api";
 import { ApiResponseStats, FileStats } from "@/models/types";
 import { TableSkeleton } from "./TableSkeleton";
-import { ProgressBar } from "react-loader-spinner";
+import { Puff } from "react-loader-spinner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -106,27 +106,29 @@ export function DataTable<TData, TValue>({
   return (
     <div className="mx-auto max-w-[90%] xl:max-w-[80%]">
       <div className="flex items-center justify-between px-4 py-4">
-        <div className="flex justify-start items-center">
-          <Button
-            className="bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400"
-            disabled={isLoading}
-            onClick={handleEndFiles}
-          >
-            Finalizar expedientes
-          </Button>
+        <Button
+          className="
+          h-fit w-fit
+          bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400
+          "
+          disabled={isLoading}
+          onClick={handleEndFiles}
+        >
+          {"Finalizar expedientes"}
           {isEndingFiles && (
-            <ProgressBar
-              visible={true}
-              height="40"
-              width="60"
-              barColor="#86efac"
-              borderColor="#232323"
-              ariaLabel="progress-bar-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
+            <div className="h-full w-full">
+              <Puff
+                visible={true}
+                height="100"
+                width="100"
+                color="#000"
+                ariaLabel="puff-loading"
+                wrapperStyle={{}}
+                wrapperClass=""
+              />
+            </div>
           )}
-        </div>
+        </Button>
         <div className="flex justify-end items-center gap-4">
           <Input
             placeholder="Filtrar por estado..."

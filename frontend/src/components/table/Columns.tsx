@@ -6,6 +6,8 @@ import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { api } from "@/api";
 import { getMessageColor, getStatusColor } from "@/lib/utils";
+import { useState } from "react";
+import { Puff } from "react-loader-spinner";
 
 // TO DO -> make a component  / inc. useMemo() ?
 export const Columns: ColumnDef<FileStats>[] = [
@@ -128,12 +130,17 @@ export const Columns: ColumnDef<FileStats>[] = [
   {
     id: "actions",
     cell: ({ row, table }) => {
+      /* eslint-disable react-hooks/rules-of-hooks */
+      const [isSearchingStats, setIsSearchingStats] = useState<boolean>(false);
+      const [isEndingFile, setIsEndingFile] = useState<boolean>(false);
+
       const isEnded = row.getValue("prevStatus") === "FINALIZADO";
       const isSelected = row.getIsSelected();
-      const endButtonDisabled = isEnded || !isSelected;
-      const searchButtonDisabled = !isSelected;
+      const endButtonDisabled = isEnded || !isSelected || isEndingFile;
+      const searchButtonDisabled = !isSelected || isSearchingStats;
 
       const handleEndFilesClick = async () => {
+        setIsEndingFile(true);
         if (!isSelected) return;
 
         const selectedNum = row.getValue("num") as string;
@@ -155,36 +162,67 @@ export const Columns: ColumnDef<FileStats>[] = [
 
         if (!updatedFileStats) return;
         table.options.meta?.updateData(row.index, updatedFileStats);
+        setIsEndingFile(false);
       };
 
       const handleSearchFileClick = async () => {
+        setIsSearchingStats(true);
         if (!isSelected) return;
 
         const selectedNum = row.getValue("num") as string;
         const apiResponse = await api.getFilesStats(selectedNum);
-        const [updatedFileStats] = apiResponse.data;
+        const [updatedFileStats] = apiResponse?.data || [];
 
         console.log("🚀 ~ handleSearchFileClick ~ apiResponse:", apiResponse);
 
         if (!updatedFileStats) return;
         table.options.meta?.updateData(row.index, updatedFileStats);
+        setIsSearchingStats(false);
       };
 
       return (
         <div className="flex flex-col space-between gap-2">
           <Button
-            className="bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400"
+            className="
+             flex items-center justify-center gap-2
+             bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400
+               "
             disabled={endButtonDisabled}
             onClick={handleEndFilesClick}
           >
-            Finalizar
+            <p>{"Finalizar"}</p>
+            {isEndingFile && (
+              <Puff
+                visible={true}
+                height="40"
+                width="40"
+                color="#000"
+                ariaLabel="puff-loading"
+                wrapperStyle={{}}
+                wrapperClass=""
+              />
+            )}
           </Button>
           <Button
-            className="bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400"
+            className="
+            flex items-center justify-center gap-2
+            bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400
+             "
             disabled={searchButtonDisabled}
             onClick={handleSearchFileClick}
           >
-            Buscar en SIEM
+            <p>{"Buscar en SIEM"}</p>
+            {isSearchingStats && (
+              <Puff
+                visible={true}
+                height="40"
+                width="40"
+                color="#000"
+                ariaLabel="puff-loading"
+                wrapperStyle={{}}
+                wrapperClass=""
+              />
+            )}
           </Button>
         </div>
       );

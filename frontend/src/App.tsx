@@ -162,13 +162,13 @@ export default function App() {
                 {isSerching && (
                   <MagnifyingGlass
                     visible={true}
-                    height="42"
-                    width="42"
+                    height="30"
+                    width="30"
                     ariaLabel="magnifying-glass-loading"
                     wrapperStyle={{}}
                     wrapperClass="magnifying-glass-wrapper"
                     glassColor="#c0efff"
-                    color="#15803d"
+                    color="#666"
                   />
                 )}
               </div>
