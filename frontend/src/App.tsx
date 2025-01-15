@@ -24,8 +24,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "./api";
-import { ApiResponseStats, ERRORS, RawFile } from "./models/types";
-import { FileStats } from "./models/types";
+import { ApiResponseStats, ERRORS, RawFile } from "./types";
+import { FileStats } from "./types";
 import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
@@ -43,6 +43,7 @@ export default function App() {
   const [isError, setIsError] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,6 +61,8 @@ export default function App() {
     setErrorFiles([]);
     const formData = new FormData();
     formData.append("file", data.file);
+
+    setFileName(data.file.name);
 
     const { message, data: apiResponseData } = (await api.uploadFile(
       formData
@@ -92,7 +95,6 @@ export default function App() {
   const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
     console.log("🚀 ~ onEndFilesClick ~ apiResponseData:", apiResponseData);
 
-    // update state with response
     const newState = filesData.map((currentFile) => {
       if (!apiResponseData.data) return currentFile;
 
@@ -187,6 +189,7 @@ export default function App() {
         <DataTable
           columns={Columns}
           data={filesData}
+          fileName={fileName ?? ""}
           onEndFilesClick={onEndFilesClick}
           onDataChange={onDataChange}
         />

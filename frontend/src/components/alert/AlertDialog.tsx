@@ -1,5 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { RawFile } from "@/models/types";
+import { RawFile } from "@/types";
 
 interface FilesStatsFetchingErrorProps {
   dialogTitle: string;

@@ -1,4 +1,4 @@
-import { FileStats } from "./models/types";
+import { FileStats } from "./types";
 
 export const apiResponseExample: FileStats[] = [
   {

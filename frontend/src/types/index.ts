@@ -33,3 +33,10 @@ export enum ERRORS {
   API_ERROR = "API_ERROR",
   INVALID_DATA = "Invalid raw data",
 }
+
+export enum FILE_EXPORT_STATS {
+  NUMBER = "Número",
+  TITLE = "Título",
+  STATUS = "Estado",
+  LOCATION = "Ubicación",
+}

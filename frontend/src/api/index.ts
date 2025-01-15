@@ -1,5 +1,12 @@
 import { API_BASE_URL } from "@/config";
-import { ApiResponseStats, ERRORS, FileStats, RawFile } from "@/models/types";
+import {
+  ApiResponseStats,
+  ERRORS,
+  FILE_EXPORT_STATS,
+  FileStats,
+  RawFile,
+} from "@/types";
+import { mkConfig, generateCsv, download } from "export-to-csv";
 
 export const api = {
   getFilesStats: async (id: string) => {
@@ -76,6 +83,33 @@ export const api = {
       };
     } catch (error) {
       console.log("🚀 ~ endFiles ~ error:", error);
+    }
+  },
+
+  downloadFiles: async (files: FileStats[], fileName: string) => {
+    try {
+      const parsedFiles = files.map((file) => {
+        const { num, title, prevStatus, location, newStatus } = file;
+        return {
+          [FILE_EXPORT_STATS.NUMBER]: num,
+          [FILE_EXPORT_STATS.TITLE]: title,
+          [FILE_EXPORT_STATS.STATUS]: newStatus?.status
+            ? newStatus?.status
+            : prevStatus,
+          [FILE_EXPORT_STATS.LOCATION]: location,
+        };
+      });
+
+      const csvConfig = mkConfig({
+        filename: fileName,
+        useKeysAsHeaders: true,
+      });
+      const csv = generateCsv(csvConfig)(parsedFiles);
+
+      download(csvConfig)(csv);
+    } catch (error) {
+      console.log("🚀 ~ downloadFiles ~ error:", error);
+      throw new Error(ERRORS.API_ERROR);
     }
   },
 };

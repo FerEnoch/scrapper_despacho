@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { FileStats } from "../../models/types";
+import { FileStats } from "../../types";
 import { Button } from "../ui/button";
 import { SIEM_URL_FILE_ID } from "@/config";
 import { ArrowUpDown } from "lucide-react";

@@ -22,13 +22,14 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { api } from "@/api";
-import { ApiResponseStats, FileStats } from "@/models/types";
+import { ApiResponseStats, FileStats } from "@/types";
 import { TableSkeleton } from "./TableSkeleton";
 import { Puff } from "react-loader-spinner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  fileName: string;
   onEndFilesClick: (apiResponseData: ApiResponseStats<FileStats>) => void;
   onDataChange: (data: FileStats[]) => void;
 }
@@ -36,10 +37,12 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  fileName,
   onEndFilesClick,
   onDataChange,
 }: DataTableProps<TData, TValue>) {
   const [isEndingFiles, setIsEndingFiles] = useState<boolean>(false);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -103,6 +106,22 @@ export function DataTable<TData, TValue>({
     setIsEndingFiles(false);
   };
 
+  const handleDownloadFiles = async () => {
+    setIsDownloading(true);
+
+    const selectedValues = table
+      .getSelectedRowModel()
+      .rows.map(({ original }) => original);
+
+    if (selectedValues.length === 0) {
+      setIsDownloading(false);
+      return;
+    }
+
+    await api.downloadFiles(selectedValues as FileStats[], fileName);
+    setIsDownloading(false);
+  };
+
   return (
     <div className="mx-auto max-w-[90%] xl:max-w-[80%]">
       <div className="flex items-center justify-between my-4">
@@ -157,6 +176,27 @@ export function DataTable<TData, TValue>({
             className="w-[16rem]"
           />
         </div>
+        <Button
+          className="
+          h-fit w-fit
+          bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400
+          "
+          disabled={isDownloading}
+          onClick={handleDownloadFiles}
+        >
+          {"Descargar .csv"}
+          {isDownloading && (
+            <Puff
+              visible={true}
+              height="100"
+              width="100"
+              color="#000"
+              ariaLabel="puff-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          )}
+        </Button>
       </div>
       {isLoading && <TableSkeleton />}
       {!isLoading && (
