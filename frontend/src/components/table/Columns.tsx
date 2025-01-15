@@ -120,7 +120,7 @@ export const Columns: ColumnDef<FileStats>[] = [
           )}
           {detail && (
             <p className="text-pretty text-[.5rem] leading-6">
-              <span className={`${statusColor}`}>{detail}</span>
+              <span>{detail}</span>
             </p>
           )}
         </div>

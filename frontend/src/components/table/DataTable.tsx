@@ -105,7 +105,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="mx-auto max-w-[90%] xl:max-w-[80%]">
-      <div className="flex items-center justify-between px-4 py-4">
+      <div className="flex items-center justify-between my-4">
         <Button
           className="
           h-fit w-fit
@@ -116,39 +116,45 @@ export function DataTable<TData, TValue>({
         >
           {"Finalizar expedientes"}
           {isEndingFiles && (
-            <div className="h-full w-full">
-              <Puff
-                visible={true}
-                height="100"
-                width="100"
-                color="#000"
-                ariaLabel="puff-loading"
-                wrapperStyle={{}}
-                wrapperClass=""
-              />
-            </div>
+            <Puff
+              visible={true}
+              height="100"
+              width="100"
+              color="#000"
+              ariaLabel="puff-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
           )}
         </Button>
-        <div className="flex justify-end items-center gap-4">
+        <div className="flex justify-end items-center gap-2">
           <Input
-            placeholder="Filtrar por estado..."
+            placeholder="Buscar número"
+            value={(table.getColumn("num")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("num")?.setFilterValue(event.target.value)
+            }
+            className="w-[16rem]"
+          />
+          <Input
+            placeholder="Filtrar por estado"
             value={
               (table.getColumn("prevStatus")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) =>
               table.getColumn("prevStatus")?.setFilterValue(event.target.value)
             }
-            className="max-w-smps-12"
+            className="w-[16rem]"
           />
           <Input
-            placeholder="Filtrar por ubicación..."
+            placeholder="Filtrar por ubicación"
             value={
               (table.getColumn("location")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) =>
               table.getColumn("location")?.setFilterValue(event.target.value)
             }
-            className="max-w-smps-12"
+            className="w-[16rem]"
           />
         </div>
       </div>
