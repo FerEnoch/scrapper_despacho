@@ -2,18 +2,27 @@ import { API_BASE_URL } from "@/config";
 import { ApiResponseStats, ERRORS, FileStats, RawFile } from "@/models/types";
 
 export const api = {
-  getFilesStats: async () => {
+  getFilesStats: async (id: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/files/stats`, {
+      const response = await fetch(`${API_BASE_URL}/files/stats/${id}`, {
         method: "GET",
       });
 
+      const responseData =
+        (await response.json()) as ApiResponseStats<FileStats>;
       if (response.ok) {
-        const data = (await response.json()) as ApiResponseStats<FileStats>;
-        return data;
+        return responseData;
       }
+      return {
+        message: responseData.message ?? "",
+        data: responseData.data ?? [],
+      };
     } catch (error) {
       console.log("🚀 ~ getFilesStats ~ error:", error);
+      return {
+        message: ERRORS.API_ERROR,
+        data: [],
+      };
     }
   },
 

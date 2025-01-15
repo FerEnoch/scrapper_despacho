@@ -31,32 +31,38 @@ const getInvalidFiles = (
   return files.filter((file) => !validateRawData([file], withLetters));
 };
 
+const rawFileParser = (files: RawFile[]): FileId[] => {
+  return files.map((file) => {
+    const { Número: completeNum = "" } = file;
+    const [org = "", rep = "", num = "", digv = ""] = completeNum.split("-");
+
+    return {
+      completeNum: completeNum.split(" ")[0],
+      org,
+      rep,
+      num,
+      digv: digv.split("")[0],
+    };
+  });
+};
+
 export async function parseRawFiles(
   files: RawFile[],
   withLetters: boolean = true
 ): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
   const isValid = validateRawData(files, withLetters);
   if (!isValid) {
+    const invalidFiles = getInvalidFiles(files, withLetters)
+
     return Promise.resolve({
       ok: isValid,
-      parsedData: getInvalidFiles(files, withLetters),
+      parsedData: rawFileParser(invalidFiles),
     });
   }
 
   return Promise.resolve({
     ok: isValid,
-    parsedData: files.map((file) => {
-      const { Número: completeNum = "" } = file;
-      const [org = "", rep = "", num = "", digv = ""] = completeNum.split("-");
-
-      return {
-        completeNum: completeNum.split(" ")[0],
-        org,
-        rep,
-        num,
-        digv: digv.split("")[0],
-      };
-    }),
+    parsedData: rawFileParser(files),
   });
 }
 

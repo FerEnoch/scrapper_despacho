@@ -67,7 +67,10 @@ export function DataTable<TData, TValue>({
           if (index === rowIndex) {
             return {
               ...value,
-              prevStatus: value.newStatus?.status ?? "",
+              prevStatus:
+                (value.newStatus
+                  ? value.newStatus?.status
+                  : value.prevStatus) ?? "",
             };
           }
           return file;

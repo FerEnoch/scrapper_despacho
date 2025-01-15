@@ -40,16 +40,19 @@ app.get("/files/stats/:id", async (req, res) => {
     const rawFile: RawFile = {
       Número: id,
     };
-    const analyzeWithLetters = false
+    const analyzeWithLetters = false;
 
-    const { ok, parsedData } = await parseRawFiles([rawFile], analyzeWithLetters);
+    const { ok, parsedData } = await parseRawFiles(
+      [rawFile],
+      analyzeWithLetters
+    );
     if (!ok) {
       console.log("🚀 ~ Invalid raw data", parsedData.length);
       res.status(400).json({
         message: "Invalid raw data",
         data: parsedData as RawFile[],
       });
-      return
+      return;
     }
 
     const scrappedData = await searchFilesStats(parsedData as FileId[]);

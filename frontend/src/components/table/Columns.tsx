@@ -130,15 +130,16 @@ export const Columns: ColumnDef<FileStats>[] = [
     cell: ({ row, table }) => {
       const isEnded = row.getValue("prevStatus") === "FINALIZADO";
       const isSelected = row.getIsSelected();
-      const disabled = isEnded || !isSelected;
+      const endButtonDisabled = isEnded || !isSelected;
+      const searchButtonDisabled = !isSelected;
 
       const handleEndFilesClick = async () => {
         if (!isSelected) return;
 
-        const selectedNum = row.getValue("num");
-        const selectedTitle = row.getValue("title");
-        const selectedPrevStatus = row.getValue("prevStatus");
-        const selectedLocation = row.getValue("location");
+        const selectedNum = row.getValue("num") as string;
+        const selectedTitle = row.getValue("title") as string;
+        const selectedPrevStatus = row.getValue("prevStatus") as string;
+        const selectedLocation = row.getValue("location") as string;
 
         const selectedValues = {
           num: selectedNum,
@@ -148,7 +149,7 @@ export const Columns: ColumnDef<FileStats>[] = [
         };
 
         const apiResponse = await api.endFiles([selectedValues] as FileStats[]);
-        const [updatedFileStats] = apiResponse?.data || [null];
+        const [updatedFileStats] = apiResponse?.data || [];
 
         console.log("🚀 ~ handleEndFilesClick ~ apiResponse:", apiResponse);
 
@@ -156,14 +157,36 @@ export const Columns: ColumnDef<FileStats>[] = [
         table.options.meta?.updateData(row.index, updatedFileStats);
       };
 
+      const handleSearchFileClick = async () => {
+        if (!isSelected) return;
+
+        const selectedNum = row.getValue("num") as string;
+        const apiResponse = await api.getFilesStats(selectedNum);
+        const [updatedFileStats] = apiResponse.data;
+
+        console.log("🚀 ~ handleSearchFileClick ~ apiResponse:", apiResponse);
+
+        if (!updatedFileStats) return;
+        table.options.meta?.updateData(row.index, updatedFileStats);
+      };
+
       return (
-        <Button
-          className="bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400"
-          disabled={disabled}
-          onClick={handleEndFilesClick}
-        >
-          Finalizar
-        </Button>
+        <div className="flex flex-col space-between gap-2">
+          <Button
+            className="bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400"
+            disabled={endButtonDisabled}
+            onClick={handleEndFilesClick}
+          >
+            Finalizar
+          </Button>
+          <Button
+            className="bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400"
+            disabled={searchButtonDisabled}
+            onClick={handleSearchFileClick}
+          >
+            Buscar en SIEM
+          </Button>
+        </div>
       );
     },
   },
