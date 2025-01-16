@@ -36,6 +36,7 @@ export async function endFiles({ files }: { files: FileStats[] }) {
   for await (const file of filesToEnd) {
     const [{ num }] = parseFileStats([file]);
     await siemPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
+    await siemPage.waitForLoadState();
 
     // await siemPage.screenshot({
     //   path: `./uploads/screenshots/checkpoint-1.png`,
@@ -43,9 +44,7 @@ export async function endFiles({ files }: { files: FileStats[] }) {
     // });
 
     await siemPage.click('.menu_contexto a:text-matches("finalizar", "i")');
-
-    await siemPage.waitForLoadState();
-    await siemPage.waitForTimeout(1000);
+    // await siemPage.waitForTimeout(1000);
 
     // await siemPage.screenshot({
     //   path: `./uploads/screenshots/checkpoint-2.png`,
@@ -61,7 +60,7 @@ export async function endFiles({ files }: { files: FileStats[] }) {
         ...file,
         num, // only middle long number
       },
-      page: newPage,
+      page: null,
     });
 
     updatedFile = {
@@ -91,5 +90,6 @@ export async function endFiles({ files }: { files: FileStats[] }) {
 
   await siemPage.removeListener("dialog", () => {});
   await browser.close();
+  console.log("🚀 ~ endFiles ~ result:", result.length);
   return result;
 }

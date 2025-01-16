@@ -43,10 +43,10 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [isEndingFiles, setIsEndingFiles] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0, //initial page index
     pageSize: 60, //default page size
@@ -104,9 +104,9 @@ export function DataTable<TData, TValue>({
     }
 
     const response = await api.endFiles(selectedValues as FileStats[]);
-    if (!response) return;
 
     onEndFilesClick(response);
+
     setIsLoading(false);
     setIsEndingFiles(false);
   };
@@ -115,7 +115,7 @@ export function DataTable<TData, TValue>({
     setIsDownloading(true);
 
     const selectedValues = table
-      .getSelectedRowModel()
+      .getRowModel()
       .rows.map(({ original }) => original);
 
     if (selectedValues.length === 0) {

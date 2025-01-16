@@ -1,5 +1,5 @@
 import { chromium } from "playwright";
-import { Page } from "@playwright/test";
+import { Browser, Page } from "@playwright/test";
 import { FileId } from "../../types";
 import { FILE_STATS_PATH, SIEM_BASE_URL } from "../../config";
 import { NO_RESULTS_GENERIC_MSG } from "../../config/constants";
@@ -30,14 +30,54 @@ export async function getBrowserContext() {
 
 export async function collectData({
   file,
-  page: siempPage,
+  page,
 }: {
   file: FileId;
-  page: Page;
+  page: Page | null;
 }) {
   try {
+    let siemPage: Page | null = page,
+      newBrowser: Browser | null = null;
+
+    if (!siemPage) {
+      const { newPage, browser } = await getBrowserContext();
+      siemPage = newPage;
+      newBrowser = browser;
+    }
+
     const { num } = file;
-    await siempPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
+    await siemPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
+
+    let titleRow = await siemPage.$("tr:has-text('Carátula:')");
+    let statusRow = await siemPage.$("tr:has-text('Estado:')");
+    let locationRow = await siemPage.$("tr:has-text('Ubicado en:')");
+
+    // retry to get the data
+    if (!titleRow || !statusRow || !locationRow) {
+      await siemPage.waitForTimeout(1000);
+      titleRow = await siemPage.$("tr:has-text('Carátula:')");
+      statusRow = await siemPage.$("tr:has-text('Estado:')");
+      locationRow = await siemPage.$("tr:has-text('Ubicado en:')");
+    }
+
+    const rawTitle = await titleRow?.textContent();
+    const rawStatus = await statusRow?.textContent();
+    const rawLocation = await locationRow?.textContent();
+
+    if (newBrowser) {
+      await newBrowser.close();
+    }
+
+    return {
+      num: file.completeNum ?? "",
+      title: rawTitle?.slice(12).trim() ?? NO_RESULTS_GENERIC_MSG,
+      prevStatus:
+        rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ??
+        NO_RESULTS_GENERIC_MSG,
+      location:
+        rawLocation?.slice(15).replace("\n", "").trim() ??
+        NO_RESULTS_GENERIC_MSG,
+    };
   } catch (error) {
     console.log("🚀 ~ Fail to fetch file data:", file, error);
     return {
@@ -47,30 +87,4 @@ export async function collectData({
       location: NO_RESULTS_GENERIC_MSG,
     };
   }
-
-  let titleRow = await siempPage.$("tr:has-text('Carátula:')");
-  let statusRow = await siempPage.$("tr:has-text('Estado:')");
-  let locationRow = await siempPage.$("tr:has-text('Ubicado en:')");
-
-  // retry to get the data
-  if (!titleRow || !statusRow || !locationRow) {
-    await siempPage.waitForTimeout(1000);
-    titleRow = await siempPage.$("tr:has-text('Carátula:')");
-    statusRow = await siempPage.$("tr:has-text('Estado:')");
-    locationRow = await siempPage.$("tr:has-text('Ubicado en:')");
-  }
-
-  const rawTitle = await titleRow?.textContent();
-  const rawStatus = await statusRow?.textContent();
-  const rawLocation = await locationRow?.textContent();
-
-  return {
-    num: file.completeNum ?? "",
-    title: rawTitle?.slice(12).trim() ?? NO_RESULTS_GENERIC_MSG,
-    prevStatus:
-      rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ??
-      NO_RESULTS_GENERIC_MSG,
-    location:
-      rawLocation?.slice(15).replace("\n", "").trim() ?? NO_RESULTS_GENERIC_MSG,
-  };
 }

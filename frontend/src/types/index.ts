@@ -37,6 +37,7 @@ export type ApiResponseStats<T> = {
 export enum ERRORS {
   API_ERROR = "API_ERROR",
   INVALID_DATA = "Invalid raw data",
+  NO_FILES_TO_END = "No files to end",
 }
 
 export enum FILE_EXPORT_STATS {

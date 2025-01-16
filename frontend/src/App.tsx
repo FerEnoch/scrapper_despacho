@@ -34,6 +34,7 @@ import {
   API_ERROR_MSG,
   CARD_TEXT,
   INVALID_DATA_ERROR_MSG,
+  NO_FILES_TO_END_ERROR_MSG,
 } from "./config/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
 
@@ -90,6 +91,11 @@ export default function App() {
   };
 
   const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
+    if (apiResponseData.message === ERRORS.NO_FILES_TO_END) {
+      setIsError(true);
+      setErrorMsg(NO_FILES_TO_END_ERROR_MSG);
+    }
+
     const newState = filesData.map((currentFile) => {
       if (!apiResponseData.data) return currentFile;
 

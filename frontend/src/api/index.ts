@@ -64,18 +64,33 @@ export const api = {
 
   endFiles: async (files: FileStats[]) => {
     try {
+      const filesToEnd = files.filter(
+        (file) => file.prevStatus !== "FINALIZADO"
+      );
+
+      if (filesToEnd.length === 0) {
+        console.log("🚀 ~ endFiles ~ ", ERRORS.NO_FILES_TO_END);
+        return {
+          message: ERRORS.NO_FILES_TO_END,
+          data: [],
+        };
+      }
+
       const response = await fetch(`${API_BASE_URL}/files/end`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify(files),
+        body: JSON.stringify(filesToEnd),
       });
 
       const responseData =
         (await response.json()) as ApiResponseStats<FileStats>;
       if (response.ok) {
-        return responseData;
+        return {
+          message: responseData.message ?? "",
+          data: responseData.data ?? [],
+        };
       }
       return {
         message: responseData.message ?? "",
@@ -83,6 +98,10 @@ export const api = {
       };
     } catch (error) {
       console.log("🚀 ~ endFiles ~ error:", error);
+      return {
+        message: ERRORS.API_ERROR,
+        data: [],
+      };
     }
   },
 
