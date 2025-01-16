@@ -109,17 +109,22 @@ export const Columns: ColumnDef<FileStats>[] = [
       return (
         <div
           className={`
-          text-xs font-medium ${statusColor}
+          text-xs
           flex flex-col space-between gap-2 
         `}
         >
+          {status && (
+            <p className="text-xs leading-6">
+              <span className={`${statusColor}`}>{status}</span>
+            </p>
+          )}
           {message && (
             <p className="text-xs leading-6">
               <span className={`${messageColor}`}>{message}</span>
             </p>
           )}
           {detail && (
-            <p className="text-pretty text-[.5rem] leading-6">
+            <p className="text-pretty font-light text-[.5rem] leading-6">
               <span>{detail}</span>
             </p>
           )}
@@ -211,7 +216,7 @@ export const Columns: ColumnDef<FileStats>[] = [
             disabled={searchButtonDisabled}
             onClick={handleSearchFileClick}
           >
-            <p>{"Buscar en SIEM"}</p>
+            <p>{"Actualizar estado"}</p>
             {isSearchingStats && (
               <Puff
                 visible={true}

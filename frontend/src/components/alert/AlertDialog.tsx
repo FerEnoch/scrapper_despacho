@@ -15,16 +15,16 @@ export function FilesStatsFetchingError({
   return (
     <Alert>
       <AlertTitle>{dialogTitle}</AlertTitle>
-      <AlertDescription>{dialogDescription} </AlertDescription>
-      {errorFiles && errorFiles.length > 0 && (
-        <div className="mt-2 text-red-500">
-          <AlertDescription>
+      <AlertDescription>
+        <p>{dialogDescription} </p>
+        {errorFiles && errorFiles.length > 0 && (
+          <div className="mt-2 text-red-500">
             {errorFiles.map((file, index) => (
-              <p key={file["Número"] + index}>{file["Número"]}</p>
+              <p key={file?.completeNum + "" + index}>{file?.completeNum}</p>
             ))}
-          </AlertDescription>
-        </div>
-      )}
+          </div>
+        )}
+      </AlertDescription>
     </Alert>
   );
 }

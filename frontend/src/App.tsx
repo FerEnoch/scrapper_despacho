@@ -67,9 +67,6 @@ export default function App() {
     const { message, data: apiResponseData } = (await api.uploadFile(
       formData
     )) as ApiResponseStats<FileStats | RawFile>;
-
-    console.log("🚀 ~ onSubmit ~ message:", message, apiResponseData);
-
     if (message === ERRORS.API_ERROR) {
       setIsSearching(false);
       setErrorMsg(API_ERROR_MSG);
@@ -93,8 +90,6 @@ export default function App() {
   };
 
   const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
-    console.log("🚀 ~ onEndFilesClick ~ apiResponseData:", apiResponseData);
-
     const newState = filesData.map((currentFile) => {
       if (!apiResponseData.data) return currentFile;
 
