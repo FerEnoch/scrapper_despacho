@@ -65,7 +65,8 @@ export const api = {
   endFiles: async (files: FileStats[]) => {
     try {
       const filesToEnd = files.filter(
-        (file) => file.prevStatus !== "FINALIZADO"
+        (file) =>
+          file.prevStatus !== "FINALIZADO" && file.prevStatus !== "Sin datos"
       );
 
       if (filesToEnd.length === 0) {
@@ -123,8 +124,13 @@ export const api = {
         filename: fileName,
         useKeysAsHeaders: true,
       });
+
       const csv = generateCsv(csvConfig)(parsedFiles);
 
+      console.log(
+        "🚀 ~ parsedFiles ~ parsedFiles:",
+        csv.toString().replace('"', "")
+      );
       download(csvConfig)(csv);
     } catch (error) {
       console.log("🚀 ~ downloadFiles ~ error:", error);

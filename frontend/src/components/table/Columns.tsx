@@ -174,7 +174,7 @@ export const Columns: ColumnDef<FileStats>[] = [
         setIsSearchingStats(true);
         if (!isSelected) return;
 
-        const selectedNum = row.getValue("num") as string;
+        const [selectedNum] = (row.getValue("num") as string).split(" ");
         const apiResponse = await api.getFilesStats(selectedNum);
         const [updatedFileStats] = apiResponse?.data || [];
 

@@ -39,6 +39,7 @@ app.get("/files/stats/:id", async (req, res) => {
 
     const rawFile: RawFile = {
       Número: id,
+      completeNum: id,
     };
     const analyzeWithLetters = false;
 

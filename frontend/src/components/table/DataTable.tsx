@@ -49,7 +49,7 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({
     pageIndex: 0, //initial page index
-    pageSize: 60, //default page size
+    pageSize: 120, //default page size
   });
   const table = useReactTable({
     data,

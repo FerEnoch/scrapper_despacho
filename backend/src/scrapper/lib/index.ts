@@ -47,6 +47,7 @@ export async function collectData({
 
     const { num } = file;
     await siemPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
+    await siemPage.waitForLoadState("domcontentloaded");
 
     let titleRow = await siemPage.$("tr:has-text('Carátula:')");
     let statusRow = await siemPage.$("tr:has-text('Estado:')");

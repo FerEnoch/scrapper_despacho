@@ -37,7 +37,7 @@ const rawFileParser = (files: RawFile[]): FileId[] => {
     const [org = "", rep = "", num = "", digv = ""] = completeNum.split("-");
 
     return {
-      completeNum: completeNum.split(" ")[0],
+      completeNum: completeNum,
       org,
       rep,
       num,
@@ -52,7 +52,7 @@ export async function parseRawFiles(
 ): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
   const isValid = validateRawData(files, withLetters);
   if (!isValid) {
-    const invalidFiles = getInvalidFiles(files, withLetters)
+    const invalidFiles = getInvalidFiles(files, withLetters);
 
     return Promise.resolve({
       ok: isValid,
@@ -72,7 +72,7 @@ export function parseFileStats(files: FileStats[]): FileId[] {
     const [org, rep, num, digv] = completeNum.split("-");
 
     return {
-      completeNum: completeNum.split(" ")[0],
+      completeNum: completeNum,
       org,
       rep,
       num,
