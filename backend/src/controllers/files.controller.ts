@@ -17,8 +17,12 @@ import { ERRORS } from "../errors/types";
 export class FilesController implements IFilesController {
   service: IFilesService;
 
-  constructor(model: modelTypes) {
-    this.service = new FilesService(model);
+  constructor({ model }: { model: modelTypes }) {
+    this.service = new FilesService({ model });
+
+    this.getFilesStats = this.getFilesStats.bind(this);
+    this.uploadFile = this.uploadFile.bind(this);
+    this.endFiles = this.endFiles.bind(this);
   }
 
   async getFilesStats(req: Request, res: Response) {
@@ -49,6 +53,7 @@ export class FilesController implements IFilesController {
       const scrappedData = await this.service.searchFilesStats(
         parsedData as FileId[]
       );
+
       res
         .status(200)
         .json({ message: "Stats retrieved successfully", data: scrappedData });
@@ -78,6 +83,7 @@ export class FilesController implements IFilesController {
       const data = file.data.toString("utf-8");
       const jsonData = await convertToJson(data);
       const { ok, parsedData } = await parseRawFiles(jsonData);
+
       if (!ok) {
         res.status(400).json({
           message: "Invalid raw data",
@@ -86,12 +92,10 @@ export class FilesController implements IFilesController {
         return;
       }
       // save the file as cache data csv
-      file.mv(`./${UPLOADS_FOLDER.FOLDER}/${UPLOADS_FOLDER.FILES_CSV}`);
-
+      await file.mv(`./${UPLOADS_FOLDER.FOLDER}/${UPLOADS_FOLDER.FILES_CSV}`);
       const scrappedData = await this.service.searchFilesStats(
         parsedData as FileId[]
       );
-
       res.status(201).json({
         message: "File uploaded and parsed successfully",
         data: scrappedData,

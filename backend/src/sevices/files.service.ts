@@ -14,7 +14,7 @@ import { IFilesService } from "./types";
 export class FilesService implements IFilesService {
   model: modelTypes;
 
-  constructor(model: modelTypes) {
+  constructor({ model }: { model: modelTypes }) {
     this.model = model;
   }
 

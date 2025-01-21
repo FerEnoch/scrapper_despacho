@@ -6,7 +6,7 @@ import cors from "cors";
 import { initializeRouter } from "./routes/index";
 import { handle404Error, handleGlobalError } from "./middlewares/handle-errors";
 
-export async function initializeApp(model: modelTypes) {
+export async function initializeApp({ model }: { model: modelTypes }) {
   const app = express();
 
   app.use(
@@ -23,10 +23,9 @@ export async function initializeApp(model: modelTypes) {
   app.use(express.json());
   app.use(morgan("dev"));
 
-  const filesRouter = await initializeRouter(model);
+  const filesRouter = await initializeRouter({ model });
   app.use("/files", filesRouter);
 
-  
   app.use(handle404Error, handleGlobalError);
 
   return app;

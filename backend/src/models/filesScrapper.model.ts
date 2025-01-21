@@ -4,6 +4,8 @@ import { NO_RESULTS_GENERIC_MSG } from "../config/constants";
 import { FileId, FileStats, IFileScrapper } from "./types";
 
 export class FilesScrapper implements IFileScrapper {
+  constructor() {}
+
   async getBrowserContext() {
     const browser = await chromium.launch();
 
@@ -65,7 +67,6 @@ export class FilesScrapper implements IFileScrapper {
           NO_RESULTS_GENERIC_MSG,
       };
     } catch (error) {
-      console.log("🚀 ~ Fail to fetch file data:", file, error);
       return {
         num: file.completeNum ?? "",
         title: "",
