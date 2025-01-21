@@ -46,6 +46,8 @@ export const api = {
       const responseData = (await response.json()) as ApiResponseStats<
         FileStats | RawFile
       >;
+      console.log("🚀 ~ uploadFile: ~ responseData:", responseData);
+
       if (response.ok) {
         return responseData;
       }

@@ -1,25 +1,27 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "dist/src/server.js",
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
-    "start": "node --env-file=.env dist/src/index.js",
-    "build": "npx tsc",
-    "dev": "tsnd --respawn --env-file=.env src/index.ts",
+    "start": "npx tsc && node --env-file=.env dist/src/server.js",
+    "dev": "nodemon",
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "convert-csv-to-json": "2.50.0",
     "cors": "2.8.5",
     "express": "4.21.2",
     "express-fileupload": "1.5.1",
-    "morgan": "1.10.0",
-    "react-loader-spinner": "6.1.6"
+    "morgan": "1.10.0"
   },
   "devDependencies": {
     "@playwright/test": "1.49.1",
@@ -28,7 +30,8 @@
     "@types/express-fileupload": "1.5.1",
     "@types/morgan": "1.9.9",
     "@types/node": "22.10.3",
-    "ts-node-dev": "2.0.0",
-    "typescript": "5.7.2"
+    "nodemon": "3.1.9",
+    "typescript": "5.7.2",
+    "vite-node": "3.0.2"
   }
 }

@@ -1,12 +1,12 @@
 import { promises as fs } from "fs";
 import path from "node:path";
 import converter from "convert-csv-to-json";
-import { RawFile, FileId, FileStats } from "../types";
 import {
   FILE_NUMBER_COLUMN_VALID_NAME,
   FILE_NUMBER_COLUMN_VALIDATION_REGEX,
   FILE_NUMBER_COLUMN_VALIDATION_REGEX_NO_LETTERS,
-} from "../config/constants";
+} from "../../config/constants";
+import { FileId, FileStats, RawFile } from "../types";
 
 const validateRawData = (
   files: RawFile[],
@@ -68,7 +68,7 @@ export async function parseRawFiles(
 
 export function parseFileStats(files: FileStats[]): FileId[] {
   return files.map((file) => {
-    const { num: completeNum, title, prevStatus, location } = file;
+    const { num: completeNum } = file;
     const [org, rep, num, digv] = completeNum.split("-");
 
     return {
