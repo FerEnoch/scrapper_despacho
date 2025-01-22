@@ -24,18 +24,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "./api";
-import { ApiResponseStats, ERRORS, RawFile } from "./types";
+import { API_ERRORS, ApiResponseStats, RawFile } from "./types";
 import { FileStats } from "./types";
 import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
 import { FilesStatsFetchingError } from "./components/alert/AlertDialog";
-import {
-  API_ERROR_MSG,
-  CARD_TEXT,
-  INVALID_DATA_ERROR_MSG,
-  NO_FILES_TO_END_ERROR_MSG,
-} from "./config/constants";
+import { CARD_TEXTS, UI_ERROR_MESSAGES } from "./config/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
 
 export default function App() {
@@ -56,6 +51,42 @@ export default function App() {
     setFilesData(data);
   };
 
+  const handleResponseMessages = ({
+    message,
+    data,
+  }: ApiResponseStats<FileStats | RawFile>) => {
+    switch (message) {
+      case API_ERRORS.SERVER_ERROR:
+      case API_ERRORS.INVALID_FILE:
+      case API_ERRORS.NO_FILE_TO_UPLOAD:
+      case API_ERRORS.NOT_FOUND:
+      case API_ERRORS.GENERIC_ERROR:
+        setIsSearching(false);
+        setErrorMsg(UI_ERROR_MESSAGES[message]);
+        setIsError(true);
+        setFilesData([]);
+        return;
+
+      case API_ERRORS.INVALID_DATA:
+        setErrorMsg(UI_ERROR_MESSAGES[message]);
+        setIsError(true);
+        setErrorFiles(data as RawFile[]);
+        setIsSearching(false);
+        setFilesData([]);
+        return;
+
+      case API_ERRORS.NO_FILES_TO_END:
+        setErrorMsg(UI_ERROR_MESSAGES[message]);
+        setIsError(true);
+        return;
+
+      default:
+        setFilesData(data as FileStats[]);
+        setIsSearching(false);
+        return data;
+    }
+  };
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSearching(true);
     setIsError(false);
@@ -65,44 +96,20 @@ export default function App() {
 
     setFileName(data.file.name);
 
-    const { message, data: apiResponseData } = (await api.uploadFile(
-      formData
-    )) as ApiResponseStats<FileStats | RawFile>;
-    if (message === ERRORS.API_ERROR) {
-      setIsSearching(false);
-      setErrorMsg(API_ERROR_MSG);
-      setIsError(true);
-      setFilesData([]);
-      return;
-    }
+    const response = (await api.uploadFile(formData)) as ApiResponseStats<
+      FileStats | RawFile
+    >;
 
-    if (message === ERRORS.INVALID_DATA) {
-      formData.delete("file");
-      setErrorMsg(INVALID_DATA_ERROR_MSG);
-      setIsError(true);
-      setErrorFiles(apiResponseData as RawFile[]);
-      setIsSearching(false);
-      setFilesData([]);
-      return;
-    }
-
-    setFilesData(apiResponseData as FileStats[]);
-    setIsSearching(false);
+    handleResponseMessages(response);
+    formData.delete("file");
   };
 
   const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
-    if (apiResponseData.message === ERRORS.NO_FILES_TO_END) {
-      setIsError(true);
-      setErrorMsg(NO_FILES_TO_END_ERROR_MSG);
-    }
+    const data = handleResponseMessages(apiResponseData);
 
     const newState = filesData.map((currentFile) => {
-      if (!apiResponseData.data) return currentFile;
-
-      const updatedFile = apiResponseData.data.find(
-        (file) => file.num === currentFile.num
-      );
-
+      if (!data) return currentFile;
+      const updatedFile = data.find((file) => file.num === currentFile.num);
       return updatedFile ? updatedFile : currentFile;
     }) as FileStats[];
 
@@ -118,10 +125,10 @@ export default function App() {
       "
       >
         <CardHeader>
-          <CardTitle className="text-3xl">Santa Fe Hábitat</CardTitle>
+          <CardTitle className="text-3xl">{CARD_TEXTS.title}</CardTitle>
 
           <CardDescription>
-            <p className="text-sm leading-8 text-gray-600">{CARD_TEXT}</p>
+            <p className="text-sm leading-8 text-gray-600">{CARD_TEXTS.body}</p>
           </CardDescription>
         </CardHeader>
 

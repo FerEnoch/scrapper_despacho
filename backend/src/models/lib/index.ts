@@ -3,9 +3,8 @@ import path from "node:path";
 import converter from "convert-csv-to-json";
 import {
   FILE_NUMBER_COLUMN_VALID_NAME,
-  FILE_NUMBER_COLUMN_VALIDATION_REGEX,
-  FILE_NUMBER_COLUMN_VALIDATION_REGEX_NO_LETTERS,
-} from "../../config/constants";
+  VALIDATION_REGEX,
+} from "../../controllers/constants";
 import { FileId, FileStats, RawFile } from "../types";
 
 const validateRawData = (
@@ -13,8 +12,8 @@ const validateRawData = (
   withLetters: boolean | undefined
 ) => {
   const validationRegex = withLetters
-    ? FILE_NUMBER_COLUMN_VALIDATION_REGEX
-    : FILE_NUMBER_COLUMN_VALIDATION_REGEX_NO_LETTERS;
+    ? VALIDATION_REGEX.FILE_NUMBER_COLUMN
+    : VALIDATION_REGEX.FILE_NUMBER_COLUMN_NO_LETTERS;
   return files.every((item) => {
     // Check if 'Número' property exists and matches the regex
     return (

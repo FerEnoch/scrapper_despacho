@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "@/config";
 import {
+  API_ERRORS,
   ApiResponseStats,
-  ERRORS,
   FILE_EXPORT_STATS,
   FileStats,
   RawFile,
@@ -27,7 +27,7 @@ export const api = {
     } catch (error) {
       console.log("🚀 ~ getFilesStats ~ error:", error);
       return {
-        message: ERRORS.API_ERROR,
+        message: API_ERRORS.GENERIC_ERROR,
         data: [],
       };
     }
@@ -58,7 +58,7 @@ export const api = {
     } catch (error) {
       console.log("🚀 ~ uploadFile ~ error:", error);
       return {
-        message: ERRORS.API_ERROR,
+        message: API_ERRORS.GENERIC_ERROR,
         data: [],
       };
     }
@@ -72,9 +72,9 @@ export const api = {
       );
 
       if (filesToEnd.length === 0) {
-        console.log("🚀 ~ endFiles ~ ", ERRORS.NO_FILES_TO_END);
+        console.log("🚀 ~ endFiles ~ ", API_ERRORS.NO_FILES_TO_END);
         return {
-          message: ERRORS.NO_FILES_TO_END,
+          message: API_ERRORS.NO_FILES_TO_END,
           data: [],
         };
       }
@@ -102,7 +102,7 @@ export const api = {
     } catch (error) {
       console.log("🚀 ~ endFiles ~ error:", error);
       return {
-        message: ERRORS.API_ERROR,
+        message: API_ERRORS.GENERIC_ERROR,
         data: [],
       };
     }
@@ -136,7 +136,7 @@ export const api = {
       download(csvConfig)(csv);
     } catch (error) {
       console.log("🚀 ~ downloadFiles ~ error:", error);
-      throw new Error(ERRORS.API_ERROR);
+      throw new Error(API_ERRORS.GENERIC_ERROR);
     }
   },
 };

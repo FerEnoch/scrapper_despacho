@@ -1,6 +1,13 @@
-export enum ERRORS {
-  SERVER_ERROR = "Internal server error",
-  NO_FILES_TO_END = "No existen arhivos para finalizar",
-  INVALID_DATA = "Datos inválidos",
-  NOT_FOUND = "Recurso no encontrada",
+enum ERRORS {
+  SERVER_ERROR = "SERVER_ERROR",
+  NO_FILE_TO_UPLOAD = "NO_FILE_TO_UPLOAD",
+  NO_FILES_TO_END = "NO_FILES_TO_END",
+  INVALID_DATA = "INVALID_DATA",
+  INVALID_FILE = "INVALID_FILE",
+  NOT_FOUND = "RESOURCE_NOT_FOUND",
+  NO_FILES_ENDED = "NO_FILES_ENDED",
+  NO_FILE_STATS_RETRIEVED = "NO_FILE_STATS_RETRIEVED",
 }
+
+
+export { ERRORS };

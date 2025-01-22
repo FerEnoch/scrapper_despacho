@@ -1,11 +1,7 @@
 import { Request, Response } from "express";
 import { IFilesController } from "./types";
 import { IFilesService } from "../sevices/types";
-import {
-  ERROR_NO_FILE_STATS_RETRIEVED,
-  ERROR_NO_FILES_ENDED,
-  UPLOADS_FOLDER,
-} from "../config/constants";
+import { MESSAGES, UPLOADS_FOLDER } from "./constants";
 import { FilesService } from "../sevices/files.service";
 import { modelTypes } from "../types";
 import { FileId, RawFile } from "../models/types";
@@ -56,9 +52,11 @@ export class FilesController implements IFilesController {
 
       res
         .status(200)
-        .json({ message: "Stats retrieved successfully", data: scrappedData });
+        .json({ message: MESSAGES.FILES_STATS_RETRIEVED, data: scrappedData });
     } catch (error: any) {
-      res.status(400).json({ message: ERROR_NO_FILE_STATS_RETRIEVED });
+      res
+        .status(400)
+        .json({ message: ERRORS.NO_FILE_STATS_RETRIEVED, data: [] });
     }
   }
 
@@ -66,7 +64,7 @@ export class FilesController implements IFilesController {
     try {
       if (!req.files) {
         res.status(400).send({
-          message: "No file uploaded",
+          message: ERRORS.NO_FILE_TO_UPLOAD,
           data: [],
         });
         return;
@@ -76,7 +74,7 @@ export class FilesController implements IFilesController {
 
       // validate file format
       if (!file.mimetype.includes("csv")) {
-        res.status(400).json({ message: "Invalid file format", data: [] });
+        res.status(400).json({ message: ERRORS.INVALID_FILE, data: [] });
         return;
       }
 
@@ -86,7 +84,7 @@ export class FilesController implements IFilesController {
 
       if (!ok) {
         res.status(400).json({
-          message: "Invalid raw data",
+          message: ERRORS.INVALID_DATA,
           data: parsedData as RawFile[],
         });
         return;
@@ -97,13 +95,13 @@ export class FilesController implements IFilesController {
         parsedData as FileId[]
       );
       res.status(201).json({
-        message: "File uploaded and parsed successfully",
+        message: MESSAGES.FILE_UPLOADED,
         data: scrappedData,
       });
     } catch (error: any) {
       res
         .status(400)
-        .json({ message: ERROR_NO_FILE_STATS_RETRIEVED, data: [] });
+        .json({ message: ERRORS.NO_FILE_STATS_RETRIEVED, data: [] });
     }
   }
 
@@ -111,21 +109,19 @@ export class FilesController implements IFilesController {
     try {
       const files = req.body;
       if (!files) {
-        res.status(400).json({ message: "No files provided", data: [] });
+        res.status(400).json({ message: ERRORS.NO_FILE_TO_UPLOAD, data: [] });
         return;
       }
 
       const endedFiles = await this.service.endFiles({ files });
       if (endedFiles.length === 0) {
-        res.status(400).json({ message: "No files to end", data: [] });
+        res.status(400).json({ message: ERRORS.NO_FILES_TO_END, data: [] });
         return;
       }
 
-      res
-        .status(200)
-        .json({ message: "Files ending process result", data: endedFiles });
+      res.status(200).json({ message: MESSAGES.FILES_ENDED, data: endedFiles });
     } catch (error: any) {
-      res.status(400).json({ message: ERROR_NO_FILES_ENDED, data: [] });
+      res.status(400).json({ message: ERRORS.NO_FILES_ENDED, data: [] });
     }
   }
 }

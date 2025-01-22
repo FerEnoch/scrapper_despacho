@@ -1,6 +1,5 @@
 import { Browser, chromium, Page } from "@playwright/test";
 import { FILE_STATS_PATH, SIEM_BASE_URL } from "../config";
-import { NO_RESULTS_GENERIC_MSG } from "../config/constants";
 import { FileId, FileStats, IFileScrapper } from "./types";
 
 export class FilesScrapper implements IFileScrapper {
@@ -58,20 +57,20 @@ export class FilesScrapper implements IFileScrapper {
 
       return {
         num: file.completeNum ?? "",
-        title: rawTitle?.slice(12).trim() ?? NO_RESULTS_GENERIC_MSG,
+        title: rawTitle?.slice(12).trim() ?? "",
         prevStatus:
           rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ??
-          NO_RESULTS_GENERIC_MSG,
+          "",
         location:
           rawLocation?.slice(15).replace("\n", "").trim() ??
-          NO_RESULTS_GENERIC_MSG,
+          "",
       };
     } catch (error) {
       return {
         num: file.completeNum ?? "",
         title: "",
-        prevStatus: NO_RESULTS_GENERIC_MSG,
-        location: NO_RESULTS_GENERIC_MSG,
+        prevStatus: "",
+        location: "",
       };
     }
   }

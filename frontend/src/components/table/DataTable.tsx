@@ -22,7 +22,7 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { api } from "@/api";
-import { ApiResponseStats, FileStats } from "@/types";
+import { API_ERRORS, ApiResponseStats, FileStats } from "@/types";
 import { TableSkeleton } from "./TableSkeleton";
 import { Puff } from "react-loader-spinner";
 
@@ -123,8 +123,16 @@ export function DataTable<TData, TValue>({
       return;
     }
 
-    await api.downloadFiles(selectedValues as FileStats[], fileName);
-    setIsDownloading(false);
+    try {
+      await api.downloadFiles(selectedValues as FileStats[], fileName);
+      setIsDownloading(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.message === API_ERRORS.GENERIC_ERROR) {
+        setIsDownloading(false);
+        return;
+      }
+    }
   };
 
   return (
