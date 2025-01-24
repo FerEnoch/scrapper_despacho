@@ -1,16 +1,22 @@
+import path from "node:path";
+import { loadEnvFile } from "node:process";
+
+const envFilePath = path.resolve(process.cwd(), "../.env");
+loadEnvFile(envFilePath);
+
 const {
-  SIEM_BASE_URL = "",
+  VITE_SIEM_BASE_URL = "",
   LOGIN_PATH = "",
-  FILE_STATS_PATH = "",
+  VITE_FILE_STATS_PATH = "",
   SIEM_USER = "",
   SIEM_PASSWORD = "",
   PORT = 3000,
 } = process.env;
 
 export {
-  SIEM_BASE_URL,
+  VITE_SIEM_BASE_URL as SIEM_BASE_URL,
   LOGIN_PATH,
-  FILE_STATS_PATH,
+  VITE_FILE_STATS_PATH as FILE_STATS_PATH,
   SIEM_USER,
   SIEM_PASSWORD,
   PORT,

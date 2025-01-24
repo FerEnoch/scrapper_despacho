@@ -1,0 +1,41 @@
+services:
+  files_scrapper_dev:
+    build:
+      context: .
+      target: dev-mode
+    volumes:
+      - .:/home/app
+    ports:
+      - 3000:3000
+      - 5173:5173
+      - 40683:40683
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=development
+      - VITE_API_BASE_URL_REMOTE=${VITE_API_BASE_URL_REMOTE}
+      - VITE_API_BASE_URL_LOCAL=${VITE_API_BASE_URL_LOCAL}
+      - VITE_SIEM_BASE_URL=${VITE_SIEM_BASE_URL}
+      - VITE_FILE_STATS_PATH=${VITE_FILE_STATS_PATH}
+      - LOGIN_PATH=${LOGIN_PATH}
+      - SIEM_USER=${SIEM_USER}
+      - SIEM_PASSWORD=${SIEM_PASSWORD}
+    env_file:
+      - .env
+  files_scrapper_prod:
+    build:
+      context: .
+      target: prod-mode
+    ports:
+      - 3000:3000
+      - 4173:4173
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=production
+      - API_BASE_URL_PROD=${API_BASE_URL_PROD}
+      - VITE_SIEM_BASE_URL=${VITE_SIEM_BASE_URL}
+      - VITE_FILE_STATS_PATH=${VITE_FILE_STATS_PATH}
+      - LOGIN_PATH=${LOGIN_PATH}
+      - SIEM_USER=${SIEM_USER}
+      - SIEM_PASSWORD=${SIEM_PASSWORD}
+    env_file:
+      - .env

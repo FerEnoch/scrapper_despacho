@@ -15,7 +15,6 @@ export class FilesController implements IFilesController {
 
   constructor({ model }: { model: modelTypes }) {
     this.service = new FilesService({ model });
-
     this.getFilesStats = this.getFilesStats.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.endFiles = this.endFiles.bind(this);

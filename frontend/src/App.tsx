@@ -120,8 +120,8 @@ export default function App() {
     <>
       <Card
         className="
-      border-sm border-gray-400 shadow-none my-8 mx-auto px-4 max-w-[60%]
-      bg-green-100 
+      border-sm border-gray-400 shadow-md my-8 mx-auto px-4 max-w-[80%]
+      bg-gray-100
       "
       >
         <CardHeader>

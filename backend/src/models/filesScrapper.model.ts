@@ -3,7 +3,11 @@ import { FILE_STATS_PATH, SIEM_BASE_URL } from "../config";
 import { FileId, FileStats, IFileScrapper } from "./types";
 
 export class FilesScrapper implements IFileScrapper {
-  constructor() {}
+  constructor() {
+    this.getBrowserContext.bind(this);
+    this.login.bind(this);
+    this.collectData.bind(this);
+  }
 
   async getBrowserContext() {
     const browser = await chromium.launch();
@@ -24,13 +28,11 @@ export class FilesScrapper implements IFileScrapper {
     try {
       let siemPage: Page | null = page,
         newBrowser: Browser | null = null;
-
       if (!siemPage) {
         const { newPage, browser } = await this.getBrowserContext();
         siemPage = newPage;
         newBrowser = browser;
       }
-
       const { num } = file;
       await siemPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
       await siemPage.waitForLoadState("domcontentloaded");
@@ -59,13 +61,11 @@ export class FilesScrapper implements IFileScrapper {
         num: file.completeNum ?? "",
         title: rawTitle?.slice(12).trim() ?? "",
         prevStatus:
-          rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ??
-          "",
-        location:
-          rawLocation?.slice(15).replace("\n", "").trim() ??
-          "",
+          rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ?? "",
+        location: rawLocation?.slice(15).replace("\n", "").trim() ?? "",
       };
     } catch (error) {
+      console.log("🚀 ~ FilesScrapper ~ error:", error);
       return {
         num: file.completeNum ?? "",
         title: "",

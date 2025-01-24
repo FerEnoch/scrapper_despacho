@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { FileStats } from "../../types";
 import { Button } from "../ui/button";
-import { SIEM_URL_FILE_ID } from "@/config";
+import { SIEM_FILE_STATS_URL } from "@/config";
 import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { api } from "@/api";
@@ -42,7 +42,7 @@ export const Columns: ColumnDef<FileStats>[] = [
       const [, , fileShortNum] = fileCompleteNum.split("-");
       return (
         <a
-          href={`${SIEM_URL_FILE_ID}${fileShortNum}`}
+          href={`${SIEM_FILE_STATS_URL}${fileShortNum}`}
           target="_blank"
           rel="noreferrer"
         >
@@ -145,8 +145,8 @@ export const Columns: ColumnDef<FileStats>[] = [
       const searchButtonDisabled = !isSelected || isSearchingStats;
 
       const handleEndFilesClick = async () => {
-        setIsEndingFile(true);
         if (!isSelected) return;
+        setIsEndingFile(true);
 
         const selectedNum = row.getValue("num") as string;
         const selectedTitle = row.getValue("title") as string;
@@ -163,24 +163,19 @@ export const Columns: ColumnDef<FileStats>[] = [
         const apiResponse = await api.endFiles([selectedValues] as FileStats[]);
         const [updatedFileStats] = apiResponse?.data || [];
 
-        console.log("🚀 ~ handleEndFilesClick ~ apiResponse:", apiResponse);
-
+        setIsEndingFile(false);
         if (!updatedFileStats) return;
         table.options.meta?.updateData(row.index, updatedFileStats);
-        setIsEndingFile(false);
       };
 
       const handleSearchFileClick = async () => {
         setIsSearchingStats(true);
         if (!isSelected) return;
 
-        const [selectedNum] = (row.getValue("num") as string).split(" ");
+        const selectedNum = row.getValue("num") as string;
         const apiResponse = await api.getFilesStats(selectedNum);
         const [updatedFileStats] = apiResponse?.data || [];
 
-        console.log("🚀 ~ handleSearchFileClick ~ apiResponse:", apiResponse);
-
-        if (!updatedFileStats) return;
         table.options.meta?.updateData(row.index, updatedFileStats);
         setIsSearchingStats(false);
       };

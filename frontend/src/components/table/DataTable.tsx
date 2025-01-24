@@ -69,7 +69,8 @@ export function DataTable<TData, TValue>({
       pagination,
     },
     meta: {
-      updateData: (rowIndex: number, value: FileStats) => {
+      updateData: (rowIndex: number, value: FileStats | null | undefined) => {
+        if (!value) return;
         setIsEndingFiles(true);
         const newData = [...data].map((file, index) => {
           if (index === rowIndex) {
@@ -91,18 +92,16 @@ export function DataTable<TData, TValue>({
   });
 
   const handleEndFiles = async () => {
-    setIsLoading(true);
-    setIsEndingFiles(true);
-
     const selectedValues = table
       .getSelectedRowModel()
       .rows.map(({ original }) => original);
 
     if (selectedValues.length === 0) {
-      setIsLoading(false);
       return;
     }
 
+    setIsLoading(true);
+    setIsEndingFiles(true);
     const response = await api.endFiles(selectedValues as FileStats[]);
 
     onEndFilesClick(response);
