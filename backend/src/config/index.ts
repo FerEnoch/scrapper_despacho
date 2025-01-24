@@ -1,8 +1,12 @@
 import path from "node:path";
 import { loadEnvFile } from "node:process";
 
-const envFilePath = path.resolve(process.cwd(), "../.env");
-loadEnvFile(envFilePath);
+try {
+  const envFilePath = path.resolve(process.cwd(), "../.env");
+  loadEnvFile(envFilePath);
+} catch (error) {
+console.log("🚀 ~ error:", error)
+}
 
 const {
   VITE_SIEM_BASE_URL = "",
