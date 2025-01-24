@@ -13,9 +13,9 @@ WORKDIR /home/app
 RUN npm install
 EXPOSE 3000 5173 4173
 
-FROM base-node AS dev-mode
-# RUN npx playwright-core install chromium
-CMD ["npm", "run", "dev"]
+# FROM base-node AS dev-mode
+# # RUN npx playwright-core install chromium
+# CMD ["npm", "run", "dev"]
 
 FROM base-node AS prod-mode
 # RUN npx playwright-core install chromium
