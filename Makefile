@@ -1,10 +1,10 @@
 dev:
-	NODE_ENV=development VITE_REMOTE_FLAG=$(REMOTE) \
+	NODE_ENV=development VITE_REMOTE_FLAG=$(REMOTE ?= 0) \
 	docker compose up --force-recreate files_scrapper_dev --build
 
 prod:
 	NODE_ENV=production \
-	VITE_REMOTE_FLAG=$(REMOTE) \
+	VITE_REMOTE_FLAG=$(REMOTE ?= 0) \
 	docker compose up --force-recreate files_scrapper_prod --build
 
 # stop and remove container
@@ -17,9 +17,9 @@ clean-dev:
 	docker rmi scrapper_despacho-files_scrapper_dev files_scrapper_dev
 
 clean-prod:
+	docker compose down -v && \	
 	rm -rf ./node_modules && \
 	rm -rf ./frontend/dist ./frontend/node_modules && \
 	rm -rf ./backend/dist ./backend/node_modules && \
-	docker compose down -v && \	
-	docker rmi scrapper_despacho-files_scrapper_prod files_scrapper_prod && \
+	docker rmi scrapper_despacho-files_scrapper_prod files_scrapper_prod
 	
