@@ -5,7 +5,7 @@ try {
   const envFilePath = path.resolve(process.cwd(), "../.env");
   loadEnvFile(envFilePath);
 } catch (error) {
-console.log("🚀 ~ error:", error)
+  console.log("🚀 ~ error:", error);
 }
 
 const {
@@ -14,7 +14,7 @@ const {
   VITE_FILE_STATS_PATH = "",
   SIEM_USER = "",
   SIEM_PASSWORD = "",
-  PORT = 3000,
+  API_PORT = 3000,
 } = process.env;
 
 export {
@@ -23,5 +23,5 @@ export {
   VITE_FILE_STATS_PATH as FILE_STATS_PATH,
   SIEM_USER,
   SIEM_PASSWORD,
-  PORT,
+  API_PORT,
 };

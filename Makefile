@@ -1,10 +1,10 @@
 dev:
-	NODE_ENV=development VITE_REMOTE_FLAG=$(REMOTE ?= 0) \
-	docker compose up --force-recreate files_scrapper_dev --build
+	echo "🚀 ~ Dev env not available"
+# NODE_ENV=development \
+# docker compose up --force-recreate files_scrapper_dev --build
 
 prod:
 	NODE_ENV=production \
-	VITE_REMOTE_FLAG=$(REMOTE ?= 0) \
 	docker compose up --force-recreate files_scrapper_prod --build
 
 # stop and remove container

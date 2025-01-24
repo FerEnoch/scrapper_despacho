@@ -11,6 +11,7 @@ RUN mkdir -p /home/app
 COPY . home/app
 WORKDIR /home/app
 RUN npm install
+RUN npx playwright install
 EXPOSE 3000 5173 4173
 
 # FROM base-node AS dev-mode

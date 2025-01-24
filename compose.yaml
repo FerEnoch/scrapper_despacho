@@ -10,7 +10,7 @@ services:
       - 5173:5173
       - 40683:40683
     environment:
-      - PORT=${PORT}
+      - API_PORT=${API_PORT}
       - NODE_ENV=development
       - VITE_API_BASE_URL_REMOTE=${VITE_API_BASE_URL_REMOTE}
       - VITE_API_BASE_URL_LOCAL=${VITE_API_BASE_URL_LOCAL}
@@ -29,7 +29,7 @@ services:
       - 3000:3000
       - 4173:4173
     environment:
-      - PORT=${PORT}
+      - API_PORT=${API_PORT}
       - NODE_ENV=production
       - API_BASE_URL_PROD=${API_BASE_URL_PROD}
       - VITE_SIEM_BASE_URL=${VITE_SIEM_BASE_URL}
