@@ -13,7 +13,6 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  envDir: "../",
   server: {
     port: VITE_PORT,
     host: true, // needed for the Docker Container port mapping to work

@@ -2,7 +2,7 @@ import path from "node:path";
 import { loadEnvFile } from "node:process";
 
 try {
-  const envFilePath = path.resolve(process.cwd(), "../.env");
+  const envFilePath = path.resolve(process.cwd(), ".env");
   loadEnvFile(envFilePath);
 } catch (error) {
   console.log("🚀 ~ error:", error);

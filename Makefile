@@ -1,28 +1,23 @@
 dev:
 	echo " 😞 ~ Dev enviroment not available"
 
-prod:
-	NODE_ENV=production \
-	docker build -t files_scrapper_prod .
+back-prod:
+	NODE_ENV=production docker build -t scrapper-api . && \
 	docker run --rm --ipc=host \
-	--name files_scrapper_prod \
+	--name scrapper-api \
 	--security-opt seccomp=seccomp_profile.json \
 	-p 3000:3000 \
-	-p 5173:5173 \
-	-p 4173:4173 \
-	files_scrapper_prod
+	scrapper-api
 
 # stop and remove container
 stop:
-	docker container stop files_scrapper_prod 	
+	docker container stop scrapper-api 	
 
 clean:
-	docker container stop files_scrapper_prod || true && \
-	docker rm files_scrapper_prod || true && \
-	docker rmi -f files_scrapper_prod || true && \
+	docker container stop scrapper-api || true && \
+	docker rm scrapper-api || true && \
+	docker rmi -f scrapper-api || true && \
 	rm -rf ./node_modules && \
-	rm -rf ./frontend/dist && \
-	rm -rf ./frontend/node_modules && \
 	rm -rf ./backend/dist && \
 	rm -rf ./backend/node_modules
 	

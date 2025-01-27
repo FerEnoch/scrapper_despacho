@@ -10,19 +10,16 @@ COPY . /home/app
 # Adjust permissions for application directory
 RUN chown -R pwuser:pwuser /home/app
 
-# Switch to pwuser
+# Use Playwright-specific node user for executing
 USER pwuser
 
 # Install dependencies
 RUN npm install
 
 # Expose ports
-EXPOSE 3000 5173 4173
+EXPOSE 3000
 
 # Build and start the app
-RUN npm run build
+RUN npm run build:back
 
-# Use Playwright-specific node user for executing
-USER pwuser
-
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:back"]
