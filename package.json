@@ -6,16 +6,21 @@
   ],
   "version": "1.0.0",
   "scripts": {
-    "dev": "npm run dev --workspace=backend && npm run dev --workspace=frontend",
+    "dev": "concurrently \"npm run dev:back\" \"npm run dev:front\"",
     "dev:front": "npm run dev --workspace=frontend",
+    "dev:back": "npm run dev --workspace=backend",
     "build:back": "npm run build --workspace=backend",
     "build:front": "npm run build --workspace=frontend",
     "start:back": "npm run start --workspace=backend",
-    "build": "npm run build:back && npm run build:front",
-    "preview": "npm run build:front && npm run preview --workspace=frontend",
-    "start": "npm run start:back && npm run preview --workspace=frontend"
+    "start:front": "npm run preview --workspace=frontend",
+    "build": "concurrently \"npm run build:back\" \"npm run build:front\"",
+    "preview": "npm run build:front && npm run start:front",
+    "start": "concurrently \"npm run start:back\" \"npm run start:front\""
   },
   "author": "Ferenoch",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
 }
