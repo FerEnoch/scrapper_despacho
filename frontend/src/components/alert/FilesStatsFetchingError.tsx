@@ -51,37 +51,32 @@ export function FilesStatsFetchingError({
   isOpen,
   toggleAlertDialog,
 }: FilesStatsFetchingErrorProps) {
+  console.log("🚀 ~ FilesStatsFetchingError ~ errorFiles:", errorFiles);
   return (
     <AlertDialog open={isOpen}>
       {/* <AlertDialogTrigger >trigger</AlertDialogTrigger> */}
       <AlertDialogContent>
         <AlertDialogHeader
           className="
-        flex flex-col align-center justify-between h-80 gap-4        "
+        flex flex-col align-center justify-between max-h-80 gap-4
+        "
         >
           <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
           <AlertDialogDescription>{dialogDescription}</AlertDialogDescription>
-          <AlertDialogDescription
-            className="
-          h-full overflow-scroll overflow-x-hidden w-full
-
-          scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100
-          "
-          >
-            {/* {" "} */}
-            {errorFiles && errorFiles.length > 0 && (
-              <div className="mt-2 text-red-500">
-                {errorFiles.map((file, index) => (
-                  <p key={file?.completeNum + "" + index}>
-                    {file?.completeNum}
-                  </p>
-                ))}
-              </div>
-            )}
-          </AlertDialogDescription>
+          {isOpen && errorFiles && errorFiles.length > 0 && (
+            <AlertDialogDescription
+              className="
+                h-full overflow-y-scroll overflow-x-hidden w-full
+                mt-2 text-red-500
+              "
+            >
+              {errorFiles.map((file, index) => (
+                <p key={file?.completeNum + "" + index}>{file?.completeNum}</p>
+              ))}
+            </AlertDialogDescription>
+          )}
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
+        <AlertDialogFooter className="mt-4">
           <AlertDialogAction onClick={() => toggleAlertDialog()}>
             Continuar
           </AlertDialogAction>

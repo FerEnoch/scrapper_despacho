@@ -31,11 +31,9 @@ export class FilesController implements IFilesController {
       // const jsonData = await convertToJson(csvFile);
 
       const rawFile: RawFile = { Número: id };
-      const analyzeWithLetters = true;
-      const { ok, parsedData } = await parseRawFiles(
-        [rawFile],
-        analyzeWithLetters
-      );
+      const { ok, parsedData } = await parseRawFiles([rawFile], {
+        withLetters: true,
+      });
 
       if (!ok) {
         throw new ApiError({
@@ -78,8 +76,11 @@ export class FilesController implements IFilesController {
       }
 
       const data = file.data.toString("utf-8");
-      const jsonData = await convertToJson(data);
-      const { ok, parsedData } = await parseRawFiles(jsonData);
+      const jsonData = (await convertToJson(data)) as RawFile[];
+      // TO DO -> let pass letters absence error, but not number errors
+      const { ok, parsedData } = await parseRawFiles(jsonData, {
+        withLetters: true,
+      });
 
       if (!ok) {
         res.status(400).json({

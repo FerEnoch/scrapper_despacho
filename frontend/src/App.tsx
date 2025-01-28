@@ -66,6 +66,7 @@ export default function App() {
       case API_ERRORS.NO_FILE_TO_UPLOAD:
       case API_ERRORS.NOT_FOUND:
       case API_ERRORS.GENERIC_ERROR:
+      case API_ERRORS.NO_FILE_STATS_RETRIEVED:
         setIsSearching(false);
         setErrorMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
@@ -203,7 +204,6 @@ export default function App() {
             dialogTitle="Error"
             dialogDescription={errorMsg}
             errorFiles={errorFiles}
-            toggleAlertDialog={() => {}}
             isOpen={isError}
             toggleAlertDialog={toggleAlertDialog}
           />
