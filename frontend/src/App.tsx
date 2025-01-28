@@ -29,7 +29,7 @@ import { FileStats } from "./types";
 import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
-import { FilesStatsFetchingError } from "./components/alert/FilesStatsFetchingError";
+import { FilesStatsFetchingError } from "./components/errorModal/FilesStatsFetchingError";
 import { CARD_TEXTS, UI_ERROR_MESSAGES } from "./config/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
 
