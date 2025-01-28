@@ -29,7 +29,7 @@ import { FileStats } from "./types";
 import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
-import { FilesStatsFetchingError } from "./components/alert/AlertDialog";
+import { FilesStatsFetchingError } from "./components/alert/FilesStatsFetchingError";
 import { CARD_TEXTS, UI_ERROR_MESSAGES } from "./config/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
 
@@ -37,6 +37,7 @@ export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
   const [isSerching, setIsSearching] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
+  // const [isOpen, setToggleAlert] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
@@ -49,6 +50,10 @@ export default function App() {
 
   const onDataChange = (data: FileStats[]) => {
     setFilesData(data);
+  };
+
+  const toggleAlertDialog = () => {
+    setIsError((error) => !error);
   };
 
   const handleResponseMessages = ({
@@ -64,12 +69,14 @@ export default function App() {
         setIsSearching(false);
         setErrorMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
+        // toggleAlertDialog();
         setFilesData([]);
         return;
 
       case API_ERRORS.INVALID_DATA:
         setErrorMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
+        // toggleAlertDialog();
         setErrorFiles(data as RawFile[]);
         setIsSearching(false);
         setFilesData([]);
@@ -78,6 +85,7 @@ export default function App() {
       case API_ERRORS.NO_FILES_TO_END:
         setErrorMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
+        // toggleAlertDialog();
         return;
 
       default:
@@ -87,10 +95,15 @@ export default function App() {
     }
   };
 
+  // const toggleAlertDialog = () => {
+  // setToggleAlert((open) => !open);
+  // };
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSearching(true);
     setIsError(false);
     setErrorFiles([]);
+
     const formData = new FormData();
     formData.append("file", data.file);
 
@@ -115,6 +128,8 @@ export default function App() {
 
     setFilesData(newState);
   };
+
+  console.log("isOpen", isError);
 
   return (
     <>
@@ -184,13 +199,14 @@ export default function App() {
               </div>
             </form>
           </Form>
-          {isError && (
-            <FilesStatsFetchingError
-              dialogTitle="Error"
-              dialogDescription={errorMsg}
-              errorFiles={errorFiles}
-            />
-          )}
+          <FilesStatsFetchingError
+            dialogTitle="Error"
+            dialogDescription={errorMsg}
+            errorFiles={errorFiles}
+            toggleAlertDialog={() => {}}
+            isOpen={isError}
+            toggleAlertDialog={toggleAlertDialog}
+          />
         </CardContent>
       </Card>
       {filesData && !isSerching && (

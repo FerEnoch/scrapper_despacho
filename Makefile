@@ -3,7 +3,7 @@ dev:
 
 back-prod:
 	NODE_ENV=production docker build -t scrapper-api . && \
-	docker run --rm --ipc=host \
+	docker run -d --rm --ipc=host \
 	--name scrapper-api \
 	--security-opt seccomp=seccomp_profile.json \
 	-p 3000:3000 \
