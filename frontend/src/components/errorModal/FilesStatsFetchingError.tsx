@@ -27,7 +27,6 @@ export function FilesStatsFetchingError({
   isOpen,
   toggleAlertDialog,
 }: FilesStatsFetchingErrorProps) {
-  console.log("🚀 ~ FilesStatsFetchingError ~ errorFiles:", errorFiles);
   return (
     <AlertDialog open={isOpen}>
       <AlertDialogContent className="min-w-[50%]">

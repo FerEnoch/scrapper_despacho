@@ -9,16 +9,12 @@ export function TableSkeleton() {
       "
     >
       <div className="p-4 w-full h-auto flex flex-col space-y-4">
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
-        <Skeleton className="h-14 w-full" />
+        <Skeleton className="h-14 w-full bg-skeleton" />
+        <Skeleton className="h-14 w-full bg-skeleton" />
+        <Skeleton className="h-14 w-full bg-skeleton" />
+        <Skeleton className="h-14 w-full bg-skeleton" />
+        <Skeleton className="h-14 w-full bg-skeleton" />
+        <Skeleton className="h-14 w-full bg-skeleton" />
       </div>
     </div>
   );

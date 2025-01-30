@@ -1,5 +1,7 @@
 import { API_ERRORS } from "@/types";
 
+type uiErrorMessages = Record<keyof typeof API_ERRORS, string>;
+
 const UI_ERROR_MESSAGES: uiErrorMessages = {
   [API_ERRORS.SERVER_ERROR]:
     "Ocurrió un error al analizar los archivos, por favor intenta con otro. No cargues archivos que contengan más de 50 expedientes",
@@ -13,8 +15,6 @@ const UI_ERROR_MESSAGES: uiErrorMessages = {
   [API_ERRORS.NO_FILE_STATS_RETRIEVED]: `No se encontraron datos de expedientes.`,
   [API_ERRORS.GENERIC_ERROR]: `Ocurrió un error. Por favor, intenta nuevamente.`,
 } as const;
-
-type uiErrorMessages = Record<keyof typeof API_ERRORS, string>;
 
 const CARD_TEXTS = {
   title: "Santa Fe Hábitat",

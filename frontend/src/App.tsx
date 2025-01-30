@@ -30,14 +30,14 @@ import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
 import { FilesStatsFetchingError } from "./components/errorModal/FilesStatsFetchingError";
-import { CARD_TEXTS, UI_ERROR_MESSAGES } from "./config/constants";
+import { CARD_TEXTS, UI_ERROR_MESSAGES } from "./i18n/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
+import { SpeedDial } from "./components/speedDial/SpeedDial";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
   const [isSerching, setIsSearching] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
-  // const [isOpen, setToggleAlert] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
@@ -47,6 +47,17 @@ export default function App() {
       file: undefined,
     },
   });
+
+  const handleDownloadData = async () => {
+    try {
+      await api.downloadFiles(filesData, fileName);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.message === API_ERRORS.GENERIC_ERROR) {
+        return;
+      }
+    }
+  };
 
   const onDataChange = (data: FileStats[]) => {
     setFilesData(data);
@@ -96,10 +107,6 @@ export default function App() {
     }
   };
 
-  // const toggleAlertDialog = () => {
-  // setToggleAlert((open) => !open);
-  // };
-
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsSearching(true);
     setIsError(false);
@@ -129,8 +136,6 @@ export default function App() {
 
     setFilesData(newState);
   };
-
-  console.log("isOpen", isError);
 
   return (
     <>
@@ -182,7 +187,11 @@ export default function App() {
                 )}
               />
               <div className="flex justify-start items-center space-x-2">
-                <Button type="submit" disabled={isSerching}>
+                <Button
+                  className="bg-green-300 hover:bg-green-400 text-green-900 hover:text-green-900"
+                  type="submit"
+                  disabled={isSerching}
+                >
                   Buscar en SIEM
                 </Button>
                 {isSerching && (
@@ -209,16 +218,18 @@ export default function App() {
           />
         </CardContent>
       </Card>
+      {isSerching && <TableSkeleton />}
       {filesData && !isSerching && (
         <DataTable
           columns={Columns}
           data={filesData}
-          fileName={fileName ?? ""}
           onEndFilesClick={onEndFilesClick}
           onDataChange={onDataChange}
         />
       )}
-      {isSerching && <TableSkeleton />}
+      {filesData && !isSerching && (
+        <SpeedDial handleDownloadData={handleDownloadData} />
+      )}
     </>
   );
 }

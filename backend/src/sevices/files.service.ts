@@ -32,11 +32,11 @@ export class FilesService implements IFilesService {
     );
 
     // repeat first file to be sure to colect all the data
-    const firstFileData = await this.model.collectData({
-      file: files[0],
-      page: null,
-    });
-    scrappedData.splice(0, 1, firstFileData);
+    // const firstFileData = await this.model.collectData({
+    //   file: files[0],
+    //   page: null,
+    // });
+    // scrappedData.splice(0, 1, firstFileData);
 
     // newPage.waitForTimeout(1500);
     // await browser.close();

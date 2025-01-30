@@ -1,14 +1,4 @@
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getPaginationRowModel,
-  SortingState,
-  getSortedRowModel,
-  ColumnFiltersState,
-  getFilteredRowModel,
-} from "@tanstack/react-table";
+import { ColumnDef, flexRender } from "@tanstack/react-table";
 
 import {
   Table,
@@ -22,14 +12,14 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { api } from "@/api";
-import { API_ERRORS, ApiResponseStats, FileStats } from "@/types";
+import { ApiResponseStats, FileStats } from "@/types";
 import { TableSkeleton } from "./TableSkeleton";
 import { Puff } from "react-loader-spinner";
+import { useTable } from "@/lib/hooks/useTable";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  fileName: string;
   onEndFilesClick: (apiResponseData: ApiResponseStats<FileStats>) => void;
   onDataChange: (data: FileStats[]) => void;
 }
@@ -37,58 +27,15 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  fileName,
   onEndFilesClick,
   onDataChange,
 }: DataTableProps<TData, TValue>) {
-  const [isEndingFiles, setIsEndingFiles] = useState<boolean>(false);
-  const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [rowSelection, setRowSelection] = useState({});
-  const [pagination, setPagination] = useState({
-    pageIndex: 0, //initial page index
-    pageSize: 120, //default page size
-  });
-  const table = useReactTable({
+
+  const { table, setIsEndingFiles, isEndingFiles } = useTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      rowSelection,
-      pagination,
-    },
-    meta: {
-      updateData: (rowIndex: number, value: FileStats | null | undefined) => {
-        if (!value) return;
-        setIsEndingFiles(true);
-        const newData = [...data].map((file, index) => {
-          if (index === rowIndex) {
-            return {
-              ...value,
-              prevStatus:
-                (value.newStatus
-                  ? value.newStatus?.status
-                  : value.prevStatus) ?? "",
-            };
-          }
-          return file;
-        }) as FileStats[];
-
-        onDataChange(newData);
-        setIsEndingFiles(false);
-      },
-    },
+    onDataChange,
   });
 
   const handleEndFiles = async () => {
@@ -110,29 +57,27 @@ export function DataTable<TData, TValue>({
     setIsEndingFiles(false);
   };
 
-  const handleDownloadFiles = async () => {
-    setIsDownloading(true);
+  // const handleDownloadFiles = async () => {
+  //   setIsDownloading(true);
 
-    const selectedValues = table
-      .getRowModel()
-      .rows.map(({ original }) => original);
+  //   const rowValues = table.getRowModel().rows.map(({ original }) => original);
 
-    if (selectedValues.length === 0) {
-      setIsDownloading(false);
-      return;
-    }
+  //   if (rowValues.length === 0) {
+  //     setIsDownloading(false);
+  //     return;
+  //   }
 
-    try {
-      await api.downloadFiles(selectedValues as FileStats[], fileName);
-      setIsDownloading(false);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.message === API_ERRORS.GENERIC_ERROR) {
-        setIsDownloading(false);
-        return;
-      }
-    }
-  };
+  //   try {
+  //     await api.downloadFiles(rowValues as FileStats[], fileName);
+  //     setIsDownloading(false);
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   } catch (error: any) {
+  //     if (error.message === API_ERRORS.GENERIC_ERROR) {
+  //       setIsDownloading(false);
+  //       return;
+  //     }
+  //   }
+  // };
 
   return (
     <div className="mx-auto max-w-[90%] xl:max-w-[80%]">
@@ -188,7 +133,7 @@ export function DataTable<TData, TValue>({
             className="w-[16rem]"
           />
         </div>
-        <Button
+        {/* <Button
           className="
           h-fit w-fit
           bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400
@@ -208,7 +153,7 @@ export function DataTable<TData, TValue>({
               wrapperClass=""
             />
           )}
-        </Button>
+        </Button> */}
       </div>
       {isLoading && <TableSkeleton />}
       {!isLoading && (
