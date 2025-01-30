@@ -73,9 +73,9 @@ export function SpeedDial({ handleDownloadData }: SpeedDialProps) {
           >
             <path
               stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1"
               d="M5 13V1m0 0L1 5m4-4 4 4"
             />
           </svg>

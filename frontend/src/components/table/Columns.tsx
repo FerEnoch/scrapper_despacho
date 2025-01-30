@@ -45,6 +45,7 @@ export const Columns: ColumnDef<FileStats>[] = [
           href={`${SIEM_FILE_STATS_URL}${fileShortNum}`}
           target="_blank"
           rel="noreferrer"
+          className="hover:font-semibold"
         >
           {row.getValue("num")}
         </a>
