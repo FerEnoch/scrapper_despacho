@@ -142,8 +142,9 @@ export default function App() {
       <Card
         className="
       border-none border-gray-400 shadow-md 
-      mt-20 mb-16 mx-auto px-4 max-w-[80%] min-h-96 py-4
-      bg-opacity-30 bg-white backdrop-filter backdrop-blur-lg
+      mt-20 mb-16 px-4 min-h-96 py-4
+      mx-auto max-w-[90%] xl:max-w-[80%] space-y-4
+      bg-opacity-60 bg-white backdrop-filter backdrop-blur-lg
       "
       >
         <CardHeader>
