@@ -15,6 +15,7 @@
 
 @layer base {
   :root {
+    --font-sans: nunito-sans, system-ui, -apple-system, BlinkMacSystemFont;
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -33,7 +34,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
+    --ring: 240 10% 55%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -74,9 +75,17 @@
 @layer base {
   * {
     @apply border-border;
+    @apply font-sans;
   }
 
   body {
     @apply bg-background text-foreground;
   }
+}
+
+body {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.dev/svgjs' width='800' height='600' preserveAspectRatio='none' viewBox='0 0 800 600'%3e%3cg mask='url(%26quot%3b%23SvgjsMask4567%26quot%3b)' fill='none'%3e%3crect width='800' height='600' x='0' y='0' fill='url(%26quot%3b%23SvgjsRadialGradient4568%26quot%3b)'%3e%3c/rect%3e%3cpath d='M26 600L626 0L1349 0L749 600z' fill='url(%26quot%3b%23SvgjsLinearGradient4569%26quot%3b)'%3e%3c/path%3e%3cpath d='M712 600L112 0L-53 0L547 600z' fill='url(%26quot%3b%23SvgjsLinearGradient4570%26quot%3b)'%3e%3c/path%3e%3cpath d='M368.73466742672105 600L800 168.73466742672105L800 600z' fill='url(%26quot%3b%23SvgjsLinearGradient4569%26quot%3b)'%3e%3c/path%3e%3cpath d='M0 600L431.26533257327895 600L 0 168.73466742672105z' fill='url(%26quot%3b%23SvgjsLinearGradient4570%26quot%3b)'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask4567'%3e%3crect width='800' height='600' fill='white'%3e%3c/rect%3e%3c/mask%3e%3cradialGradient cx='50%25' cy='100%25' r='721.11' gradientUnits='userSpaceOnUse' id='SvgjsRadialGradient4568'%3e%3cstop stop-color='rgba(222%2c 236%2c 136%2c 0.7)' offset='0.23'%3e%3c/stop%3e%3cstop stop-color='rgba(222%2c 236%2c 136%2c 0.42)' offset='0.65'%3e%3c/stop%3e%3cstop stop-color='rgba(203%2c 248%2c 181%2c 1)' offset='1'%3e%3c/stop%3e%3c/radialGradient%3e%3clinearGradient x1='0%25' y1='100%25' x2='100%25' y2='0%25' id='SvgjsLinearGradient4569'%3e%3cstop stop-color='rgba(22%2c 76%2c 0%2c 0.2)' offset='0'%3e%3c/stop%3e%3cstop stop-opacity='0' stop-color='rgba(22%2c 76%2c 0%2c 0.2)' offset='0.66'%3e%3c/stop%3e%3c/linearGradient%3e%3clinearGradient x1='100%25' y1='100%25' x2='0%25' y2='0%25' id='SvgjsLinearGradient4570'%3e%3cstop stop-color='rgba(22%2c 76%2c 0%2c 0.2)' offset='0'%3e%3c/stop%3e%3cstop stop-opacity='0' stop-color='rgba(22%2c 76%2c 0%2c 0.2)' offset='0.66'%3e%3c/stop%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e");
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
 }

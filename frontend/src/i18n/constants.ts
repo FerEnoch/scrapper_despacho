@@ -17,7 +17,7 @@ const UI_ERROR_MESSAGES: uiErrorMessages = {
 } as const;
 
 const CARD_TEXTS = {
-  title: "Santa Fe Hábitat",
+  title: "Santa Fe Hábitat - Depto. Admin. y Despacho",
   body: `Carga un archivo .csv que contenga una columna "Número" con el número completo de expediente SIEM. Podrás visualizar su estado actual y finalizar su tramitación.`,
 };
 

@@ -141,19 +141,27 @@ export default function App() {
     <>
       <Card
         className="
-      border-sm border-gray-400 shadow-md my-8 mx-auto px-4 max-w-[80%]
-      bg-gray-100
+      border-none border-gray-400 shadow-md 
+      mt-20 mb-16 mx-auto px-4 max-w-[80%] min-h-96 py-4
+      bg-opacity-30 bg-white backdrop-filter backdrop-blur-lg
       "
       >
         <CardHeader>
-          <CardTitle className="text-3xl">{CARD_TEXTS.title}</CardTitle>
+          <CardTitle className="text-3xl mb-6">{CARD_TEXTS.title}</CardTitle>
 
-          <CardDescription>
-            <p className="text-sm leading-8 text-gray-600">{CARD_TEXTS.body}</p>
+          <CardDescription className="my-8">
+            <p
+              className="
+            text-pretty text-sm leading-8 text-gray-700
+            max-w-[80ch]
+            "
+            >
+              {CARD_TEXTS.body}
+            </p>
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="my-4">
           <Form {...form}>
             <form
               encType="multipart/form-data"
@@ -188,7 +196,7 @@ export default function App() {
               />
               <div className="flex justify-start items-center space-x-2">
                 <Button
-                  className="bg-green-300 hover:bg-green-400 text-green-900 hover:text-green-900"
+                  className="bg-primary hover:bg-green-300"
                   type="submit"
                   disabled={isSerching}
                 >
@@ -219,16 +227,18 @@ export default function App() {
         </CardContent>
       </Card>
       {isSerching && <TableSkeleton />}
-      {filesData && !isSerching && (
-        <DataTable
-          columns={Columns}
-          data={filesData}
-          onEndFilesClick={onEndFilesClick}
-          onDataChange={onDataChange}
-        />
-      )}
-      {filesData && !isSerching && (
-        <SpeedDial handleDownloadData={handleDownloadData} />
+      {filesData.length > 0 && !isSerching ? (
+        <>
+          <DataTable
+            columns={Columns}
+            data={filesData}
+            onEndFilesClick={onEndFilesClick}
+            onDataChange={onDataChange}
+          />
+          <SpeedDial handleDownloadData={handleDownloadData} />
+        </>
+      ) : (
+        <></>
       )}
     </>
   );

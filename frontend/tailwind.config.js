@@ -55,7 +55,10 @@ export default {
 					'5': 'hsl(var(--chart-5))'
 				},
 				skeleton: 'hsl(var(--skeleton))'
-			}
+			},
+			fontFamily: {
+				sans: "var(--font-sans)",
+			},
 		}
 	},
 	plugins: [

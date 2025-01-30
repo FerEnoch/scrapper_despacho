@@ -57,115 +57,83 @@ export function DataTable<TData, TValue>({
     setIsEndingFiles(false);
   };
 
-  // const handleDownloadFiles = async () => {
-  //   setIsDownloading(true);
-
-  //   const rowValues = table.getRowModel().rows.map(({ original }) => original);
-
-  //   if (rowValues.length === 0) {
-  //     setIsDownloading(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     await api.downloadFiles(rowValues as FileStats[], fileName);
-  //     setIsDownloading(false);
-  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //   } catch (error: any) {
-  //     if (error.message === API_ERRORS.GENERIC_ERROR) {
-  //       setIsDownloading(false);
-  //       return;
-  //     }
-  //   }
-  // };
-
   return (
-    <div className="mx-auto max-w-[90%] xl:max-w-[80%]">
-      <div className="flex items-center justify-between my-4">
-        <Button
-          className="
-          h-fit w-fit
-          bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400
-          "
-          disabled={isLoading}
-          onClick={handleEndFiles}
-        >
-          {"Finalizar expedientes"}
-          {isEndingFiles && (
-            <Puff
-              visible={true}
-              height="100"
-              width="100"
-              color="#000"
-              ariaLabel="puff-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-          )}
-        </Button>
-        <div className="flex justify-end items-center gap-2">
-          <Input
-            placeholder="Buscar número"
-            value={(table.getColumn("num")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("num")?.setFilterValue(event.target.value)
-            }
-            className="w-[16rem]"
-          />
-          <Input
-            placeholder="Filtrar por estado"
-            value={
-              (table.getColumn("prevStatus")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("prevStatus")?.setFilterValue(event.target.value)
-            }
-            className="w-[16rem]"
-          />
-          <Input
-            placeholder="Filtrar por ubicación"
-            value={
-              (table.getColumn("location")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("location")?.setFilterValue(event.target.value)
-            }
-            className="w-[16rem]"
-          />
-        </div>
-        {/* <Button
-          className="
-          h-fit w-fit
-          bg-gray-800 text-white hover:bg-gray-600 disabled:bg-gray-400
-          "
-          disabled={isDownloading}
-          onClick={handleDownloadFiles}
-        >
-          {"Descargar .csv"}
-          {isDownloading && (
-            <Puff
-              visible={true}
-              height="100"
-              width="100"
-              color="#000"
-              ariaLabel="puff-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-            />
-          )}
-        </Button> */}
-      </div>
+    <>
       {isLoading && <TableSkeleton />}
       {!isLoading && (
-        <>
-          <div className="rounded-md border shadow-sm">
-            <Table>
-              <TableHeader>
+        <div className="mx-auto max-w-[90%] xl:max-w-[80%] space-y-4">
+          <div className="h-14 flex items-center justify-between my-4">
+            <Button
+              className="
+          h-fit w-fit
+          bg-primary hover:bg-green-300 disabled:bg-gray-400
+          "
+              disabled={isLoading}
+              onClick={handleEndFiles}
+            >
+              {"Finalizar expedientes"}
+              {isEndingFiles && (
+                <Puff
+                  visible={true}
+                  height="100"
+                  width="100"
+                  color="#000"
+                  ariaLabel="puff-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              )}
+            </Button>
+            <div className="flex justify-end items-center gap-2 md:gap-4">
+              <Input
+                placeholder="Buscar número"
+                value={
+                  (table.getColumn("num")?.getFilterValue() as string) ?? ""
+                }
+                onChange={(event) =>
+                  table.getColumn("num")?.setFilterValue(event.target.value)
+                }
+                className="w-[18rem] border-b-1 border-gray-400 border-t-transparent border-x-transparent"
+              />
+              <Input
+                placeholder="Filtrar por estado"
+                value={
+                  (table.getColumn("prevStatus")?.getFilterValue() as string) ??
+                  ""
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn("prevStatus")
+                    ?.setFilterValue(event.target.value)
+                }
+                className="w-[18rem] border-b-1 border-gray-400 border-t-transparent border-x-transparent"
+              />
+              <Input
+                placeholder="Filtrar por ubicación"
+                value={
+                  (table.getColumn("location")?.getFilterValue() as string) ??
+                  ""
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn("location")
+                    ?.setFilterValue(event.target.value)
+                }
+                className="w-[18rem] border-b-1 border-gray-400 border-t-transparent border-x-transparent"
+              />
+            </div>
+          </div>
+          <div className="rounded-md">
+            <Table className="mt-4">
+              <TableHeader className="border-none">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-none hover:bg-inherit"
+                  >
                     {headerGroup.headers.map((header) => {
                       return (
-                        <TableHead key={header.id}>
+                        <TableHead key={header.id} className="pb-2">
                           {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -185,6 +153,7 @@ export function DataTable<TData, TValue>({
                       <TableRow
                         key={row.id}
                         data-state={row.getIsSelected() && "selected"}
+                        className="bg-white hover:bg-gray-100 border-gray-200 border"
                       >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell key={cell.id} className="p-4 leading-snug">
@@ -198,12 +167,9 @@ export function DataTable<TData, TValue>({
                     );
                   })
                 ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      Sin resultados.
+                  <TableRow className="h-52 text-center bg-white hover:bg-white">
+                    <TableCell colSpan={columns.length}>
+                      {"Sin resultados."}
                     </TableCell>
                   </TableRow>
                 )}
@@ -228,8 +194,9 @@ export function DataTable<TData, TValue>({
               Siguiente
             </Button>
           </div>
-        </>
+        </div>
       )}
-    </div>
+      {!data.length && <div></div>}
+    </>
   );
 }
