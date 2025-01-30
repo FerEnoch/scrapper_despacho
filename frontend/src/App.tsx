@@ -153,7 +153,7 @@ export default function App() {
           <CardDescription className="my-8">
             <p
               className="
-            text-pretty text-sm leading-8 text-gray-700
+            text-pretty text-sm leading-6 text-gray-700
             max-w-[80ch]
             "
             >
@@ -162,7 +162,7 @@ export default function App() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="my-4">
+        <CardContent>
           <Form {...form}>
             <form
               encType="multipart/form-data"
@@ -190,7 +190,7 @@ export default function App() {
                         ref={field.ref}
                       />
                     </FormControl>
-                    <FormDescription>Carga un archivo .csv</FormDescription>
+                    <FormDescription>Adjunta un archivo .csv</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

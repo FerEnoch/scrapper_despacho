@@ -101,9 +101,9 @@ export const Columns: ColumnDef<FileStats>[] = [
 
       if (!newStatus) return <></>;
 
-      const { status = "", message = "", detail = "" } = newStatus;
+      const { /*status = "",*/ message = "", detail = "" } = newStatus;
 
-      const statusColor = getStatusColor(status);
+      // const statusColor = getStatusColor(status);
       const messageColor = getMessageColor(message);
 
       return (
@@ -113,18 +113,18 @@ export const Columns: ColumnDef<FileStats>[] = [
           flex flex-col space-between gap-2 
         `}
         >
-          {status && (
-            <p className="text-xs leading-6">
+          {/* {status && (
+            <p className="text-xs leading-4">
               <span className={`${statusColor}`}>{status}</span>
             </p>
-          )}
+          )} */}
           {message && (
-            <p className="text-xs leading-6">
+            <p className="text-xs leading-4">
               <span className={`${messageColor}`}>{message}</span>
             </p>
           )}
           {detail && (
-            <p className="text-pretty font-light text-[.5rem] leading-6">
+            <p className="text-pretty font-light text-xs leading-1">
               <span>{detail}</span>
             </p>
           )}

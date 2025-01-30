@@ -93,7 +93,11 @@ export function DataTable<TData, TValue>({
                 onChange={(event) =>
                   table.getColumn("num")?.setFilterValue(event.target.value)
                 }
-                className="w-[18rem] border-b-1 border-gray-400 border-t-transparent border-x-transparent"
+                className="
+                w-[14rem] border-b-1 rounded-none 
+                text-gray-400
+                border-gray-400 border-t-transparent border-x-transparent
+                "
               />
               <Input
                 placeholder="Filtrar por estado"
@@ -106,7 +110,11 @@ export function DataTable<TData, TValue>({
                     .getColumn("prevStatus")
                     ?.setFilterValue(event.target.value)
                 }
-                className="w-[18rem] border-b-1 border-gray-400 border-t-transparent border-x-transparent"
+                className="
+                w-[14rem] border-b-1 rounded-none 
+                text-gray-400
+                border-gray-400 border-t-transparent border-x-transparent
+                "
               />
               <Input
                 placeholder="Filtrar por ubicación"
@@ -119,7 +127,11 @@ export function DataTable<TData, TValue>({
                     .getColumn("location")
                     ?.setFilterValue(event.target.value)
                 }
-                className="w-[18rem] border-b-1 border-gray-400 border-t-transparent border-x-transparent"
+                className="
+                w-[14rem] border-b-1 rounded-none 
+                text-gray-400
+                border-gray-400 border-t-transparent border-x-transparent
+                "
               />
             </div>
           </div>
@@ -129,7 +141,7 @@ export function DataTable<TData, TValue>({
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
                     key={headerGroup.id}
-                    className="border-none hover:bg-inherit"
+                    className="border-none hover:bg-inherit [&>*]:font-bold [&>*>*]:font-bold"
                   >
                     {headerGroup.headers.map((header) => {
                       return (
@@ -146,7 +158,7 @@ export function DataTable<TData, TValue>({
                   </TableRow>
                 ))}
               </TableHeader>
-              <TableBody>
+              <TableBody className="text-gray-700">
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => {
                     return (
@@ -182,6 +194,7 @@ export function DataTable<TData, TValue>({
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
+              className="text-gray-500"
             >
               Anterior
             </Button>
@@ -190,13 +203,13 @@ export function DataTable<TData, TValue>({
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
+              className="text-gray-500"
             >
               Siguiente
             </Button>
           </div>
         </div>
       )}
-      {!data.length && <div></div>}
     </>
   );
 }
