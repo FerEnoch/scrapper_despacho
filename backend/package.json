@@ -18,21 +18,27 @@
     "test:ui": "npx playwright test --ui"
   },
   "dependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "bcrypt": "5.1.1",
+    "better-sqlite3": "^11.8.1",
     "convert-csv-to-json": "2.50.0",
     "cors": "2.8.5",
     "express": "4.21.2",
     "express-fileupload": "1.5.1",
-    "morgan": "1.10.0"
+    "jsonwebtoken": "9.0.2",
+    "morgan": "1.10.0",
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "@playwright/test": "1.49.1",
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "2.8.17",
     "@types/express": "5.0.0",
     "@types/express-fileupload": "1.5.1",
     "@types/morgan": "1.9.9",
     "@types/node": "22.10.3",
     "nodemon": "3.1.9",
-    "tsc-alias": "^1.8.10",
+    "tsc-alias": "1.8.10",
     "typescript": "5.7.2",
     "vite-node": "3.0.2"
   }

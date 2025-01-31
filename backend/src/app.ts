@@ -3,10 +3,16 @@ import fileUpload from "express-fileupload";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-import { initializeRouter } from "./routes/index";
+import { initializeFilesRouter } from "./routes/files.router";
 import { handle404Error, handleGlobalError } from "./middlewares/handle-errors";
+import { initializeAuthRouter } from "./routes/auth.router";
+import { AuthModel } from "./models/auth.model";
 
-export async function initializeApp({ model }: { model: modelTypes }) {
+export async function initializeApp({
+  model,
+}: {
+  model: modelTypes["IFileScrapper"];
+}) {
   const app = express();
 
   app.use(
@@ -23,8 +29,11 @@ export async function initializeApp({ model }: { model: modelTypes }) {
   app.use(express.json());
   app.use(morgan("dev"));
 
-  const filesRouter = await initializeRouter({ model });
+  const filesRouter = await initializeFilesRouter({ model });
   app.use("/files", filesRouter);
+
+  const authRouter = await initializeAuthRouter({ model: new AuthModel() });
+  app.use("/auth", authRouter);
 
   app.use(handle404Error, handleGlobalError);
 

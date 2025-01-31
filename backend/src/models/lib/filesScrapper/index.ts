@@ -4,8 +4,8 @@ import converter from "convert-csv-to-json";
 import {
   FILE_NUMBER_COLUMN_VALID_NAME,
   VALIDATION_REGEX,
-} from "../../controllers/constants";
-import { FileId, FileStats, RawFile } from "../types";
+} from "../../../controllers/constants";
+import { FileId, FileStats, RawFile } from "../../types";
 
 function removeKVQuotes(file: RawFile) {
   const removeQuotesByRegex = (str: string) => str.replace(/['"]+/g, "");

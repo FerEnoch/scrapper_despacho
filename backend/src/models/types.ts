@@ -1,12 +1,14 @@
 import { Browser, Page } from "@playwright/test";
+import { Auth } from "../schemas/auth";
+import Database, { Statement } from "better-sqlite3";
 
-export interface IFileScrapper {
+export type IFileScrapper = {
   getBrowserContext(): Promise<{
     newPage: Page;
     browser: Browser;
   }>;
 
-  login({
+  siemLogin({
     user,
     pass,
     newPage,
@@ -23,7 +25,25 @@ export interface IFileScrapper {
     file: FileId;
     page: Page | null;
   }): Promise<FileStats>;
-}
+};
+
+export type IAuthModel = {
+  database: Database.Database;
+  createUsersTable: Statement;
+  login({ user, pass }: Auth): Promise<authApiResponse>;
+  getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
+  logout({ userId }: { userId: string }): Promise<authApiResponse>;
+};
+
+/********************************* */
+/******************************** */
+
+export type authApiResponse = {
+  ok: boolean;
+  message: string;
+  userId: string;
+  username?: string;
+};
 
 export type RawFile = {
   Número: string;
