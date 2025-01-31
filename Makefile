@@ -17,6 +17,8 @@ clean:
 	docker container stop scrapper-api || true && \
 	docker rm scrapper-api || true && \
 	docker rmi -f scrapper-api || true && \
+	rn -rf ./frontend/dist && \
+	rm -rf ./frontend/node_modules && \
 	rm -rf ./node_modules && \
 	rm -rf ./backend/dist && \
 	rm -rf ./backend/node_modules

@@ -129,10 +129,6 @@ export const api = {
 
       const csv = generateCsv(csvConfig)(parsedFiles);
 
-      console.log(
-        "🚀 ~ parsedFiles ~ parsedFiles:",
-        csv.toString().replace('"', "")
-      );
       download(csvConfig)(csv);
     } catch (error) {
       console.log("🚀 ~ downloadFiles ~ error:", error);

@@ -62,10 +62,17 @@ export function DataTable<TData, TValue>({
       {isLoading && <TableSkeleton />}
       {!isLoading && (
         <div className="mx-auto max-w-[90%] xl:max-w-[80%] space-y-4">
-          <div className="h-14 flex items-center justify-between my-4">
+          <div
+            className="
+            ps-2 md:ps-0
+          h-14 space-y-2 md:space-y-4
+          flex flex-col items-start justify-center
+          md:flex-row md:items-center md:justify-between 
+          "
+          >
             <Button
               className="
-          h-fit w-fit
+          h-fit w-fit mb-4 md:my-4
           bg-primary hover:bg-green-300 disabled:bg-gray-400
           "
               disabled={isLoading}
@@ -84,7 +91,7 @@ export function DataTable<TData, TValue>({
                 />
               )}
             </Button>
-            <div className="flex justify-end items-center gap-2 md:gap-4">
+            <div className="pb-2 flex justify-end items-center gap-4 md:gap-6">
               <Input
                 placeholder="Buscar número"
                 value={

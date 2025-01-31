@@ -4,7 +4,7 @@ export function TableSkeleton() {
   return (
     <div
       className="
-      mx-auto max-w-[90%] xl:max-w-[80%]
+      mx-auto max-w-[92%] md:max-w-[90%] xl:max-w-[80%]
       flex justify-center items-center space-x-4
       "
     >

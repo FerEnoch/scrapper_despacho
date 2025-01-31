@@ -14,47 +14,70 @@ export const Columns: ColumnDef<FileStats>[] = [
   {
     id: "select",
     header: ({ table }) => (
-      <Checkbox
-        className="w-6 h-6"
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
+      <div className="ps-2 grid place-content-center">
+        <Checkbox
+          className="w-6 h-6"
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          id="select-all"
+        />
+      </div>
     ),
     cell: ({ row }) => (
-      <Checkbox
-        className="w-6 h-6"
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
+      <div className="grid place-content-center">
+        <Checkbox
+          className="w-6 h-6"
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      </div>
     ),
     enableSorting: false,
   },
   {
     accessorKey: "num",
-    header: "Número",
+    header: () => {
+      return (
+        <div className="ps-4 grid place-content-start w-[24ch]">
+          <label className="text-sm cursor-pointer" htmlFor="select-all">
+            {"Número"}
+          </label>
+        </div>
+      );
+    },
     cell: ({ row }) => {
       const fileCompleteNum = row.getValue("num") as string;
       const [, , fileShortNum] = fileCompleteNum.split("-");
       return (
-        <a
-          href={`${SIEM_FILE_STATS_URL}${fileShortNum}`}
-          target="_blank"
-          rel="noreferrer"
-          className="hover:font-semibold"
-        >
-          {row.getValue("num")}
-        </a>
+        <div className="grid place-content-center w-[24ch] tracking-wide">
+          <a
+            href={`${SIEM_FILE_STATS_URL}${fileShortNum}`}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:font-semibold"
+          >
+            {row.getValue("num")}
+          </a>
+        </div>
       );
     },
   },
   {
     accessorKey: "title",
     header: "Carátula",
+    cell: ({ row }) => {
+      const fileTitle = row.getValue("title") as string;
+      return (
+        <div className="grid place-content-start w-[30ch] text-pretty">
+          {fileTitle}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "prevStatus",
@@ -74,15 +97,28 @@ export const Columns: ColumnDef<FileStats>[] = [
       const statusColor = getStatusColor(fileStatus);
 
       return (
-        <span className={`text-xs font-medium ${statusColor}`}>
+        <div
+          className={`
+          grid place-content-start w-[16ch] 
+          text-xs font-medium ${statusColor}
+        `}
+        >
           {fileStatus}
-        </span>
+        </div>
       );
     },
   },
   {
     accessorKey: "location",
     header: "Ubicación",
+    cell: ({ row }) => {
+      const fileLocation = row.getValue("location") as string;
+      return (
+        <div className="grid place-content-start w-[16ch] text-pretty">
+          {fileLocation}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "newStatus",
@@ -100,7 +136,7 @@ export const Columns: ColumnDef<FileStats>[] = [
     cell: ({ row }) => {
       const newStatus = row.getValue("newStatus") as FileStats["newStatus"];
 
-      if (!newStatus) return <></>;
+      if (!newStatus) return <div className="w-[1rem]"></div>;
 
       const { /*status = "",*/ message = "", detail = "" } = newStatus;
 
@@ -110,8 +146,9 @@ export const Columns: ColumnDef<FileStats>[] = [
       return (
         <div
           className={`
+          max-w-[16ch]
           text-xs
-          flex flex-col space-between gap-2 
+          flex flex-col space-between gap-1 
         `}
         >
           {/* {status && (
