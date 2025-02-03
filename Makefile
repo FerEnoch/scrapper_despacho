@@ -21,5 +21,8 @@ clean:
 	rm -rf ./frontend/node_modules && \
 	rm -rf ./node_modules && \
 	rm -rf ./backend/dist && \
-	rm -rf ./backend/node_modules
+	rm -rf ./backend/node_modules && \
+	rm ./backend/users.db && \
+	rm ./backend/users.db-shm && \
+	rm ./backend/users.db-wal
 	

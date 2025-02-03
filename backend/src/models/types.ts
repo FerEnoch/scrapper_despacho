@@ -1,6 +1,6 @@
 import { Browser, Page } from "@playwright/test";
 import { Auth } from "../schemas/auth";
-import Database, { Statement } from "better-sqlite3";
+import Database from "better-sqlite3";
 
 export type IFileScrapper = {
   getBrowserContext(): Promise<{
@@ -29,8 +29,12 @@ export type IFileScrapper = {
 
 export type IAuthModel = {
   database: Database.Database;
-  createUsersTable: Statement;
-  login({ user, pass }: Auth): Promise<authApiResponse>;
+  checkIfUserExists({
+    user,
+  }: {
+    user: string;
+  }): Promise<{ id: string; user: string } | undefined>;
+  login({ user, pass }: Auth): Promise<{ userId: string }>;
   getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
   logout({ userId }: { userId: string }): Promise<authApiResponse>;
 };

@@ -4,9 +4,7 @@ import { loadEnvFile } from "node:process";
 try {
   const envFilePath = path.resolve(process.cwd(), ".env");
   loadEnvFile(envFilePath);
-} catch (error) {
-  console.log("🚀 ~ error:", error);
-}
+} catch (error) {}
 
 const {
   VITE_SIEM_BASE_URL = "",
@@ -15,6 +13,9 @@ const {
   SIEM_USER = "",
   SIEM_PASSWORD = "",
   API_PORT = 3000,
+  JWT_SECRET = "",
+  JWT_ACCESS_EXPIRES_IN = "1h",
+  JWT_REFRESH_EXPIRES_IN = "1d",
 } = process.env;
 
 export {
@@ -24,4 +25,7 @@ export {
   SIEM_USER,
   SIEM_PASSWORD,
   API_PORT,
+  JWT_SECRET,
+  JWT_ACCESS_EXPIRES_IN,
+  JWT_REFRESH_EXPIRES_IN,
 };

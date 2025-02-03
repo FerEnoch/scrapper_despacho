@@ -67,7 +67,7 @@ Content-Type: application/json
 
 {
     "user": "fgomez",
-    "pass": "123456"
+    "pass": 123456
 }
 
 ###
@@ -81,7 +81,7 @@ POST http://localhost:3000/auth/logout HTTP/1.1
 Content-Type: application/json
 
 {
-    "id": "68825f6e-ac09-453f-9b45-7d89043e045f"
+    "id": "9dcf2ba1-814c-4ad7-90f0-9257797af48c"
 }
 
 

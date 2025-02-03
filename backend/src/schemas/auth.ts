@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const authSchema = z.object({
+export const AuthSchema = z.object({
   user: z.string({
     required_error: "User is required",
     invalid_type_error: "User must be a string",
@@ -11,4 +11,4 @@ const authSchema = z.object({
   }),
 });
 
-export type Auth = z.infer<typeof authSchema>;
+export type Auth = z.infer<typeof AuthSchema>;

@@ -1,3 +1,4 @@
+import { MESSAGES } from "../controllers/constants";
 import { authApiResponse } from "../models/types";
 import { Auth } from "../schemas/auth";
 import { modelTypes } from "../types";
@@ -14,7 +15,25 @@ export class AuthService implements IAuthService {
   }
 
   async login({ user, pass }: Auth): Promise<authApiResponse> {
-    return await this.model.login({ user, pass });
+    const checkInfo = await this.model.checkIfUserExists({ user });
+
+    if (checkInfo) {
+      return {
+        ok: true,
+        message: MESSAGES.USER_ALREADY_LOGGED,
+        userId: checkInfo.id,
+        username: checkInfo.user,
+      };
+    }
+
+    const { userId } = await this.model.login({ user, pass });
+
+    return {
+      ok: true,
+      message: MESSAGES.SUCCESS,
+      userId,
+      username: user,
+    };
   }
 
   async getUserById({ userId }: { userId: string }): Promise<authApiResponse> {

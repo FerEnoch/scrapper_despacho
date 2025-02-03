@@ -9,40 +9,23 @@ import { MESSAGES } from "../controllers/constants";
 
 export class AuthModel implements IAuthModel {
   database: Database.Database;
-  createUsersTable: Statement;
 
-  constructor() {
-    this.database = new Database("users.db", {
-      verbose: console.log,
-    });
-    this.database.pragma("journal_mode = WAL");
-    this.database.pragma("synchonous = 1");
-    this.createUsersTable = this.database.prepare(
-      "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, user TEXT, pass TEXT)"
+  constructor(private readonly db: Database.Database) {
+    this.database = db;
+  }
+
+  async checkIfUserExists({ user }: { user: string }) {
+    const getByNameStmt = this.database.prepare(
+      "SELECT id, user FROM users WHERE user = $user"
     );
+
+    return getByNameStmt.get({
+      user,
+    }) as unknown as { id: string; user: string } | undefined;
   }
 
   async login({ user, pass }: Auth) {
     try {
-      this.createUsersTable.run();
-
-      const getByNameStmt = this.database.prepare(
-        "SELECT id, user FROM users WHERE user = $user"
-      );
-
-      const checkInfo = getByNameStmt.get({
-        user,
-      }) as unknown as { id: string; user: string } | undefined;
-
-      if (checkInfo) {
-        return {
-          ok: true,
-          message: MESSAGES.USER_ALREADY_LOGGED,
-          userId: checkInfo.id,
-          username: checkInfo.user,
-        };
-      }
-
       const hashedPass = await bcrypt.hash(pass, 10);
       const id = randomUUID();
 
@@ -50,25 +33,20 @@ export class AuthModel implements IAuthModel {
         "INSERT INTO users (id, user, pass) VALUES ($id, $user, $pass)"
       );
 
-      const loginInfo = loginStmt.run({
+      const loginResult = loginStmt.run({
         id,
         user,
         pass: hashedPass,
       });
 
-      if (loginInfo.changes === 0) {
+      if (loginResult.changes === 0) {
         throw new ApiError({
           statusCode: 400,
           message: ERRORS.DB_TRANSACTION_FAILURE,
         });
       }
 
-      return {
-        ok: true,
-        message: MESSAGES.SUCCESS,
-        userId: id,
-        username: user,
-      };
+      return { userId: id };
     } catch (error: any) {
       console.log("🚀 ~ login ~ error:", error);
       throw new ApiError({

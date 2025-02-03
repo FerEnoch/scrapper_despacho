@@ -6,7 +6,9 @@ import cors from "cors";
 import { initializeFilesRouter } from "./routes/files.router";
 import { handle404Error, handleGlobalError } from "./middlewares/handle-errors";
 import { initializeAuthRouter } from "./routes/auth.router";
+import cookieParser from "cookie-parser";
 import { AuthModel } from "./models/auth.model";
+import { createDB, createTables } from "./db";
 
 export async function initializeApp({
   model,
@@ -23,16 +25,22 @@ export async function initializeApp({
   );
 
   app.disable("x-powered-by");
-
+  app.use(cookieParser());
   app.use(cors());
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(morgan("dev"));
 
+  /** Initialize files routes model */
   const filesRouter = await initializeFilesRouter({ model });
   app.use("/files", filesRouter);
 
-  const authRouter = await initializeAuthRouter({ model: new AuthModel() });
+  /** Initialize auth model and database */
+  const db = createDB("users.db");
+  createTables(db);
+  const authModel = new AuthModel(db);
+
+  const authRouter = await initializeAuthRouter({ model: authModel });
   app.use("/auth", authRouter);
 
   app.use(handle404Error, handleGlobalError);

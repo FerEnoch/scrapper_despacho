@@ -16,7 +16,6 @@ export class AuthController implements IAuthController {
   }
 
   async login(req: Request, res: Response): Promise<void> {
-    // parse with zod
     const { user, pass } = req.body as Auth;
     const { ok, message, userId, username } = await this.service.login({
       user,
@@ -49,7 +48,6 @@ export class AuthController implements IAuthController {
   }
 
   async getUserById(req: Request, res: Response): Promise<void> {
-    // parse with zod
     const { id } = req.params as { id: string };
     const { ok, message, userId, username } = await this.service.getUserById({
       userId: id,
@@ -82,7 +80,6 @@ export class AuthController implements IAuthController {
   }
 
   async logout(req: Request, res: Response): Promise<void> {
-    // parse with zod
     const { id } = req.body as { id: string };
     const { ok, message, userId } = await this.service.logout({
       userId: id,
