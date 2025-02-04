@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { IAuthService, IFilesService } from "../sevices/types";
+import { IFilesService, IUserService } from "../sevices/types";
 
 export interface IFilesController {
   service: IFilesService;
@@ -9,8 +9,9 @@ export interface IFilesController {
 }
 
 export interface IAuthController {
-  service: IAuthService;
+  service: IUserService;
   login(req: Request, res: Response): Promise<void>;
+  register(req: Request, res: Response): Promise<void>;
   getUserById(req: Request, res: Response): Promise<void>;
   logout(req: Request, res: Response): Promise<void>;
 }

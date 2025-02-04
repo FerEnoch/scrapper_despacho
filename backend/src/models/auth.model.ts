@@ -1,128 +1,104 @@
-import { IAuthModel } from "./types";
-import { Auth } from "../schemas/auth";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import {
+  JWT_ACCESS_EXPIRES_IN,
+  JWT_REFRESH_EXPIRES_IN,
+  JWT_SECRET,
+} from "../config";
+import { NextFunction, Response, Request } from "express";
 import { ApiError } from "../errors/api-error";
-import Database, { Statement } from "better-sqlite3";
-import bcrypt from "bcrypt";
-import { randomUUID } from "node:crypto";
 import { ERRORS } from "../errors/types";
-import { MESSAGES } from "../controllers/constants";
+import { IAuthModel } from "./types";
+import ms from "ms";
 
 export class AuthModel implements IAuthModel {
-  database: Database.Database;
+  private readonly jwtSecret: Secret;
+  private readonly jwtAccessExpiresIn: ms.StringValue;
+  private readonly jwtRefreshExpiresIn: ms.StringValue;
 
-  constructor(private readonly db: Database.Database) {
-    this.database = db;
+  constructor() {
+    this.jwtSecret = JWT_SECRET;
+    this.jwtAccessExpiresIn = JWT_ACCESS_EXPIRES_IN as ms.StringValue;
+    this.jwtRefreshExpiresIn = JWT_REFRESH_EXPIRES_IN as ms.StringValue;
+    this.generateAccessToken = this.generateAccessToken.bind(this);
+    this.generateRefreshToken = this.generateRefreshToken.bind(this);
+    this.verifyJwt = this.verifyJwt.bind(this);
   }
 
-  async checkIfUserExists({ user }: { user: string }) {
-    const getByNameStmt = this.database.prepare(
-      "SELECT id, user FROM users WHERE user = $user"
-    );
-
-    return getByNameStmt.get({
-      user,
-    }) as unknown as { id: string; user: string } | undefined;
+  generateRefreshToken(userId: string) {
+    const refresh = jwt.sign({ userId }, this.jwtSecret, {
+      expiresIn: this.jwtRefreshExpiresIn,
+    });
+    return { refreshToken: refresh };
   }
 
-  async login({ user, pass }: Auth) {
+  generateAccessToken(userId: string): {
+    accessToken: string;
+  } {
     try {
-      const hashedPass = await bcrypt.hash(pass, 10);
-      const id = randomUUID();
-
-      const loginStmt = this.database.prepare(
-        "INSERT INTO users (id, user, pass) VALUES ($id, $user, $pass)"
-      );
-
-      const loginResult = loginStmt.run({
-        id,
-        user,
-        pass: hashedPass,
+      const access = jwt.sign({ userId }, this.jwtSecret, {
+        expiresIn: this.jwtAccessExpiresIn,
       });
 
-      if (loginResult.changes === 0) {
+      return { accessToken: access };
+    } catch (error) {
+      throw new ApiError({
+        statusCode: 500,
+        message: ERRORS.TOKEN_GENERATION_FAILED,
+      });
+    }
+  }
+
+  verifyJwt(
+    req: Request & {
+      auth?: {
+        access: string | JwtPayload;
+      };
+    },
+    _res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const accessToken = req.cookies.accessToken;
+
+      if (!accessToken) {
         throw new ApiError({
-          statusCode: 400,
-          message: ERRORS.DB_TRANSACTION_FAILURE,
+          statusCode: 401,
+          message: ERRORS.TOKEN_MISSING_ACCESS_DENIED,
         });
       }
 
-      return { userId: id };
+      const decoded = jwt.verify(accessToken, this.jwtSecret);
+
+      if (!decoded) {
+        throw new ApiError({ statusCode: 401, message: ERRORS.INVALID_TOKEN });
+      }
+
+      req.auth = {
+        access: decoded,
+      };
+
+      next();
     } catch (error: any) {
-      console.log("🚀 ~ login ~ error:", error);
       throw new ApiError({
-        statusCode: 400,
-        message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
-        data: [{ user }],
+        statusCode: error?.message ? 401 : 500,
+        message: error?.message ?? ERRORS.SERVER_ERROR,
       });
     }
   }
 
-  async getUserById({ userId }: { userId: string }) {
+  verifyRefreshToken({ refreshToken }: { refreshToken: string }) {
     try {
-      const getByIdStmt = this.database.prepare(
-        "SELECT id, user FROM users WHERE id = $id"
-      );
+      const decoded = jwt.verify(refreshToken, this.jwtSecret);
 
-      const checkInfo = getByIdStmt.get({
-        id: userId,
-      }) as unknown as { id: string; user: string } | undefined;
-
-      console.log("🚀 ~ AuthModel ~ getUserById ~ checkInfo:", checkInfo);
-
-      if (!checkInfo) {
-        return {
-          ok: false,
-          message: MESSAGES.USER_NOT_FOUND,
-          userId,
-          username: "",
-        };
+      if (!decoded) {
+        throw new ApiError({ statusCode: 401, message: ERRORS.TOKEN_EXPIRED });
       }
 
-      return {
-        ok: true,
-        message: MESSAGES.SUCCESS,
-        userId: checkInfo.id,
-        username: checkInfo.user,
-      };
+      return decoded;
     } catch (error: any) {
-      console.log("🚀 ~ getUserById ~ error:", error);
       throw new ApiError({
-        statusCode: 400,
-        message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
-        data: [{ userId }],
-      });
-    }
-  }
-
-  async logout({ userId }: { userId: string }) {
-    try {
-      const logoutStmt = this.database.prepare(
-        "DELETE FROM users WHERE id = $id"
-      );
-
-      const checkInfo = logoutStmt.run({
-        id: userId,
-      });
-
-      if (checkInfo.changes === 0) {
-        return {
-          ok: false,
-          message: MESSAGES.USER_NOT_FOUND,
-          userId,
-        };
-      }
-
-      return {
-        ok: true,
-        message: MESSAGES.SUCCESS,
-        userId,
-      };
-    } catch (error: any) {
-      console.log("🚀 ~ logout ~ error:", error);
-      throw new ApiError({
-        statusCode: 400,
-        message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
-        data: [{ userId }],
+        statusCode: error?.message ? 401 : 500,
+        message: error?.message ?? ERRORS.SERVER_ERROR,
       });
     }
   }

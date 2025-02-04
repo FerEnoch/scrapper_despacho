@@ -1,21 +1,25 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { modelTypes } from "../types";
-import { verifyToken } from "../middlewares/verifyToken";
 import { validateRequest } from "../middlewares/validateRequest";
 import { AuthSchema } from "../schemas/auth";
+import { AuthModel } from "../models/auth.model";
 
 export async function initializeAuthRouter({
   model,
 }: {
-  model: modelTypes["IAuthModel"];
+  model: modelTypes["IDatabaseModel"];
 }) {
-  const authRouter = new AuthController({ model });
+  const { login, register, getUserById, logout } = new AuthController({
+    model,
+  });
+  const { verifyJwt } = new AuthModel();
 
   const router = Router();
-  router.post("/login", validateRequest(AuthSchema), authRouter.login);
-  router.get("/user/:id", verifyToken, authRouter.getUserById);
-  router.post("/logout", verifyToken, authRouter.logout);
+  router.post("/register", validateRequest(AuthSchema), register);
+  router.post("/login", verifyJwt, validateRequest(AuthSchema), login);
+  router.get("/user/:id", verifyJwt, getUserById);
+  router.post("/logout", verifyJwt, logout);
 
   return router;
 }

@@ -6,12 +6,14 @@ function handle404Error(_req: Request, res: Response, _next: NextFunction) {
   res.status(404).json({ message: ERRORS.NOT_FOUND });
 }
 
-function handleGlobalError(err: Error,
+function handleGlobalError(
+  err: Error,
   _req: Request,
   res: Response,
-  _next: NextFunction) {
+  _next: NextFunction
+) {
   if (err instanceof ApiError) {
-    res.status(err.statusCode).json({ message: err.message });
+    res.status(err.statusCode).json(err);
     return;
   }
 

@@ -13,8 +13,10 @@ export interface IFilesService {
   endFiles({ files }: { files: FileStats[] }): Promise<FileEndedStats[]>;
 }
 
-export interface IAuthService {
-  model: modelTypes["IAuthModel"];
+export interface IUserService {
+  databaseModel: modelTypes["IDatabaseModel"];
+  authModel: modelTypes["IAuthModel"];
+  register({ user, pass }: Auth): Promise<authApiResponse>;
   login({ user, pass }: Auth): Promise<authApiResponse>;
   getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
   logout({ userId }: { userId: string }): Promise<authApiResponse>;

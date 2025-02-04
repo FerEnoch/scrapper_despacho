@@ -9,5 +9,5 @@
         "dist",
         "test"
     ],
-    "exec": "vite-node src/server.ts"
+    "exec": "NODE_ENV=development vite-node src/server.ts"
 }

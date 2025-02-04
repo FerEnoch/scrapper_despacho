@@ -24,7 +24,8 @@ export const validateRequest =
     } catch (error: any) {
       throw new ApiError({
         statusCode: 400,
-        message: error?.message ?? error?.code ?? ERRORS.INVALID_CREDENTIALS,
+        message: error.errors?.[0].message ?? ERRORS.INVALID_CREDENTIALS,
+        data: error?.errors ?? [],
       });
     }
   };
