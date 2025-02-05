@@ -1,0 +1,58 @@
+export default [
+    {
+        completeNum: "DE-0010-00485568-0 (N)",
+        digv: "0",
+        num: "00485568",
+        org: "DE",
+        rep: "0010",
+    },
+    {
+        completeNum: "DE-0512-00503161-2 (N)",
+        digv: "2",
+        num: "00503161",
+        org: "DE",
+        rep: "0512",
+    },
+    {
+        completeNum: "DE-0425-00525605-2 (NI)",
+        digv: "2",
+        num: "00525605",
+        org: "DE",
+        rep: "0425",
+    },
+    {
+        completeNum: "DE-0512-00500029-4 (N)",
+        digv: "4",
+        num: "00500029",
+        org: "DE",
+        rep: "0512",
+    },
+    {
+        completeNum: "DE-0509-00518726-5 (NI)",
+        digv: "5",
+        num: "00518726",
+        org: "DE",
+        rep: "0509",
+    },
+    {
+        completeNum: "DE-0509-00504725-3 (NI)",
+        digv: "3",
+        num: "00504725",
+        org: "DE",
+        rep: "0509",
+    },
+    {
+        completeNum: "DE-0425-00525612-8 (NI)",
+        digv: "8",
+        num: "00525612",
+        org: "DE",
+        rep: "0425",
+    },
+    {
+        completeNum: "DE-0425-00571780-6 (NI)",
+        digv: "6",
+        num: "00571780",
+        org: "DE",
+        rep: "0425",
+    },
+]

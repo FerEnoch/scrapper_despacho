@@ -100,7 +100,7 @@ export async function getFilesRawDataFromFile({
   return fileRawData;
 }
 
-export async function convertToJson(rawData: string) {
+export async function convertData(rawData: string) {
   const json = converter.fieldDelimiter(",").csvStringToJson(rawData);
   return json;
 }

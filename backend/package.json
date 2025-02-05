@@ -14,7 +14,7 @@
     "start": "node dist/server.js",
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "nodemon",
-    "test": "npx playwright test",
+    "test": "vitest",
     "test:ui": "npx playwright test --ui"
   },
   "dependencies": {
@@ -29,11 +29,15 @@
     "@types/cors": "2.8.17",
     "@types/express": "5.0.0",
     "@types/express-fileupload": "1.5.1",
+    "@types/jest": "29.5.14",
     "@types/morgan": "1.9.9",
     "@types/node": "22.10.3",
+    "@types/supertest": "^6.0.2",
     "nodemon": "3.1.9",
+    "supertest": "^7.0.0",
     "tsc-alias": "^1.8.10",
     "typescript": "5.7.2",
-    "vite-node": "3.0.2"
+    "vite-node": "3.0.2",
+    "vitest": "3.0.5"
   }
 }
