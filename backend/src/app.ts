@@ -1,31 +1,28 @@
 import { modelTypes } from "./types";
-import fileUpload from "express-fileupload";
 import express from "express";
-import morgan from "morgan";
-import cors from "cors";
-import { initializeRouter } from "./routes/index";
+import { initializeFilesRouter } from "./routes/files.router";
 import { handle404Error, handleGlobalError } from "./middlewares/handle-errors";
+import { initializeAuthRouter } from "./routes/auth.router";
+import { DatabaseModel } from "./models/database.model";
+import { useMiddlewares } from "./middlewares";
 
-export async function initializeApp({ model }: { model: modelTypes }) {
-  const app = express();
+export async function initializeApp({
+  model,
+}: {
+  model: modelTypes["IFileScrapper"];
+}) {
+  const app = useMiddlewares(express());
 
-  app.use(
-    fileUpload({
-      createParentPath: true,
-      // debug: true,
-    })
-  );
+  /** Initialize auth module: model, database and router */
+  const databaseModel = new DatabaseModel("users.db");
+  const authRouter = await initializeAuthRouter({ model: databaseModel });
+  app.use("/auth", authRouter);
 
-  app.disable("x-powered-by");
-
-  app.use(cors());
-  app.use(express.urlencoded({ extended: true }));
-  app.use(express.json());
-  app.use(morgan("dev"));
-
-  const filesRouter = await initializeRouter({ model });
+  /** Initialize files routes model */
+  const filesRouter = await initializeFilesRouter({ model });
   app.use("/files", filesRouter);
 
+  /* Handle errors */
   app.use(handle404Error, handleGlobalError);
 
   return app;

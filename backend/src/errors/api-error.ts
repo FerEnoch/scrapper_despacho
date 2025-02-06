@@ -1,11 +1,11 @@
 export class ApiError extends Error {
   public statusCode: number;
   public data?: any[];
-  
+
   constructor({
     statusCode,
     message,
-    data
+    data,
   }: {
     statusCode: number;
     message: string;

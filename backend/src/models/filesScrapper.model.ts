@@ -5,7 +5,7 @@ import { FileId, FileStats, IFileScrapper } from "./types";
 export class FilesScrapper implements IFileScrapper {
   constructor() {
     this.getBrowserContext.bind(this);
-    this.login.bind(this);
+    this.siemLogin.bind(this);
     this.collectData.bind(this);
   }
 
@@ -75,7 +75,7 @@ export class FilesScrapper implements IFileScrapper {
     }
   }
 
-  async login({
+  async siemLogin({
     user,
     pass,
     newPage,

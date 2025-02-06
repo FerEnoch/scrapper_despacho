@@ -5,7 +5,7 @@ import { MESSAGES, UPLOADS_FOLDER } from "./constants";
 import { FilesService } from "../sevices/files.service";
 import { modelTypes } from "../types";
 import { FileId, RawFile } from "../models/types";
-import { convertData, parseRawFiles } from "../models/lib/index";
+import { convertData, parseRawFiles } from "../models/lib/filesScrapper"
 import { UploadedFile } from "express-fileupload";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";

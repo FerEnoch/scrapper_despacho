@@ -8,11 +8,11 @@ import {
   SIEM_PASSWORD,
   SIEM_USER,
 } from "../config";
-import { parseFileStats } from "../models/lib";
+import { parseFileStats } from "../models/lib/filesScrapper";
 import { IFilesService } from "./types";
 
 export class FilesService implements IFilesService {
-  model: modelTypes;
+  model: modelTypes["IFileScrapper"];
 
   constructor({ model }: { model: modelTypes }) {
     this.model = model;

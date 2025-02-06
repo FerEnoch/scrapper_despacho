@@ -1,4 +1,8 @@
 import { IFileScrapper } from "./models/filesScrapper.model";
+import { IAuthModel, IDatabaseModel } from "./models/types";
 
-export type modelTypes = IFileScrapper; // more could be added in the future
-
+export type modelTypes = {
+  IFileScrapper: IFileScrapper;
+  IDatabaseModel: IDatabaseModel;
+  IAuthModel: IAuthModel;
+};
