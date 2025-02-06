@@ -2,32 +2,30 @@ import { describe, it, expect } from "vitest";
 import { request } from "../setup";
 import { MESSAGES } from "../../controllers/constants";
 import { ERRORS } from "../../errors/types";
+import { filesStats } from "../sample_data/filesStats";
 
-describe("API-INTEGRATION > files-router", () => {
-  /**
-   * 
-   * router.get("/stats/:id", filesController.getFilesStats);
-  router.post("/end", filesController.endFiles);
-  */
-
+describe.only("API-INTEGRATION > files-router", () => {
   /**
    * @route /files
    * @method POST
    * @description Upload a csv file
    */
-  it.skip("should upload a csv file", async () => {
+  it.skip("should upload a csv file and search files stats", async () => {
     const res = await request
       .post("/files")
       .attach("file", "src/tests/sample_data/files.csv");
 
+    const { data } = res.body;
+
     expect(res.status).toBe(201);
     expect(res.body.message).toBe(MESSAGES.FILE_UPLOADED);
+    expect(data).toEqual(filesStats);
   });
 
   it("should return 400 if file is not a csv", async () => {
     const res = await request
       .post("/files")
-      .attach("file", "src/tests/sample_data/siem.png");
+      .attach("file", "src/tests/sample_data/browser-nav-login.jpg");
     expect(res.status).toBe(400);
     expect(res.body.message).toBe(ERRORS.INVALID_FILE);
   });
@@ -42,13 +40,11 @@ describe("API-INTEGRATION > files-router", () => {
    * @route /files/end
    * @method POST
    * @description End files in SIEM system
+   * @description Requires authentication
    */
   it("should not end files that are already ended", async () => {
     const endedFiles = [
       {
-        num: "DE-0010-00485568-0 (N)",
-        location: "S116 - Agencia de Vivienda",
-        title: "SOLIC. LOTE",
         prevStatus: "FINALIZADO",
       },
     ];

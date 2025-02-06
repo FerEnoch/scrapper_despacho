@@ -1,3 +1,4 @@
+import { convertData } from "../utils";
 import { Request, Response } from "express";
 import { IFilesController } from "./types";
 import { IFilesService } from "../sevices/types";
@@ -5,7 +6,7 @@ import { MESSAGES, UPLOADS_FOLDER } from "./constants";
 import { FilesService } from "../sevices/files.service";
 import { modelTypes } from "../types";
 import { FileId, RawFile } from "../models/types";
-import { convertData, parseRawFiles } from "../models/lib/filesScrapper"
+import { parseRawFiles } from "../models/lib/filesScrapper";
 import { UploadedFile } from "express-fileupload";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
@@ -77,8 +78,7 @@ export class FilesController implements IFilesController {
 
       const data = file.data.toString("utf-8");
       const jsonData = (await convertData(data)) as RawFile[];
-      // TO DO -> let pass letters absence error, but not number errors
-      console.log("🚀 ~ FilesController ~ jsonData:", jsonData);
+
       const { ok, parsedData } = await parseRawFiles(jsonData, {
         withLetters: true,
       });

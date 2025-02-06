@@ -2,8 +2,8 @@ import { initializeApp } from "../app";
 import { FilesScrapper } from "../models/filesScrapper.model";
 import supertest, { Test } from "supertest";
 import { Server } from "node:http";
-import { API_PORT } from "../config";
 import TestAgent from "supertest/lib/agent";
+import { afterAll, beforeAll } from "vitest";
 
 let server: Server;
 let request: TestAgent<Test>;
@@ -16,6 +16,7 @@ beforeAll(async () => {
       console.log(`TESTING server running on port ${address.port}`);
     }
   });
+
   request = supertest(server);
 });
 

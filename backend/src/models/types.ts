@@ -95,6 +95,7 @@ export type RawFile = {
 };
 
 export type FileId = {
+  index: number;
   num: string;
   org?: string;
   rep?: string;
@@ -103,6 +104,7 @@ export type FileId = {
 };
 
 export type FileEndedStats = {
+  index: number;
   num: string;
   location: string;
   title: string;
@@ -115,6 +117,7 @@ export type FileEndedStats = {
 };
 
 export type FileStats = {
+  index: number;
   num: string;
   title: string;
   prevStatus: string;

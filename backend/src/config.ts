@@ -1,11 +1,14 @@
 import path from "node:path";
 import { loadEnvFile } from "node:process";
 import { Secret } from "jsonwebtoken";
+import { config } from "dotenv";
 
 try {
   const envFilePath = path.resolve(process.cwd(), ".env");
   loadEnvFile(envFilePath);
-} catch (error) {}
+} catch (error) {
+  config();
+}
 
 const {
   NODE_ENV = "development",

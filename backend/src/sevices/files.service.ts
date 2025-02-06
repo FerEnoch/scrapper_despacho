@@ -10,6 +10,8 @@ import {
 } from "../config";
 import { parseFileStats } from "../models/lib/filesScrapper";
 import { IFilesService } from "./types";
+import { ApiError } from "../errors/api-error";
+import { ERRORS } from "../errors/types";
 
 export class FilesService implements IFilesService {
   model: modelTypes["IFileScrapper"];
@@ -56,7 +58,12 @@ export class FilesService implements IFilesService {
     const result: FileEndedStats[] = [];
     let updatedFile: FileEndedStats, message: string, detail: string;
 
-    // divide the files to end in groups of 10 to avoid timeouts
+    /**
+     * TO DO:
+     * 1. Divide the files to end in groups of 5-10 to avoid timeouts
+     * 2. Use Promise.allSettled() to handle errors
+     * 3. Use "for await" loop to work with chunks, where each would be parallelized with Promise.allSettled()
+     */
     const filesToEndChunks = filesToEnd.reduce((acc, file, index) => {
       if (index % 10 === 0) {
         acc.push([file]);
@@ -78,14 +85,17 @@ export class FilesService implements IFilesService {
 
             await newPage.goto(`${SIEM_BASE_URL}${LOGIN_PATH}`);
 
-            siemPage = await this.model.login({
+            siemPage = await this.model.siemLogin({
               user: SIEM_USER,
               pass: SIEM_PASSWORD,
               newPage,
             });
 
             if (!siemPage) {
-              throw new Error("Could not login to SIEM");
+              throw new ApiError({
+                statusCode: 401,
+                message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
+              });
             }
 
             siemPage.addListener("dialog", (alert) => {
@@ -104,7 +114,7 @@ export class FilesService implements IFilesService {
               await siemPage
                 .locator('.menu_contexto a:text-matches("finalizar", "i")')
                 .click();
-              await siemPage.waitForTimeout(1000);
+              // await siemPage.waitForTimeout(1000);
 
               // await siemPage.screenshot({
               //   path: `./uploads/screenshots/checkpoint-2.png`,

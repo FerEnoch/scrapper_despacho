@@ -17,12 +17,12 @@ clean:
 	docker container stop scrapper-api || true && \
 	docker rm scrapper-api || true && \
 	docker rmi -f scrapper-api || true && \
-	rm -rf ./frontend/dist && \
-	rm -rf ./frontend/node_modules && \
-	rm -rf ./node_modules && \
-	rm -rf ./backend/dist && \
-	rm -rf ./backend/node_modules && \
-	rm ./backend/users.db && \
-	rm ./backend/users.db-shm && \
+	rm -rf ./frontend/dist || true && \
+	rm -rf ./frontend/node_modules || true && \
+	rm -rf ./node_modules || true && \
+	rm -rf ./backend/dist || true && \
+	rm -rf ./backend/node_modules || true && \ 
+	rm ./backend/users.db || true && \
+	rm ./backend/users.db-shm || true && \
 	rm ./backend/users.db-wal
 	

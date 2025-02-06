@@ -13,10 +13,10 @@ export class AuthController implements IAuthController {
 
   constructor({ model }: { model: modelTypes["IDatabaseModel"] }) {
     this.service = new UserService({ model });
+    this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.getUserById = this.getUserById.bind(this);
     this.logout = this.logout.bind(this);
-    this.register = this.register.bind(this);
   }
 
   async register(req: Request, res: Response): Promise<void> {
@@ -48,7 +48,7 @@ export class AuthController implements IAuthController {
     const access = req.auth?.access;
     console.log("🚀 ~ AuthController ~ login ~ access:", access);
 
-    const { userId  } = await this.service.login({
+    const { userId } = await this.service.login({
       user,
       pass,
     });

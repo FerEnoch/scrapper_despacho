@@ -1,6 +1,3 @@
-import { promises as fs } from "fs";
-import path from "node:path";
-import converter from "convert-csv-to-json";
 import {
   FILE_NUMBER_COLUMN_VALID_NAME,
   VALIDATION_REGEX,
@@ -17,7 +14,7 @@ function removeKVQuotes(file: RawFile) {
   }, {} as RawFile);
 }
 
-const validateRawData = (files: RawFile[], withLetters: boolean) => {
+const validateRawDataBatch = (files: RawFile[], withLetters: boolean) => {
   const validationRegex = withLetters
     ? VALIDATION_REGEX.FILE_NUMBER_COLUMN
     : VALIDATION_REGEX.FILE_NUMBER_COLUMN_NO_LETTERS;
@@ -33,15 +30,16 @@ const validateRawData = (files: RawFile[], withLetters: boolean) => {
 };
 
 const getInvalidFiles = (files: RawFile[], withLetters: boolean) =>
-  files.filter((file) => !validateRawData([file], withLetters));
+  files.filter((file) => !validateRawDataBatch([file], withLetters));
 
 const rawFileParser = (files: RawFile[]): FileId[] => {
-  return files.map((file) => {
+  return files.map((file, index) => {
     const newRawFile = removeKVQuotes(file);
     const { Número: completeNum = "" } = newRawFile;
     const [org = "", rep = "", num = "", digv = ""] = completeNum.split("-");
 
     return {
+      index,
       completeNum: completeNum,
       org,
       rep,
@@ -55,17 +53,23 @@ export async function parseRawFiles(
   files: RawFile[],
   { withLetters = true }: { withLetters: boolean }
 ): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
-  const isValid = validateRawData(files, withLetters);
-  if (!isValid) {
+  /**
+   * TODO:
+   *  1. let pass letters absence error, but not number errors
+   *  2. accept code with 3 numbers (i.e. 963), and no letters
+   * */
+
+  const batchIsValid = validateRawDataBatch(files, withLetters);
+  if (!batchIsValid) {
     const invalidFiles = getInvalidFiles(files, withLetters);
     return Promise.resolve({
-      ok: isValid,
+      ok: batchIsValid,
       parsedData: rawFileParser(invalidFiles),
     });
   }
 
   return Promise.resolve({
-    ok: isValid,
+    ok: batchIsValid,
     parsedData: rawFileParser(files),
   });
 }
@@ -73,9 +77,10 @@ export async function parseRawFiles(
 export function parseFileStats(files: FileStats[]): FileId[] {
   return files.map((file) => {
     const { num: completeNum } = file;
-    const [org, rep, num, digv] = completeNum.split("-");
+    const [org, rep, num, digv, index] = completeNum.split("-");
 
     return {
+      index: +index,
       completeNum: completeNum,
       org,
       rep,
@@ -83,24 +88,4 @@ export function parseFileStats(files: FileStats[]): FileId[] {
       digv: digv.split("")[0],
     };
   });
-}
-
-export async function getFilesRawDataFromFile({
-  folder,
-  fileName,
-}: {
-  folder: string;
-  fileName: string;
-}) {
-  const fileRawData = await fs.readFile(
-    path.join(process.cwd(), folder, fileName),
-    "utf8"
-  );
-
-  return fileRawData;
-}
-
-export async function convertData(rawData: string) {
-  const json = converter.fieldDelimiter(",").csvStringToJson(rawData);
-  return json;
 }

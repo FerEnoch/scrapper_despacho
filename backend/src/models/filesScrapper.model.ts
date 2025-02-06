@@ -35,7 +35,7 @@ export class FilesScrapper implements IFileScrapper {
       }
       const { num } = file;
       await siemPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
-      await siemPage.waitForLoadState("domcontentloaded");
+      await siemPage.waitForLoadState();
 
       let titleRow = await siemPage.$("tr:has-text('Carátula:')");
       let statusRow = await siemPage.$("tr:has-text('Estado:')");
@@ -43,7 +43,7 @@ export class FilesScrapper implements IFileScrapper {
 
       // retry to get the data
       if (!titleRow || !statusRow || !locationRow) {
-        await siemPage.waitForTimeout(1000);
+        // await siemPage.waitForTimeout(1000);
         titleRow = await siemPage.$("tr:has-text('Carátula:')");
         statusRow = await siemPage.$("tr:has-text('Estado:')");
         locationRow = await siemPage.$("tr:has-text('Ubicado en:')");
@@ -58,6 +58,7 @@ export class FilesScrapper implements IFileScrapper {
       }
 
       return {
+        index: file.index,
         num: file.completeNum ?? "",
         title: rawTitle?.slice(12).trim() ?? "",
         prevStatus:
@@ -67,6 +68,7 @@ export class FilesScrapper implements IFileScrapper {
     } catch (error) {
       console.log("🚀 ~ FilesScrapper ~ error:", error);
       return {
+        index: file.index,
         num: file.completeNum ?? "",
         title: "",
         prevStatus: "",

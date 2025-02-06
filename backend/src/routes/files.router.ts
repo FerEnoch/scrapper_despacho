@@ -15,6 +15,6 @@ export async function initializeFilesRouter({
 
   router.get("/stats/:id", filesController.getFilesStats);
   router.post("/", filesController.uploadFile);
-  router.post("/end", verifyJwt, filesController.endFiles);
+  router.post("/end", /*verifyJwt*/ filesController.endFiles);
   return router;
 }
