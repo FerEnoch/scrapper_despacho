@@ -1,6 +1,7 @@
 import { Browser, chromium, Page } from "@playwright/test";
 import { FILE_STATS_PATH, SIEM_BASE_URL } from "../config";
 import { FileId, FileStats, IFileScrapper } from "./types";
+import { ERRORS } from "../errors/types";
 
 export class FilesScrapper implements IFileScrapper {
   constructor() {
@@ -59,17 +60,20 @@ export class FilesScrapper implements IFileScrapper {
 
       return {
         index: file.index,
-        num: file.completeNum ?? "",
-        title: rawTitle?.slice(12).trim() ?? "",
+        num: file.completeNum ?? ERRORS.NO_DATA_COLLECTED,
+        title: rawTitle?.slice(12).trim() ?? ERRORS.NO_DATA_COLLECTED,
         prevStatus:
-          rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ?? "",
-        location: rawLocation?.slice(15).replace("\n", "").trim() ?? "",
+          rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ??
+          ERRORS.NO_DATA_COLLECTED,
+        location:
+          rawLocation?.slice(15).replace("\n", "").trim() ??
+          ERRORS.NO_DATA_COLLECTED,
       };
     } catch (error) {
       console.log("🚀 ~ FilesScrapper ~ error:", error);
       return {
         index: file.index,
-        num: file.completeNum ?? "",
+        num: file.completeNum ?? ERRORS.NO_DATA_COLLECTED,
         title: "",
         prevStatus: "",
         location: "",
@@ -88,7 +92,8 @@ export class FilesScrapper implements IFileScrapper {
   }): Promise<Page> {
     await newPage.fill("input[name='login']", user);
     await newPage.fill("input[name='password']", pass);
-    await newPage.click("input[type='submit']");
+    await newPage.getByRole("button", { name: "acceder" }).click();
+    await newPage.waitForLoadState();
     return newPage;
   }
 }

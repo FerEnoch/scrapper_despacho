@@ -33,6 +33,7 @@ export class FilesService implements IFilesService {
       })
     );
 
+    /** Appear to be not needed */
     // repeat first file to be sure to colect all the data
     // const firstFileData = await this.model.collectData({
     //   file: files[0],

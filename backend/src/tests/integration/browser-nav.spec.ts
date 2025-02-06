@@ -30,7 +30,7 @@ test("Should login in SIEM page", async () => {
   expect(newPage).toBeTruthy();
 });
 
-test.only("Should get complete files stats in batches", async () => {
+test("Should get complete files stats in batches", async () => {
   const filesScrapper = new FilesScrapper();
   const fileStatsSettled: Array<FileStats> = [];
 
