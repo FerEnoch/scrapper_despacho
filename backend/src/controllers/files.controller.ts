@@ -5,7 +5,7 @@ import { IFilesService } from "../sevices/types";
 import { MESSAGES, UPLOADS_FOLDER } from "./constants";
 import { FilesService } from "../sevices/files.service";
 import { modelTypes } from "../types";
-import { FileId, RawFile } from "../models/types";
+import { FileId, FileStats, RawFile } from "../models/types";
 import { parseRawFiles } from "../models/lib/filesScrapper";
 import { UploadedFile } from "express-fileupload";
 import { ApiError } from "../errors/api-error";
@@ -109,21 +109,34 @@ export class FilesController implements IFilesController {
 
   async endFiles(req: Request, res: Response) {
     try {
-      const files = req.body;
-      if (!files) {
-        res.status(400).json({ message: ERRORS.NO_FILE_TO_UPLOAD, data: [] });
-        return;
+      const files = req.body as FileStats[];
+      const filesToEnd = files?.filter(
+        (file) =>
+          file.prevStatus !== "FINALIZADO" && file.prevStatus !== "Sin datos"
+      );
+
+      if (filesToEnd.length === 0) {
+        throw new ApiError({
+          statusCode: 400,
+          message: ERRORS.NO_FILES_ENDED,
+        });
       }
 
       const endedFiles = await this.service.endFiles({ files });
+
       if (endedFiles.length === 0) {
-        res.status(400).json({ message: ERRORS.NO_FILES_TO_END, data: [] });
-        return;
+        throw new ApiError({
+          statusCode: 400,
+          message: ERRORS.NO_FILES_ENDED,
+        });
       }
 
       res.status(200).json({ message: MESSAGES.FILES_ENDED, data: endedFiles });
     } catch (error: any) {
-      res.status(400).json({ message: ERRORS.NO_FILES_ENDED, data: [] });
+      throw new ApiError({
+        statusCode: 400,
+        message: ERRORS.NO_FILES_ENDED,
+      });
     }
   }
 }

@@ -1,7 +1,4 @@
-import {
-  FILE_NUMBER_COLUMN_VALID_NAME,
-  VALIDATION_REGEX,
-} from "../../../controllers/constants";
+import { FILE_NUMBER_COLUMN_VALID_NAME, VALIDATION_REGEX } from "./constants";
 import { FileId, FileStats, RawFile } from "../../types";
 
 function removeKVQuotes(file: RawFile) {
@@ -90,13 +87,13 @@ export function parseFileStats(files: FileStats[]): FileId[] {
   });
 }
 
-export function getFilesBatches({
+export function getFilesBatches<F>({
   arr,
   size,
 }: {
-  arr: FileId[];
+  arr: F[];
   size: number;
-}): Array<FileId[]> {
+}): Array<F[]> {
   return arr.reduce((acc, item, index) => {
     if (index % size === 0) {
       acc.push([item]);
@@ -104,5 +101,5 @@ export function getFilesBatches({
       acc[acc.length - 1].push(item);
     }
     return acc;
-  }, [] as Array<FileId[]>);
+  }, [] as Array<F[]>);
 }

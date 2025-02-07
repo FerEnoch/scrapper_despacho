@@ -15,8 +15,8 @@
     "build": "NODE_ENV=production tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "nodemon",
     "test:backend": "vitest",
-    "test:nav": "npx playwright test ./src/tests/integration/*.spec.ts",
-    "test:nav:report": "npx playwright test ./src/tests/integration/*.spec.ts --output ./src/tests/integration/.pw-last && npx playwright show-report",
+    "test:fs-service": "npx playwright test ./src/tests/integration/*.spec.ts --output ./src/tests/integration/.pw-last",
+    "report:test:fs-service": "npx playwright test ./src/tests/integration/*.spec.ts --output ./src/tests/integration/.pw-last && npx playwright show-report",
     "test": "npm-run-all test:*"
   },
   "dependencies": {

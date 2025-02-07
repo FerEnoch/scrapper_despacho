@@ -5,6 +5,15 @@ import { Request, Response, NextFunction } from "express";
 import { JwtPayload } from "jsonwebtoken";
 
 export type IFileScrapper = {
+  END_FILE_TEXT: string;
+  SIEM_BASE_URL: string;
+  SIEM_LOGIN_PATH: string;
+  SIEM_LOGIN_URL: string;
+  SIEM_SEARCH_FILE_PATH: string;
+  SIEM_SEARCH_FILE_URL: string;
+  SIEM_LOCATE_FILE_TITLE: locationType;
+  SIEM_LOCATE_FILE_STATUS: locationType;
+  SIEM_LOCATE_FILE_LOCATION: locationType;
   getBrowserContext(): Promise<{
     newPage: Page;
     browser: Browser;
@@ -13,12 +22,15 @@ export type IFileScrapper = {
   siemLogin({
     user,
     pass,
-    newPage,
   }: {
     user: string;
     pass: string;
-    newPage: Page;
-  }): Promise<Page>;
+  }): Promise<{ siemPage: Page; browser: Browser }>;
+
+  endFileByNum({ num, page }: { num: string; page: Page }): Promise<{
+    message: string;
+    detail: string;
+  }>;
 
   collectData({
     file,
@@ -113,7 +125,7 @@ export type FileEndedStats = {
     status: string;
     message: string;
     detail: string;
-  };
+  } | null;
 };
 
 export type FileStats = {
@@ -122,4 +134,9 @@ export type FileStats = {
   title: string;
   prevStatus: string;
   location: string;
+};
+
+export type locationType = {
+  element: string;
+  text: string;
 };

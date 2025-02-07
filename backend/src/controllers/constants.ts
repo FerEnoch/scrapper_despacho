@@ -1,10 +1,3 @@
-const FILE_NUMBER_COLUMN_VALID_NAME = "Número";
-
-const VALIDATION_REGEX = {
-  FILE_NUMBER_COLUMN: /^\w{2}-\d{4}-\d{7,9}-\d+ \(\w{1,2}\)$/,
-  FILE_NUMBER_COLUMN_NO_LETTERS: /^\w{2}-\d{4}-\d{7,9}-\d+$/,
-};
-
 enum UPLOADS_FOLDER {
   FOLDER = "uploads",
   FILES_CSV = "files.csv",
@@ -21,9 +14,4 @@ enum MESSAGES {
   USER_REGISTERED = "USER_REGISTERED",
 }
 
-export {
-  UPLOADS_FOLDER,
-  FILE_NUMBER_COLUMN_VALID_NAME,
-  VALIDATION_REGEX,
-  MESSAGES,
-};
+export { UPLOADS_FOLDER, MESSAGES };

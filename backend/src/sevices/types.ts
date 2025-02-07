@@ -10,12 +10,13 @@ import { modelTypes } from "../types";
 
 export interface IFilesService {
   model: modelTypes["IFileScrapper"];
+  ENDED_FILE_STATUS_TEXT: string;
   MAX_BATCH_SIZE: number;
-  SIEM_USER: string;
   SIEM_PASSWORD: string;
-  SIEM_LOGIN_URL: string;
+  SIEM_USER: string;
   searchFilesStats(files: FileId[]): Promise<FileStats[]>;
   endFiles({ files }: { files: FileStats[] }): Promise<FileEndedStats[]>;
+  endFileByNum(num: string): Promise<{ message: string; detail: string }>;
   siemLogin(): Promise<{ siemPage: Page; browser: Browser }>;
 }
 
@@ -28,9 +29,9 @@ export interface IUserService {
   logout({ userId }: { userId: string }): Promise<authApiResponse>;
 }
 
-export type ResultType =
+export type BatchOpResultType<F> =
   | {
-      value: Array<FileStats & { status?: "fulfilled" | "rejected" }>;
+      value: Array<F>;
       status: "fulfilled";
     }
   | { error: any; status: "rejected" };

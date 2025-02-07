@@ -1,12 +1,13 @@
-import { FileStats } from "../../models/types";
+import { FileEndedStats } from "../../models/types";
 
-export const filesStats: Array<FileStats> = [
+export const filesEnded: Array<FileEndedStats> = [
   {
     index: 0,
     num: "DE-0010-00485568-0 (N)",
     title: "Sin datos",
     prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: null,
   },
   {
     index: 1,
@@ -14,6 +15,11 @@ export const filesStats: Array<FileStats> = [
     title: "Sin datos",
     prevStatus: "SISTEMA ANTERIOR",
     location: "S58 - SUB. DEL HABITAT Y LA VIVIENDA",
+    newStatus: {
+      status: "SISTEMA ANTERIOR",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 2,
@@ -21,6 +27,11 @@ export const filesStats: Array<FileStats> = [
     title: "SUBS.HABITAT Y VIV",
     prevStatus: "EN CURSO",
     location: "S58 - SUB. DEL HABITAT Y LA VIVIENDA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 3,
@@ -28,6 +39,11 @@ export const filesStats: Array<FileStats> = [
     title: "Sin datos",
     prevStatus: "SISTEMA ANTERIOR",
     location: "S58 - SUB. DEL HABITAT Y LA VIVIENDA",
+    newStatus: {
+      status: "SISTEMA ANTERIOR",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 4,
@@ -35,5 +51,10 @@ export const filesStats: Array<FileStats> = [
     title: "DIRECCION EJECUTIVA DE PROGRAMA DE vIV. Y pAT. COMUNITARIO",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
 ];
