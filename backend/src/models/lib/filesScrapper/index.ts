@@ -89,3 +89,20 @@ export function parseFileStats(files: FileStats[]): FileId[] {
     };
   });
 }
+
+export function getFilesBatches({
+  arr,
+  size,
+}: {
+  arr: FileId[];
+  size: number;
+}): Array<FileId[]> {
+  return arr.reduce((acc, item, index) => {
+    if (index % size === 0) {
+      acc.push([item]);
+    } else {
+      acc[acc.length - 1].push(item);
+    }
+    return acc;
+  }, [] as Array<FileId[]>);
+}

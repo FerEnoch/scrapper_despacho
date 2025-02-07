@@ -10,7 +10,7 @@ export class FilesScrapper implements IFileScrapper {
     this.collectData.bind(this);
   }
 
-  async getBrowserContext() {
+  async getBrowserContext(): Promise<{ newPage: Page; browser: Browser }> {
     const browser = await chromium.launch();
 
     const context = await browser.newContext();

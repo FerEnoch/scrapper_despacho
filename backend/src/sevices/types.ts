@@ -1,3 +1,4 @@
+import { Browser, Page } from "@playwright/test";
 import {
   authApiResponse,
   FileEndedStats,
@@ -9,8 +10,13 @@ import { modelTypes } from "../types";
 
 export interface IFilesService {
   model: modelTypes["IFileScrapper"];
+  MAX_BATCH_SIZE: number;
+  SIEM_USER: string;
+  SIEM_PASSWORD: string;
+  SIEM_LOGIN_URL: string;
   searchFilesStats(files: FileId[]): Promise<FileStats[]>;
   endFiles({ files }: { files: FileStats[] }): Promise<FileEndedStats[]>;
+  siemLogin(): Promise<{ siemPage: Page; browser: Browser }>;
 }
 
 export interface IUserService {
@@ -21,3 +27,10 @@ export interface IUserService {
   getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
   logout({ userId }: { userId: string }): Promise<authApiResponse>;
 }
+
+export type ResultType =
+  | {
+      value: Array<FileStats & { status?: "fulfilled" | "rejected" }>;
+      status: "fulfilled";
+    }
+  | { error: any; status: "rejected" };

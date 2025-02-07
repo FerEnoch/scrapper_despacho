@@ -10,7 +10,7 @@ describe.only("API-INTEGRATION > files-router", () => {
    * @method POST
    * @description Upload a csv file
    */
-  it.skip("should upload a csv file and search files stats", async () => {
+  it("should upload a csv file and search files stats", async () => {
     const res = await request
       .post("/files")
       .attach("file", "src/tests/sample_data/files.csv");

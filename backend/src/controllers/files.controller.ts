@@ -22,6 +22,7 @@ export class FilesController implements IFilesController {
   }
 
   async getFilesStats(req: Request, res: Response) {
+    /** Ever used ?? */
     const { id } = req.params;
     try {
       // read from cache
@@ -109,7 +110,6 @@ export class FilesController implements IFilesController {
   async endFiles(req: Request, res: Response) {
     try {
       const files = req.body;
-      console.log("🚀 ~ FilesController ~ endFiles ~ files:", files);
       if (!files) {
         res.status(400).json({ message: ERRORS.NO_FILE_TO_UPLOAD, data: [] });
         return;

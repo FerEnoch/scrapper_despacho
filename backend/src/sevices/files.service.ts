@@ -8,41 +8,89 @@ import {
   SIEM_PASSWORD,
   SIEM_USER,
 } from "../config";
-import { parseFileStats } from "../models/lib/filesScrapper";
-import { IFilesService } from "./types";
+import { getFilesBatches, parseFileStats } from "../models/lib/filesScrapper";
+import { IFilesService, ResultType } from "./types";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 
 export class FilesService implements IFilesService {
   model: modelTypes["IFileScrapper"];
+  MAX_BATCH_SIZE = 5;
+  SIEM_USER = "";
+  SIEM_PASSWORD = "";
+  SIEM_LOGIN_URL = "";
 
   constructor({ model }: { model: modelTypes }) {
     this.model = model;
+    this.SIEM_USER = SIEM_USER;
+    this.SIEM_PASSWORD = SIEM_PASSWORD;
+    this.SIEM_LOGIN_URL = `${SIEM_BASE_URL}${LOGIN_PATH}`;
+    this.searchFilesStats.bind(this);
+    this.endFiles.bind(this);
+    this.siemLogin.bind(this);
   }
 
   async searchFilesStats(files: FileId[]) {
-    // const { newPage, browser } = await getBrowserContext();
+    const scrappedData: Array<FileStats> = [];
 
-    const scrappedData: FileStats[] = [];
+    const batched = getFilesBatches({ arr: files, size: this.MAX_BATCH_SIZE });
+
+    const results = (await Promise.allSettled(
+      batched.map(async (batch) => {
+        return Promise.all(
+          batch.map(async (file) => {
+            const { newPage, browser } = await this.model.getBrowserContext();
+            try {
+              const fileStats = await this.model.collectData({
+                file,
+                page: newPage,
+              });
+              await browser.close();
+              return { ...fileStats, status: "fulfilled" };
+            } catch (error) {
+              return { error, status: "rejected" };
+            }
+          })
+        );
+      })
+    )) as Array<ResultType>;
+
+    results.forEach((batchResult) => {
+      if (batchResult.status === "fulfilled") {
+        batchResult.value.forEach((file) => {
+          const { status, ...fileData } = file;
+          scrappedData.push(fileData);
+        });
+      } else {
+        throw new ApiError({
+          statusCode: 400,
+          message: ERRORS.NO_FILE_STATS_RETRIEVED,
+          data: [],
+        });
+      }
+    });
+
+    /* old-method
     let dataCollection: FileStats;
-
     await Promise.all(
       files.map(async (file) => {
         dataCollection = await this.model.collectData({ file, page: null });
         scrappedData.push(dataCollection);
       })
     );
+    */
 
-    /** Appear to be not needed */
+    /* Appear to be not needed 
     // repeat first file to be sure to colect all the data
-    // const firstFileData = await this.model.collectData({
-    //   file: files[0],
-    //   page: null,
-    // });
-    // scrappedData.splice(0, 1, firstFileData);
+    const firstFileData = await this.model.collectData({
+      file: files[0],
+      page: null,
+    });
+    scrappedData.splice(0, 1, firstFileData);
+    */
 
-    // newPage.waitForTimeout(1500);
-    // await browser.close();
+    scrappedData.sort((a, b) => a.index - b.index);
+
     return scrappedData;
   }
 
@@ -81,23 +129,9 @@ export class FilesService implements IFilesService {
           newBrowser: Browser | null = null;
         await Promise.all(
           filesChunk.map(async (file) => {
-            const { newPage, browser } = await this.model.getBrowserContext();
-            newBrowser = browser;
-
-            await newPage.goto(`${SIEM_BASE_URL}${LOGIN_PATH}`);
-
-            siemPage = await this.model.siemLogin({
-              user: SIEM_USER,
-              pass: SIEM_PASSWORD,
-              newPage,
-            });
-
-            if (!siemPage) {
-              throw new ApiError({
-                statusCode: 401,
-                message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
-              });
-            }
+            const loginResult = await this.siemLogin();
+            siemPage = loginResult.siemPage;
+            newBrowser = loginResult.browser;
 
             siemPage.addListener("dialog", (alert) => {
               alert.accept();
@@ -163,5 +197,37 @@ export class FilesService implements IFilesService {
     );
 
     return result;
+  }
+
+  async siemLogin(): Promise<{ siemPage: Page; browser: Browser }> {
+    if (!this.SIEM_LOGIN_URL) {
+      throw new ApiError({
+        statusCode: 500,
+        message: ERRORS.SERVER_ERROR,
+      });
+    }
+
+    let { newPage: siemPage, browser } = await this.model.getBrowserContext();
+
+    await siemPage.goto(this.SIEM_LOGIN_URL);
+    await siemPage.waitForLoadState();
+
+    try {
+      siemPage = await this.model.siemLogin({
+        user: SIEM_USER,
+        pass: SIEM_PASSWORD,
+        newPage: siemPage,
+      });
+    } catch (error) {
+      console.log("🚀 ~ FilesService ~ siemLogin ~ error:", error);
+      throw new ApiError({
+        statusCode: 401,
+        message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
+      });
+    }
+
+    await siemPage.waitForLoadState();
+
+    return { siemPage, browser };
   }
 }
