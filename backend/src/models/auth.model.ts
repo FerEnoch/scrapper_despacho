@@ -25,10 +25,17 @@ export class AuthModel implements IAuthModel {
   }
 
   generateRefreshToken(userId: string) {
-    const refresh = jwt.sign({ userId }, this.jwtSecret, {
-      expiresIn: this.jwtRefreshExpiresIn,
-    });
-    return { refreshToken: refresh };
+    try {
+      const refresh = jwt.sign({ userId }, this.jwtSecret, {
+        expiresIn: this.jwtRefreshExpiresIn,
+      });
+      return { refreshToken: refresh };
+    } catch (error: any) {
+      throw new ApiError({
+        statusCode: 500,
+        message: ERRORS.SERVER_ERROR,
+      });
+    }
   }
 
   generateAccessToken(userId: string): {
@@ -40,7 +47,7 @@ export class AuthModel implements IAuthModel {
       });
 
       return { accessToken: access };
-    } catch (error) {
+    } catch (error: any) {
       throw new ApiError({
         statusCode: 500,
         message: ERRORS.TOKEN_GENERATION_FAILED,
@@ -79,10 +86,16 @@ export class AuthModel implements IAuthModel {
 
       next();
     } catch (error: any) {
-      throw new ApiError({
-        statusCode: error?.message ? 401 : 500,
-        message: error?.message ?? ERRORS.SERVER_ERROR,
-      });
+      if (error instanceof ApiError) {
+        next(error);
+      } else {
+        next(
+          new ApiError({
+            statusCode: 500,
+            message: ERRORS.SERVER_ERROR,
+          })
+        );
+      }
     }
   }
 

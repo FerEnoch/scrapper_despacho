@@ -23,8 +23,7 @@ export async function initializeApp({
   app.use("/files", filesRouter);
 
   /* Handle errors */
-  app.use(handle404Error);
-  app.use(handleGlobalError);
+  app.use(handle404Error, handleGlobalError);
 
   return app;
 }
