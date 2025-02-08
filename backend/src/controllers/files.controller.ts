@@ -1,5 +1,5 @@
 import { convertData } from "../utils";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { IFilesController } from "./types";
 import { IFilesService } from "../sevices/types";
 import { MESSAGES, UPLOADS_FOLDER } from "./constants";
@@ -21,10 +21,10 @@ export class FilesController implements IFilesController {
     this.endFiles = this.endFiles.bind(this);
   }
 
-  async getFilesStats(req: Request, res: Response) {
+  async getFilesStats(req: Request, res: Response, next: NextFunction) {
     /** Ever used ?? */
-    const { id } = req.params;
     try {
+      const { id } = req.params;
       // read from cache
       // const csvFile = await getFilesRawDataFromFile({
       //   folder: UPLOADS_FOLDER.FOLDER,
@@ -53,13 +53,20 @@ export class FilesController implements IFilesController {
         .status(200)
         .json({ message: MESSAGES.FILES_STATS_RETRIEVED, data: scrappedData });
     } catch (error: any) {
-      res
-        .status(400)
-        .json({ message: ERRORS.NO_FILE_STATS_RETRIEVED, data: [] });
+      if (error instanceof ApiError) {
+        next(error);
+      } else {
+        next(
+          new ApiError({
+            statusCode: 500,
+            message: ERRORS.SERVER_ERROR,
+          })
+        );
+      }
     }
   }
 
-  async uploadFile(req: Request, res: Response) {
+  async uploadFile(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req?.files) {
         res.status(400).send({
@@ -101,13 +108,20 @@ export class FilesController implements IFilesController {
         data: scrappedData,
       });
     } catch (error: any) {
-      res
-        .status(400)
-        .json({ message: ERRORS.NO_FILE_STATS_RETRIEVED, data: [] });
+      if (error instanceof ApiError) {
+        next(error);
+      } else {
+        next(
+          new ApiError({
+            statusCode: 500,
+            message: ERRORS.SERVER_ERROR,
+          })
+        );
+      }
     }
   }
 
-  async endFiles(req: Request, res: Response) {
+  async endFiles(req: Request, res: Response, next: NextFunction) {
     try {
       const files = req.body as FileStats[];
       const filesToEnd = files?.filter(
@@ -115,10 +129,10 @@ export class FilesController implements IFilesController {
           file.prevStatus !== "FINALIZADO" && file.prevStatus !== "Sin datos"
       );
 
-      if (filesToEnd.length === 0) {
+      if (filesToEnd?.length === 0) {
         throw new ApiError({
           statusCode: 400,
-          message: ERRORS.NO_FILES_ENDED,
+          message: ERRORS.NO_FILES_TO_END,
         });
       }
 
@@ -133,10 +147,16 @@ export class FilesController implements IFilesController {
 
       res.status(200).json({ message: MESSAGES.FILES_ENDED, data: endedFiles });
     } catch (error: any) {
-      throw new ApiError({
-        statusCode: 400,
-        message: ERRORS.NO_FILES_ENDED,
-      });
+      if (error instanceof ApiError) {
+        next(error);
+      } else {
+        next(
+          new ApiError({
+            statusCode: 500,
+            message: ERRORS.SERVER_ERROR,
+          })
+        );
+      }
     }
   }
 }

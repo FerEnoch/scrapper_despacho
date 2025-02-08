@@ -13,10 +13,13 @@ function handleGlobalError(
   _next: NextFunction
 ) {
   if (err instanceof ApiError) {
-    res.status(err.statusCode).json(err);
+    res
+      .status(err.statusCode)
+      .json({ message: err.message, data: err.data || null });
     return;
   }
 
+  console.error("Encountered an unexpected error:", err);
   res.status(500).json({ message: ERRORS.SERVER_ERROR });
 }
 

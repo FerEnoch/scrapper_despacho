@@ -6,6 +6,8 @@ import bcrypt from "bcrypt";
 import { randomUUID } from "node:crypto";
 import { ERRORS } from "../errors/types";
 import { BCRYPT_SALT_ROUNDS } from "../config";
+import path from "node:path";
+import { cwd } from "node:process";
 
 export class DatabaseModel implements IDatabaseModel {
   database: Database.Database;
@@ -24,8 +26,9 @@ export class DatabaseModel implements IDatabaseModel {
   }
 
   createDB(name: string = "default.db") {
-    const db = new Database(name, {
-      verbose: console.log,
+    const dbPath = path.resolve(cwd(), "./db", name);
+    const db = new Database(dbPath, {
+      // verbose: console.log,
     });
     db.pragma("journal_mode = WAL");
     db.pragma("synchonous = 1");

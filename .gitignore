@@ -3,7 +3,7 @@ node_modules/
 .env
 
 # db
-backend/users.db
+backend/db/**/*
 
 # testing
 */test-results/

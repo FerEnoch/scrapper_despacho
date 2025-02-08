@@ -1,4 +1,4 @@
-import { FileEndedStats, FileStats } from "../../models/types";
+import { FileStats } from "../../models/types";
 import { filesStats } from "../sample_data/filesStats";
 import { expect, test } from "@playwright/test";
 import { FilesScrapper } from "../../models/filesScrapper.model";
@@ -6,14 +6,7 @@ import { parsedFilesIds } from "../sample_data/parsedFilesIds";
 import { FilesService } from "../../sevices/files.service";
 import { modelTypes } from "../../types";
 import fs from "node:fs/promises";
-import {
-  getFilesBatches,
-  parseFileStats,
-} from "../../models/lib/filesScrapper";
-import { ERRORS } from "../../errors/types";
-import { SIEM_PAGE_DATA } from "../../models/lib/filesScrapper/constants";
 import { filesEnded } from "../sample_data/filesEnded";
-import { BatchOpResultType } from "../../sevices/types";
 
 test("files.service > Should login in SIEM page", async () => {
   try {
