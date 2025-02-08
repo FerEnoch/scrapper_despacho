@@ -3,7 +3,7 @@ import { parsedFilesIds } from "../sample_data/parsedFilesIds.js";
 import { parseRawFiles } from "../../models/lib/filesScrapper/index.js";
 import { getJsonSampleDataFile } from "../json-imports.js";
 
-describe("LIB FUNCTIONS > filesScrapper", () => {
+describe("LIB-FUNCTIONS > filesScrapper", () => {
   it("should return a list of files stats", async () => {
     const jsonDataFiles = await getJsonSampleDataFile("jsonDataFiles.json");
     const { ok, parsedData } = await parseRawFiles(JSON.parse(jsonDataFiles), {

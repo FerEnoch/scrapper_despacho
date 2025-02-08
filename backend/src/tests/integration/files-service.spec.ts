@@ -8,7 +8,7 @@ import { modelTypes } from "../../types";
 import fs from "node:fs/promises";
 import { filesEnded } from "../sample_data/filesEnded";
 
-test("files.service > Should login in SIEM page", async () => {
+test("FILES-SERVICE > Should login in SIEM page", async () => {
   try {
     const lastResportImg = await fs.readFile(
       "./src/tests/integration/nav-to-login.jpg"

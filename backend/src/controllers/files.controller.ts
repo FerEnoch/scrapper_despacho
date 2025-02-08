@@ -66,24 +66,13 @@ export class FilesController implements IFilesController {
     }
   }
 
-  async uploadFile(req: Request, res: Response, next: NextFunction) {
+  async uploadFile(
+    req: Request & { file: UploadedFile },
+    res: Response,
+    next: NextFunction
+  ) {
     try {
-      if (!req?.files) {
-        res.status(400).send({
-          message: ERRORS.NO_FILE_TO_UPLOAD,
-          data: [],
-        });
-        return;
-      }
-
-      const file = req.files.file as UploadedFile;
-
-      // validate file format
-      if (!file.mimetype.includes("csv")) {
-        res.status(400).json({ message: ERRORS.INVALID_FILE, data: [] });
-        return;
-      }
-
+      const file = req.file as UploadedFile;
       const data = file.data.toString("utf-8");
       const jsonData = (await convertData(data)) as RawFile[];
 
@@ -92,17 +81,17 @@ export class FilesController implements IFilesController {
       });
 
       if (!ok) {
-        res.status(400).json({
+        throw new ApiError({
+          statusCode: 400,
           message: ERRORS.INVALID_DATA,
           data: parsedData as RawFile[],
         });
-        return;
       }
-      // save the file as cache data csv
-      await file.mv(`./${UPLOADS_FOLDER.FOLDER}/${UPLOADS_FOLDER.FILES_CSV}`);
+
       const scrappedData = await this.service.searchFilesStats(
         parsedData as FileId[]
       );
+
       res.status(201).json({
         message: MESSAGES.FILE_UPLOADED,
         data: scrappedData,

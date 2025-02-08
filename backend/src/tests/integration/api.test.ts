@@ -4,13 +4,13 @@ import { MESSAGES } from "../../controllers/constants";
 import { ERRORS } from "../../errors/types";
 import { filesStats } from "../sample_data/filesStats";
 
-describe.only("API-INTEGRATION > files-router", () => {
+describe("API-INTEGRATION > files-router", () => {
   /**
    * @route /files
    * @method POST
    * @description Upload a csv file
    */
-  it.skip("should upload a csv file and search files stats", async () => {
+  it("should upload a csv file and search files stats", async () => {
     const res = await request
       .post("/files")
       .attach("file", "src/tests/sample_data/files.csv");
@@ -22,7 +22,7 @@ describe.only("API-INTEGRATION > files-router", () => {
     expect(data).toEqual(filesStats);
   });
 
-  it("should return 400 if file is not a csv", async () => {
+  it("should return 400 & correct msg if file is not a csv", async () => {
     const res = await request
       .post("/files")
       .attach("file", "src/tests/sample_data/sample.jpg");
@@ -30,7 +30,7 @@ describe.only("API-INTEGRATION > files-router", () => {
     expect(res.body.message).toBe(ERRORS.INVALID_FILE);
   });
 
-  it("should return 400 if no file is attached", async () => {
+  it("should return 400 & correct msg if no file is attached", async () => {
     const res = await request.post("/files");
     expect(res.status).toBe(400);
     expect(res.body.message).toBe(ERRORS.NO_FILE_TO_UPLOAD);
@@ -42,7 +42,7 @@ describe.only("API-INTEGRATION > files-router", () => {
    * @description End files in SIEM system
    * @description Requires authentication
    */
-  it.only("should not end files that are already ended", async () => {
+  it("should not end files that are already ended", async () => {
     const endedFiles = [
       {
         prevStatus: "FINALIZADO",

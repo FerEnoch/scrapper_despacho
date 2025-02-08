@@ -2,6 +2,7 @@ import { Router } from "express";
 import { FilesController } from "../controllers/files.controller";
 import { modelTypes } from "../types";
 import { AuthModel } from "../models/auth.model";
+import { validateFileRequest } from "../middlewares/validateFileReq";
 
 export async function initializeFilesRouter({
   model,
@@ -14,7 +15,7 @@ export async function initializeFilesRouter({
   const { verifyJwt } = new AuthModel();
 
   router.get("/stats/:id", filesController.getFilesStats);
-  router.post("/", filesController.uploadFile);
+  router.post("/", validateFileRequest, filesController.uploadFile);
   router.post("/end", /*verifyJwt*/ filesController.endFiles);
   return router;
 }
