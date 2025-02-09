@@ -8,16 +8,24 @@ import { modelTypes } from "../../types";
 import fs from "node:fs/promises";
 import { filesEnded } from "../sample_data/filesEnded";
 
-test("FILES-SERVICE > Should login in SIEM page", async () => {
+/**
+ * @description Playwright tests
+ * @dev To run tests:
+ *  1. npm run test:fs-service
+ *  2. npm run report:test:fs-service
+ */
+
+test.only("FILES-SERVICE > Should login in SIEM page", async () => {
   try {
     const lastResportImg = await fs.readFile(
       "./src/tests/integration/nav-to-login.jpg"
     );
+
     if (lastResportImg) {
       await fs.rm("./src/tests/integration/nav-to-login.jpg");
     }
   } catch (error: any) {
-    console.log("🚀 ~ test > removing nav-to-login.jpg error:", error?.message);
+    console.log("No file nav-to-login.jpg to remove");
   }
 
   const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();

@@ -2,7 +2,7 @@ import { convertData } from "../utils";
 import { NextFunction, Request, Response } from "express";
 import { IFilesController } from "./types";
 import { IFilesService } from "../sevices/types";
-import { MESSAGES, UPLOADS_FOLDER } from "./constants";
+import { MESSAGES } from "./constants";
 import { FilesService } from "../sevices/files.service";
 import { modelTypes } from "../types";
 import { FileId, FileStats, RawFile } from "../models/types";
@@ -66,13 +66,9 @@ export class FilesController implements IFilesController {
     }
   }
 
-  async uploadFile(
-    req: Request & { file: UploadedFile },
-    res: Response,
-    next: NextFunction
-  ) {
+  async uploadFile(req: Request, res: Response, next: NextFunction) {
     try {
-      const file = req.file as UploadedFile;
+      const file = req.body as UploadedFile;
       const data = file.data.toString("utf-8");
       const jsonData = (await convertData(data)) as RawFile[];
 

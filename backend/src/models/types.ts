@@ -14,6 +14,10 @@ export type IFileScrapper = {
   SIEM_LOCATE_FILE_TITLE: locationType;
   SIEM_LOCATE_FILE_STATUS: locationType;
   SIEM_LOCATE_FILE_LOCATION: locationType;
+  AUTH_DENIED_PAGE_TITLE: locationType;
+  AUTH_DENIED_PAGE_MSG: locationType;
+  AUTH_GRANTED_PAGE_TITLE: locationType;
+  AUTH_GRANTED_PAGE_USER: locationType;
   getBrowserContext(): Promise<{
     newPage: Page;
     browser: Browser;
@@ -39,6 +43,8 @@ export type IFileScrapper = {
     file: FileId;
     page: Page | null;
   }): Promise<FileStats>;
+
+  checkSiemLogin({ page }: { page: Page; user: string }): Promise<boolean>;
 };
 
 export type IDatabaseModel = {

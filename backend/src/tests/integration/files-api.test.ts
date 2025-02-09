@@ -4,7 +4,13 @@ import { MESSAGES } from "../../controllers/constants";
 import { ERRORS } from "../../errors/types";
 import { filesStats } from "../sample_data/filesStats";
 
-describe("API-INTEGRATION > files-router", () => {
+/**
+ * @description This test suite is for testing the API files routes
+ * @dev To run this test suite, you need to have a running SIEM system user and password
+ * @dev Command to run this test suite:
+ *  - npm run test:backend
+ */
+describe.only("API-INTEGRATION > files-router", () => {
   /**
    * @route /files
    * @method POST
@@ -54,20 +60,4 @@ describe("API-INTEGRATION > files-router", () => {
     expect(res.body.message).toEqual(ERRORS.NO_FILES_TO_END);
     expect(res.body.data).toEqual(null);
   });
-
-  // it("should end files by 1 per request", async () => {
-  //   const endedFiles = [{}];
-  //   const res = await request.post("/files/end").send(endedFiles);
-  //   expect(res.status).toBe(200);
-  //   expect(res.body.message).toEqual(MESSAGES.FILES_ENDED);
-  //   expect(res.body.data).toEqual([]);
-  // });
-
-  // it("should end files by ~=50 per request", async () => {
-  //   const endedFiles = [{}];
-  //   const res = await request.post("/files/end").send(endedFiles);
-  //   expect(res.status).toBe(200);
-  //   expect(res.body.message).toEqual(MESSAGES.FILES_ENDED);
-  //   expect(res.body.data).toEqual([]);
-  // });
 });

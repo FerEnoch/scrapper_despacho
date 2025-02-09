@@ -1,8 +1,6 @@
-import { MESSAGES } from "../controllers/constants";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { AuthModel } from "../models/auth.model";
-import { authApiResponse } from "../models/types";
 import { Auth } from "../schemas/auth";
 import { modelTypes } from "../types";
 import { IUserService } from "./types";

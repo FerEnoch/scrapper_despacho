@@ -7,7 +7,7 @@ import { csvFileSchema } from "../schemas/csvFile";
 import { ZodError } from "zod";
 
 export async function validateFileRequest(
-  req: Request & { file: UploadedFile },
+  req: Request,
   _res: Response,
   next: NextFunction
 ) {
@@ -28,7 +28,7 @@ export async function validateFileRequest(
     // save the file as cache data csv
     await file.mv(`./${UPLOADS_FOLDER.FOLDER}/${UPLOADS_FOLDER.FILES_CSV}`);
 
-    req.file = file;
+    req.body = file;
 
     next();
   } catch (error: any) {
