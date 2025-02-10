@@ -18,7 +18,7 @@ describe.skip("API-INTEGRATION > files-router", () => {
    */
   it("should upload a csv file and search files stats", async () => {
     const res = await testAgent
-      .post("/files")
+      .post("/v1/files")
       .attach("file", "src/tests/sample_data/files.csv");
 
     const { data } = res.body;
@@ -30,14 +30,14 @@ describe.skip("API-INTEGRATION > files-router", () => {
 
   it("should return 400 & correct msg if file is not a csv", async () => {
     const res = await testAgent
-      .post("/files")
+      .post("/v1/files")
       .attach("file", "src/tests/sample_data/sample.jpg");
     expect(res.status).toBe(400);
     expect(res.body.message).toBe(ERRORS.INVALID_FILE);
   });
 
   it("should return 400 & correct msg if no file is attached", async () => {
-    const res = await testAgent.post("/files");
+    const res = await testAgent.post("/v1/files");
     expect(res.status).toBe(400);
     expect(res.body.message).toBe(ERRORS.NO_FILE_TO_UPLOAD);
   });
@@ -55,7 +55,7 @@ describe.skip("API-INTEGRATION > files-router", () => {
       },
     ];
 
-    const res = await testAgent.post("/files/end").send(endedFiles);
+    const res = await testAgent.post("/v1/files/end").send(endedFiles);
     expect(res.status).toBe(400);
     expect(res.body.message).toEqual(ERRORS.NO_FILES_TO_END);
     expect(res.body.data).toEqual(null);

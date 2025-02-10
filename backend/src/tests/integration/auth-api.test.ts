@@ -16,7 +16,7 @@ describe.only("API-INTEGRATION > auth-router", () => {
    */
   test("should register a new user", async () => {
     const res = await testAgent
-      .post("/auth/register")
+      .post("/v1/auth/register")
       .send({ user: "John Doe", pass: "password" });
 
     // check response
@@ -32,11 +32,11 @@ describe.only("API-INTEGRATION > auth-router", () => {
    */
   test("should login a user", async () => {
     await testAgent
-      .post("/auth/register")
+      .post("/v1/auth/register")
       .send({ user: "John Doe", pass: "password" });
 
     const loginResponse = await testAgent
-      .post("/auth/login")
+      .post("/v1/auth/login")
       .send({ user: "John Doe", pass: "password" });
 
     expect(loginResponse.headers["set-cookie"]).toBeDefined();
@@ -58,11 +58,11 @@ describe.only("API-INTEGRATION > auth-router", () => {
    */
   test("should logout a user", async () => {
     await testAgent
-      .post("/auth/register")
+      .post("/v1/auth/register")
       .send({ user: "John Doe", pass: "password" });
 
     const loginResponse = await testAgent
-      .post("/auth/login")
+      .post("/v1/auth/login")
       .send({ user: "John Doe", pass: "password" });
 
     expect(loginResponse.headers["set-cookie"]).toBeDefined();
@@ -77,7 +77,7 @@ describe.only("API-INTEGRATION > auth-router", () => {
       .split("=")[1];
 
     const logoutResponse = await testAgent
-      .post("/auth/logout")
+      .post("/v1/auth/logout")
       .set("Cookie", `accessToken=${accessToken}`);
 
     const logoutCookies = logoutResponse.headers[

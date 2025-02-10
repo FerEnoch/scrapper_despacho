@@ -15,7 +15,7 @@ import { filesEnded } from "../sample_data/filesEnded";
  *  2. npm run report:test:fs-service
  */
 
-test.only("FILES-SERVICE > Should login in SIEM page", async () => {
+test("FILES-SERVICE > Should login in SIEM page", async () => {
   try {
     const lastResportImg = await fs.readFile(
       "./src/tests/integration/nav-to-login.jpg"
