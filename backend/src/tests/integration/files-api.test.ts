@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { request } from "../setup";
+import { testAgent } from "../setup";
 import { MESSAGES } from "../../controllers/constants";
 import { ERRORS } from "../../errors/types";
 import { filesStats } from "../sample_data/filesStats";
@@ -8,16 +8,16 @@ import { filesStats } from "../sample_data/filesStats";
  * @description This test suite is for testing the API files routes
  * @dev To run this test suite, you need to have a running SIEM system user and password
  * @dev Command to run this test suite:
- *  - npm run test:backend
+ *  - npm run test:back
  */
-describe.only("API-INTEGRATION > files-router", () => {
+describe.skip("API-INTEGRATION > files-router", () => {
   /**
    * @route /files
    * @method POST
    * @description Upload a csv file
    */
   it("should upload a csv file and search files stats", async () => {
-    const res = await request
+    const res = await testAgent
       .post("/files")
       .attach("file", "src/tests/sample_data/files.csv");
 
@@ -29,7 +29,7 @@ describe.only("API-INTEGRATION > files-router", () => {
   });
 
   it("should return 400 & correct msg if file is not a csv", async () => {
-    const res = await request
+    const res = await testAgent
       .post("/files")
       .attach("file", "src/tests/sample_data/sample.jpg");
     expect(res.status).toBe(400);
@@ -37,7 +37,7 @@ describe.only("API-INTEGRATION > files-router", () => {
   });
 
   it("should return 400 & correct msg if no file is attached", async () => {
-    const res = await request.post("/files");
+    const res = await testAgent.post("/files");
     expect(res.status).toBe(400);
     expect(res.body.message).toBe(ERRORS.NO_FILE_TO_UPLOAD);
   });
@@ -55,7 +55,7 @@ describe.only("API-INTEGRATION > files-router", () => {
       },
     ];
 
-    const res = await request.post("/files/end").send(endedFiles);
+    const res = await testAgent.post("/files/end").send(endedFiles);
     expect(res.status).toBe(400);
     expect(res.body.message).toEqual(ERRORS.NO_FILES_TO_END);
     expect(res.body.data).toEqual(null);

@@ -4,12 +4,15 @@ import supertest, { Test } from "supertest";
 import { Server } from "node:http";
 import TestAgent from "supertest/lib/agent";
 import { afterAll, beforeAll } from "vitest";
+import { useMiddlewares } from "../middlewares";
 
 let server: Server;
-let request: TestAgent<Test>;
+let testAgent: TestAgent<Test>;
 
 beforeAll(async () => {
-  const app = await initializeApp({ model: new FilesScrapper() });
+  let app = await initializeApp({ model: new FilesScrapper() });
+  app = useMiddlewares(app);
+
   server = app.listen(0, () => {
     const address = server.address();
     if (typeof address === "object" && address !== null) {
@@ -17,11 +20,11 @@ beforeAll(async () => {
     }
   });
 
-  request = supertest(server);
+  testAgent = supertest(server);
 });
 
 afterAll(async () => {
   await server.close();
 });
 
-export { request };
+export { testAgent };

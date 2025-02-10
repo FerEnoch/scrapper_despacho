@@ -12,10 +12,10 @@ export async function initializeFilesRouter({
   const router = Router();
 
   const filesController = new FilesController({ model });
-  const { verifyJwt } = new AuthModel();
+  const { verifyJwtMiddleware: verifyJwt } = new AuthModel();
 
   router.get("/stats/:id", filesController.getFilesStats);
   router.post("/", validateFileRequest, filesController.uploadFile);
-  router.post("/end", /* verifyJwt, */ filesController.endFiles);
+  router.post("/end", verifyJwt, filesController.endFiles);
   return router;
 }

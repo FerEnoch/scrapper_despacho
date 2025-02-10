@@ -26,7 +26,7 @@ export interface IUserService {
   register({ user, pass }: Auth): Promise<authApiResponse>;
   login({ user, pass }: Auth): Promise<authApiResponse>;
   getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
-  logout({ userId }: { userId: string }): Promise<authApiResponse>;
+  // logout({ userId }: { userId: string }): Promise<authApiResponse>;
 }
 
 export type BatchOpResultType<F> =

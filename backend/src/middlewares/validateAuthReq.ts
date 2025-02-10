@@ -3,7 +3,7 @@ import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { ZodSchema } from "zod";
 
-export const validateRequest =
+export const validateAuthReq =
   (schema: ZodSchema) => (req: Request, _res: Response, next: NextFunction) => {
     try {
       const { user, pass } = req.body;

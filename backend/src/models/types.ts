@@ -49,11 +49,12 @@ export type IFileScrapper = {
 
 export type IDatabaseModel = {
   database: Database.Database;
+  BCRYPT_SALT_ROUNDS: number;
   checkIfUserExists({
     user,
   }: {
     user: string;
-  }): Promise<{ id: string; user: string }>;
+  }): Promise<{ id: string; user: string } | null>;
   saveRefreshToken({
     userId,
     refreshToken,
@@ -70,7 +71,7 @@ export type IDatabaseModel = {
   login({ user, pass }: Auth): Promise<{ userId: string }>;
   getPassByUser({ user }: { user: string }): Promise<{ pass: string }>;
   getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
-  logout({ userId }: { userId: string }): Promise<authApiResponse>;
+  // logout({ userId }: { userId: string }): Promise<authApiResponse>;
   createDB(name: string): Database.Database;
   createTables(db: Database.Database): void;
 };
@@ -82,7 +83,8 @@ export type IAuthModel = {
   generateAccessToken(userId: string): {
     accessToken: string;
   };
-  verifyJwt(
+  verifyJwt({ token }: { token: string }): string | JwtPayload;
+  verifyJwtMiddleware(
     req: Request & {
       auth?: {
         access: string | JwtPayload;
@@ -91,11 +93,6 @@ export type IAuthModel = {
     _res: Response,
     next: NextFunction
   ): void;
-  verifyRefreshToken({
-    refreshToken,
-  }: {
-    refreshToken: string;
-  }): string | JwtPayload;
 };
 
 /****************************************************************** */

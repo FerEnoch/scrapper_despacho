@@ -11,9 +11,11 @@ import { cwd } from "node:process";
 
 export class DatabaseModel implements IDatabaseModel {
   database: Database.Database;
+  BCRYPT_SALT_ROUNDS: number;
 
   constructor(private readonly dbName: string) {
     this.database = this.createDB(dbName);
+    this.BCRYPT_SALT_ROUNDS = +BCRYPT_SALT_ROUNDS;
     this.createTables(this.database);
     this.getRefreshTokenById = this.getRefreshTokenById.bind(this);
     this.checkIfUserExists = this.checkIfUserExists.bind(this);
@@ -22,7 +24,7 @@ export class DatabaseModel implements IDatabaseModel {
     this.login = this.login.bind(this);
     this.getPassByUser = this.getPassByUser.bind(this);
     this.getUserById = this.getUserById.bind(this);
-    this.logout = this.logout.bind(this);
+    // this.logout = this.logout.bind(this);
   }
 
   createDB(name: string = "default.db") {
@@ -47,23 +49,26 @@ export class DatabaseModel implements IDatabaseModel {
 
     createUsersTable.run();
     createAutnTokensTable.run();
+
+    console.log(
+      "🚀 ~ DatabaseModel ~ createTables ~ Tables created successfully"
+    );
   }
 
   async getRefreshTokenById({ userId }: { userId: string }) {
-    const stmt = this.database.prepare(
-      "SELECT refreshToken FROM auth WHERE id = $userId"
-    );
+    const stmt = this.database.prepare("SELECT * FROM auth WHERE id = $userId");
     const stmtResult = stmt.get({
       userId,
-    }) as unknown as { refreshToken: string } | undefined;
-    if (!stmtResult) {
+    }) as unknown as { refreshToken: string } | null;
+
+    const { refreshToken } = stmtResult || {};
+    if (!refreshToken) {
       throw new ApiError({
         statusCode: 404,
-        message: ERRORS.NOT_FOUND,
-        data: [{ userId }],
+        message: ERRORS.REFRESH_TOKEN_NOT_FOUND,
       });
     }
-    return stmtResult;
+    return { refreshToken };
   }
 
   async checkIfUserExists({ user }: { user: string }) {
@@ -71,18 +76,9 @@ export class DatabaseModel implements IDatabaseModel {
       "SELECT id, user FROM users WHERE user = $user"
     );
 
-    const stmtResult = getByNameStmt.get({
+    return getByNameStmt.get({
       user,
-    }) as unknown as { id: string; user: string } | undefined;
-
-    if (!stmtResult) {
-      throw new ApiError({
-        statusCode: 404,
-        message: ERRORS.NOT_FOUND,
-        data: [{ user }],
-      });
-    }
-    return stmtResult;
+    }) as unknown as { id: string; user: string } | null;
   }
 
   async saveRefreshToken({
@@ -93,14 +89,22 @@ export class DatabaseModel implements IDatabaseModel {
     refreshToken: string;
   }) {
     try {
-      this.database
+      const result = await this.database
         .prepare(
-          "INSERT INTO auth (id, refreshToken) VALUES ($id, $refreshToken)"
+          "INSERT OR REPLACE INTO auth (id, refreshToken) VALUES ($id, $refreshToken)"
         )
         .run({
           id: userId,
           refreshToken,
         });
+
+      if (result.changes === 0) {
+        throw new ApiError({
+          statusCode: 400,
+          message: ERRORS.REFRESH_TOKEN_SAVE_FAILED,
+          data: [{ userId }],
+        });
+      }
     } catch (error: any) {
       console.log("🚀 ~ saveRefreshToken ~ error:", error);
       throw new ApiError({
@@ -114,7 +118,7 @@ export class DatabaseModel implements IDatabaseModel {
 
   async register({ user, pass }: Auth) {
     try {
-      const hashedPass = await bcrypt.hash(pass, BCRYPT_SALT_ROUNDS);
+      const hashedPass = await bcrypt.hash(pass, this.BCRYPT_SALT_ROUNDS);
       const id = randomUUID();
 
       const loginStmt = this.database.prepare(
@@ -147,11 +151,11 @@ export class DatabaseModel implements IDatabaseModel {
 
   async login({ user, pass }: Auth) {
     try {
-      const hashedPass = await bcrypt.hash(pass, BCRYPT_SALT_ROUNDS);
+      const { pass: dbPass } = await this.getPassByUser({ user });
 
-      const dbPass = await this.getPassByUser({ user });
+      const isValidPass = await bcrypt.compare(pass, dbPass);
 
-      if (dbPass?.pass !== hashedPass) {
+      if (!isValidPass) {
         throw new ApiError({
           statusCode: 400,
           message: ERRORS.INVALID_CREDENTIALS,
@@ -165,7 +169,7 @@ export class DatabaseModel implements IDatabaseModel {
 
       const stmtResult = getByIdStmt.get({
         user,
-      }) as unknown as { userId: string } | undefined;
+      }) as unknown as { id: string } | null;
 
       if (!stmtResult) {
         throw new ApiError({
@@ -175,7 +179,7 @@ export class DatabaseModel implements IDatabaseModel {
         });
       }
 
-      return stmtResult;
+      return { userId: stmtResult.id };
     } catch (error: any) {
       console.log("🚀 ~ login ~ error:", error);
       throw new ApiError({
@@ -194,7 +198,7 @@ export class DatabaseModel implements IDatabaseModel {
 
       const stmtResult = getByNameStmt.get({
         user,
-      }) as unknown as { pass: string } | undefined;
+      }) as unknown as { pass: string } | null;
 
       if (!stmtResult) {
         throw new ApiError({
@@ -223,7 +227,7 @@ export class DatabaseModel implements IDatabaseModel {
 
       const checkInfo = getByIdStmt.get({
         id: userId,
-      }) as unknown as { id: string; user: string } | undefined;
+      }) as unknown as { id: string; user: string } | null;
 
       if (!checkInfo) {
         throw new ApiError({
@@ -246,33 +250,41 @@ export class DatabaseModel implements IDatabaseModel {
     }
   }
 
-  async logout({ userId }: { userId: string }) {
-    try {
-      const logoutStmt = this.database.prepare(
-        "DELETE FROM users WHERE id = $id"
-      );
+  /** NOT NEC TO DELETE USER FROM DATABAESE */
+  // async logout({ userId }: { userId: string }) {
+  //   try {
+  //     const deleteAuthStmt = this.database.prepare(
+  //       "DELETE FROM auth WHERE id = $id"
+  //     );
+  //     deleteAuthStmt.run({
+  //       id: userId,
+  //     });
 
-      const checkInfo = logoutStmt.run({
-        id: userId,
-      });
+  //     const logoutStmt = this.database.prepare(
+  //       "DELETE FROM users WHERE id = $id"
+  //     );
 
-      if (checkInfo.changes === 0) {
-        throw new ApiError({
-          statusCode: 404,
-          message: ERRORS.USER_NOT_FOUND,
-        });
-      }
+  //     const checkInfo = logoutStmt.run({
+  //       id: userId,
+  //     });
 
-      return {
-        userId,
-      };
-    } catch (error: any) {
-      console.log("🚀 ~ logout ~ error:", error);
-      throw new ApiError({
-        statusCode: 400,
-        message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
-        data: [{ userId }],
-      });
-    }
-  }
+  //     if (checkInfo.changes === 0) {
+  //       throw new ApiError({
+  //         statusCode: 404,
+  //         message: ERRORS.USER_NOT_FOUND,
+  //       });
+  //     }
+
+  //     return {
+  //       userId,
+  //     };
+  //   } catch (error: any) {
+  //     console.log("🚀 ~ logout ~ error:", error);
+  //     throw new ApiError({
+  //       statusCode: 500,
+  //       message: ERRORS.DB_TRANSACTION_FAILURE,
+  //       data: [{ userId }],
+  //     });
+  //   }
+  // }
 }

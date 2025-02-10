@@ -11,23 +11,24 @@ import { IAuthModel } from "./types";
 import ms from "ms";
 
 export class AuthModel implements IAuthModel {
-  private readonly jwtSecret: Secret;
-  private readonly jwtAccessExpiresIn: ms.StringValue;
-  private readonly jwtRefreshExpiresIn: ms.StringValue;
+  private readonly JWT_SECRET: Secret;
+  private readonly JWT_ACCESS_EXPIRES_IN: ms.StringValue;
+  private readonly JWT_REFRESH_EXPIRES_IN: ms.StringValue;
 
   constructor() {
-    this.jwtSecret = JWT_SECRET;
-    this.jwtAccessExpiresIn = JWT_ACCESS_EXPIRES_IN as ms.StringValue;
-    this.jwtRefreshExpiresIn = JWT_REFRESH_EXPIRES_IN as ms.StringValue;
+    this.JWT_SECRET = JWT_SECRET;
+    this.JWT_ACCESS_EXPIRES_IN = JWT_ACCESS_EXPIRES_IN as ms.StringValue;
+    this.JWT_REFRESH_EXPIRES_IN = JWT_REFRESH_EXPIRES_IN as ms.StringValue;
     this.generateAccessToken = this.generateAccessToken.bind(this);
     this.generateRefreshToken = this.generateRefreshToken.bind(this);
+    this.verifyJwtMiddleware = this.verifyJwtMiddleware.bind(this);
     this.verifyJwt = this.verifyJwt.bind(this);
   }
 
   generateRefreshToken(userId: string) {
     try {
-      const refresh = jwt.sign({ userId }, this.jwtSecret, {
-        expiresIn: this.jwtRefreshExpiresIn,
+      const refresh = jwt.sign({ userId }, this.JWT_SECRET, {
+        expiresIn: this.JWT_REFRESH_EXPIRES_IN,
       });
       return { refreshToken: refresh };
     } catch (error: any) {
@@ -42,8 +43,8 @@ export class AuthModel implements IAuthModel {
     accessToken: string;
   } {
     try {
-      const access = jwt.sign({ userId }, this.jwtSecret, {
-        expiresIn: this.jwtAccessExpiresIn,
+      const access = jwt.sign({ userId }, this.JWT_SECRET, {
+        expiresIn: this.JWT_ACCESS_EXPIRES_IN,
       });
 
       return { accessToken: access };
@@ -55,7 +56,27 @@ export class AuthModel implements IAuthModel {
     }
   }
 
-  verifyJwt(
+  verifyJwt({ token }: { token: string }) {
+    try {
+      const decoded = jwt.verify(token, this.JWT_SECRET);
+
+      if (!decoded) {
+        throw new ApiError({
+          statusCode: 400,
+          message: ERRORS.INVALID_TOKEN,
+        });
+      }
+
+      return decoded;
+    } catch (error: any) {
+      throw new ApiError({
+        statusCode: 500,
+        message: ERRORS.SERVER_ERROR,
+      });
+    }
+  }
+
+  verifyJwtMiddleware(
     req: Request & {
       auth?: {
         access: string | JwtPayload;
@@ -74,7 +95,7 @@ export class AuthModel implements IAuthModel {
         });
       }
 
-      const decoded = jwt.verify(accessToken, this.jwtSecret);
+      const decoded = jwt.verify(accessToken, this.JWT_SECRET);
 
       if (!decoded) {
         throw new ApiError({ statusCode: 401, message: ERRORS.INVALID_TOKEN });
@@ -96,23 +117,6 @@ export class AuthModel implements IAuthModel {
           })
         );
       }
-    }
-  }
-
-  verifyRefreshToken({ refreshToken }: { refreshToken: string }) {
-    try {
-      const decoded = jwt.verify(refreshToken, this.jwtSecret);
-
-      if (!decoded) {
-        throw new ApiError({ statusCode: 401, message: ERRORS.TOKEN_EXPIRED });
-      }
-
-      return decoded;
-    } catch (error: any) {
-      throw new ApiError({
-        statusCode: error?.message ? 401 : 500,
-        message: error?.message ?? ERRORS.SERVER_ERROR,
-      });
     }
   }
 }

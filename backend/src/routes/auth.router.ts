@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { modelTypes } from "../types";
-import { validateRequest } from "../middlewares/validateAuthReq";
+import { validateAuthReq } from "../middlewares/validateAuthReq";
 import { AuthSchema } from "../schemas/auth";
 import { AuthModel } from "../models/auth.model";
 
@@ -13,13 +13,13 @@ export async function initializeAuthRouter({
   const { login, register, getUserById, logout } = new AuthController({
     model,
   });
-  const { verifyJwt } = new AuthModel();
+  const { verifyJwtMiddleware } = new AuthModel();
 
   const router = Router();
-  router.post("/register", validateRequest(AuthSchema), register);
-  router.post("/login", verifyJwt, validateRequest(AuthSchema), login);
-  router.get("/user/:id", verifyJwt, getUserById);
-  router.post("/logout", verifyJwt, logout);
+  router.post("/register", validateAuthReq(AuthSchema), register);
+  router.post("/login", validateAuthReq(AuthSchema), login);
+  router.get("/user/:id", verifyJwtMiddleware, getUserById);
+  router.post("/logout", verifyJwtMiddleware, logout);
 
   return router;
 }

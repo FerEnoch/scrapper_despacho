@@ -1,20 +1,28 @@
 import { describe, test, expect } from "vitest";
-import { request } from "../setup";
+import { testAgent } from "../setup";
 import { MESSAGES } from "../../controllers/constants";
 
-describe("API-INTEGRATION > auth-router", () => {
+/**
+ * @description This test suite is for testing the API auth routes
+ * @dev To run this test suite, you need to have a running SIEM system user and password
+ * @dev Command to run this test suite:
+ *  - npm run test:back
+ */
+describe.only("API-INTEGRATION > auth-router", () => {
   /**
    * @route /auth/register
    * @method POST
-   * @description Register a new user
+   * @description Register a new user and return access token
    */
   test.skip("should register a new user", async () => {
-    const res = await request
+    const res = await testAgent
       .post("/auth/register")
-      .send({ name: "John Doe", pass: "password" });
+      .send({ user: "John Doe", pass: "password" });
 
-    expect(res.status).toBe(201);
+    // check response
+    expect(res.body.userId).toBeDefined();
     expect(res.body.message).toBe(MESSAGES.USER_REGISTERED);
+    expect(res.status).toBe(201);
   });
 
   /**
@@ -22,24 +30,66 @@ describe("API-INTEGRATION > auth-router", () => {
    * @method POST
    * @description Login a user
    */
-  // test("should login a user", async () => {
-  //   const res = await request
-  //     .post("/auth/login")
-  //     .send({ email: "john@example.com", password: "password" });
+  test.skip("should login a user", async () => {
+    await testAgent
+      .post("/auth/register")
+      .send({ user: "John Doe", pass: "password" });
 
-  //   expect(res.status).toBe(200);
-  //   expect(res.body.message).toBe(MESSAGES.USER_LOGGED_IN);
-  // });
+    const loginResponse = await testAgent
+      .post("/auth/login")
+      .send({ user: "John Doe", pass: "password" });
+
+    expect(loginResponse.headers["set-cookie"]).toBeDefined();
+    expect("cookie", "accessToken");
+
+    const cookie = loginResponse.headers["set-cookie"][0]
+      .split(";")[0]
+      .split("=")[1];
+    expect(cookie).toBeDefined();
+
+    expect(loginResponse.body.message).toBe(MESSAGES.USER_LOGGED_IN);
+    expect(loginResponse.status).toBe(201);
+  });
 
   /**
    * @route /auth/logout
    * @method POST
    * @description Logout a user
    */
-  // test("should logout a user", async () => {
-  //   const res = await request.post("/auth/logout");
+  test("should logout a user", async () => {
+    await testAgent
+      .post("/auth/register")
+      .send({ user: "John Doe", pass: "password" });
 
-  //   expect(res.status).toBe(200);
-  //   expect(res.body.message).toBe(MESSAGES.USER_LOGGED_OUT);
-  // });
+    const loginResponse = await testAgent
+      .post("/auth/login")
+      .send({ user: "John Doe", pass: "password" });
+
+    expect(loginResponse.headers["set-cookie"]).toBeDefined();
+    expect("cookie", "accessToken");
+
+    const loginCookies = loginResponse.headers[
+      "set-cookie"
+    ] as unknown as string[];
+    const accessToken = loginCookies
+      .find((cookie) => cookie.startsWith("accessToken="))
+      ?.split(";")[0]
+      .split("=")[1];
+
+    const logoutResponse = await testAgent
+      .post("/auth/logout")
+      .set("Cookie", `accessToken=${accessToken}`);
+
+    const logoutCookies = logoutResponse.headers[
+      "set-cookie"
+    ] as unknown as string[];
+    const logoutAccessToken = logoutCookies
+      .find((cookie) => cookie.startsWith("accessToken="))
+      ?.split(";")[0]
+      .split("=")[1];
+
+    expect(logoutAccessToken).toBeFalsy();
+    expect(logoutResponse.body.message).toBe(MESSAGES.USER_LOGGED_OUT);
+    expect(logoutResponse.status).toBe(200);
+  });
 });

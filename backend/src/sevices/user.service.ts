@@ -15,15 +15,13 @@ export class UserService implements IUserService {
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.getUserById = this.getUserById.bind(this);
-    this.logout = this.logout.bind(this);
+    // this.logout = this.logout.bind(this);
   }
 
   async register({ user, pass }: Auth) {
     const { userId } = await this.databaseModel.register({ user, pass });
 
-    const { accessToken, refreshToken } =
-      this.authModel.generateAccessToken(userId);
-
+    const { refreshToken } = this.authModel.generateRefreshToken(userId);
     await this.databaseModel.saveRefreshToken({
       userId,
       refreshToken,
@@ -31,57 +29,77 @@ export class UserService implements IUserService {
 
     return {
       userId,
-      token: accessToken,
     };
   }
 
   async login({ user, pass }: Auth) {
-    const checkInfo = await this.databaseModel.checkIfUserExists({ user });
+    /**
+     * Check if user exists: Verify that the user exists in the database.
+     * Authenticate user: Verify the user's credentials (username and password).
+     * Generate access token: Generate a new access token for the user.
+     * Check if refresh token is valid: Verify the validity of the existing refresh token.
+     * Revalidate refresh token if invalid: If the refresh token is invalid, generate a new refresh token.
+     * Return userId and access token: Return the userId and the new access token.
+     */
 
-    if (!checkInfo) {
-      throw new ApiError({
-        statusCode: 404,
-        message: ERRORS.USER_NOT_FOUND,
+    try {
+      // 1. Check if user exists
+      const userExists = await this.databaseModel.checkIfUserExists({ user });
+      if (!userExists) {
+        throw new ApiError({
+          statusCode: 404,
+          message: ERRORS.USER_NOT_FOUND,
+        });
+      }
+      // 2. Authenticate user
+      const { userId } = await this.databaseModel.login({ user, pass });
+
+      // 3. Generate access token
+      const { accessToken } = this.authModel.generateAccessToken(userId);
+
+      // 4. Check if refresh token is valid
+      let { refreshToken } = await this.databaseModel.getRefreshTokenById({
+        userId,
       });
-    }
 
-    const userData = await this.databaseModel.login({ user, pass });
+      try {
+        this.authModel.verifyJwt({ token: refreshToken });
+      } catch (error: any) {
+        // 5. Revalidate refresh token if invalid
+        if (error.message === ERRORS.INVALID_TOKEN) {
+          const { refreshToken: freshRefreshToken } =
+            this.authModel.generateRefreshToken(userId);
+          await this.databaseModel.saveRefreshToken({
+            userId,
+            refreshToken,
+          });
+          refreshToken = freshRefreshToken;
+        } else {
+          throw error;
+        }
+      }
 
-    if (!userData) {
+      return {
+        userId,
+        token: accessToken,
+      };
+    } catch (error: any) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
       throw new ApiError({
-        statusCode: 404,
+        statusCode: 400,
         message: ERRORS.INVALID_CREDENTIALS,
       });
     }
-
-    const { userId } = userData;
-    const refreshTokenData = await this.databaseModel.getRefreshTokenById({
-      userId: userId,
-    });
-
-    if (!refreshTokenData) {
-      throw new ApiError({
-        statusCode: 404,
-        message: ERRORS.TOKEN_EXPIRED,
-      });
-    }
-
-    const { refreshToken } = refreshTokenData;
-
-    const result = this.authModel.verifyRefreshToken({
-      refreshToken,
-    }) as string;
-
-    return {
-      userId: result,
-    };
   }
 
   async getUserById({ userId }: { userId: string }) {
     return await this.databaseModel.getUserById({ userId });
   }
 
-  async logout({ userId }: { userId: string }) {
-    return await this.databaseModel.logout({ userId });
-  }
+  /** NOT NEC TO DELETE USER FROM DATABAESE */
+  // async logout({ userId }: { userId: string }) {
+  // return await this.databaseModel.logout({ userId });
+  // }
 }

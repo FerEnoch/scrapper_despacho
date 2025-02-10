@@ -29,15 +29,9 @@ export class AuthController implements IAuthController {
     try {
       const { user, pass } = req.body as Auth;
 
-      const { userId, token } = await this.service.register({
+      const { userId } = await this.service.register({
         user,
         pass,
-      });
-
-      res.cookie("accessToken", token, {
-        httpOnly: true,
-        secure: NODE_ENV === "production",
-        sameSite: "strict",
       });
 
       res.status(201).json({
@@ -66,12 +60,15 @@ export class AuthController implements IAuthController {
     try {
       const { user, pass } = req.body as Auth;
 
-      const access = req.auth?.access;
-      console.log("🚀 ~ AuthController ~ login ~ access:", access);
-
-      const { userId } = await this.service.login({
+      const { userId, token } = await this.service.login({
         user,
         pass,
+      });
+
+      res.cookie("accessToken", token, {
+        httpOnly: true,
+        secure: NODE_ENV === "production",
+        sameSite: "strict",
       });
 
       res.status(201).json({
@@ -136,14 +133,11 @@ export class AuthController implements IAuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { id } = req.body as { id: string };
+      const { userId } = req.auth?.access as { userId: string };
 
-      const access = req.auth?.access;
-      console.log("🚀 ~ AuthController ~ logout ~ access:", access);
-
-      const { userId } = await this.service.logout({
-        userId: id,
-      });
+      // await this.service.logout({
+      //   userId,
+      // });
 
       res.clearCookie("accessToken");
 
