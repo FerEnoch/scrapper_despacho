@@ -16,7 +16,7 @@ export async function initializeApp({
   });
 
   const v1Router = await v1Routes({ filesModel: model });
-  app.use("/v1", v1Router);
+  app.use("/api/v1", v1Router);
 
   /* Handle errors */
   app.use(handle404Error, handleGlobalError);

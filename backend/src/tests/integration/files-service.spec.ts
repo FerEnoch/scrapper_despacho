@@ -11,8 +11,8 @@ import { filesEnded } from "../sample_data/filesEnded";
 /**
  * @description Playwright tests
  * @dev To run tests:
- *  1. npm run test:fs-service
- *  2. npm run report:test:fs-service
+ *  1. npm run fs-service:test
+ *  2. npm run fs-service:report:test
  */
 
 test("FILES-SERVICE > Should login in SIEM page", async () => {

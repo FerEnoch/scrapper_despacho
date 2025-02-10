@@ -14,10 +14,12 @@
     "start": "node dist/server.js",
     "build": "NODE_ENV=production tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "nodemon",
-    "test:back": "NODE_ENV=test vitest",
-    "test:fs-service": "NODE_ENV=test npx playwright test ./src/tests/integration/*.spec.ts --output ./src/tests/integration/.pw-last",
-    "report:test:fs-service": "NODE_ENV=test npx playwright test ./src/tests/integration/*.spec.ts --output ./src/tests/integration/.pw-last && npx playwright show-report",
-    "test": "NODE_ENV=test npm-run-all test:*"
+    "back:test": "NODE_ENV=test vitest",
+    "test:back:run": "NODE_ENV=test vitest --run",
+    "fs-service:test": "NODE_ENV=test npx playwright test ./src/tests/integration/*.spec.ts --output ./src/tests/integration/.pw-last",
+    "test:fs-service:run": "NODE_ENV=test npx playwright test ./src/tests/integration/*.spec.ts --output ./src/tests/integration/.pw-last",
+    "fs-service:report:test": "NODE_ENV=test npx playwright test ./src/tests/integration/*.spec.ts --output ./src/tests/integration/.pw-last && npx playwright show-report",
+    "test": "NODE_ENV=test npm-run-all test:*:run"
   },
   "dependencies": {
     "@playwright/test": "1.49.1",

@@ -6,9 +6,9 @@ import { getJsonSampleDataFile } from "../json-imports.js";
 /**
  * @description This test suite is for testing the API lib functions
  * @dev Command to run this test suite:
- *  - npm run test:backend
+ *  - npm run back:test
  */
-describe.skip("LIB-FUNCTIONS > filesScrapper", () => {
+describe("LIB-FUNCTIONS > filesScrapper", () => {
   it("should return a list of files stats", async () => {
     const jsonDataFiles = await getJsonSampleDataFile("jsonDataFiles.json");
     const { ok, parsedData } = await parseRawFiles(JSON.parse(jsonDataFiles), {

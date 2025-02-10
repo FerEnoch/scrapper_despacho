@@ -28,9 +28,9 @@ export class DatabaseModel implements IDatabaseModel {
   }
 
   createDB(name: string = "default.db") {
-    let databaseFolder = "./db";
+    let databaseFolder = "db";
     if (NODE_ENV === "test") {
-      databaseFolder = "./db-test";
+      databaseFolder = "db-test";
     }
     const dbPath = path.resolve(cwd(), databaseFolder, name);
     const db = new Database(dbPath, {
@@ -53,9 +53,11 @@ export class DatabaseModel implements IDatabaseModel {
     createUsersTable.run();
     createAutnTokensTable.run();
 
-    console.log(
-      "🚀 ~ DatabaseModel ~ createTables ~ Tables created successfully"
-    );
+    if (NODE_ENV !== "test") {
+      console.log(
+        "🚀 ~ DatabaseModel ~ createTables ~ Tables created successfully"
+      );
+    }
   }
 
   async getRefreshTokenById({ userId }: { userId: string }) {
