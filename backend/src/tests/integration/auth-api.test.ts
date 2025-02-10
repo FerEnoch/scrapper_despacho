@@ -14,7 +14,7 @@ describe.only("API-INTEGRATION > auth-router", () => {
    * @method POST
    * @description Register a new user and return access token
    */
-  test.skip("should register a new user", async () => {
+  test("should register a new user", async () => {
     const res = await testAgent
       .post("/auth/register")
       .send({ user: "John Doe", pass: "password" });
@@ -30,7 +30,7 @@ describe.only("API-INTEGRATION > auth-router", () => {
    * @method POST
    * @description Login a user
    */
-  test.skip("should login a user", async () => {
+  test("should login a user", async () => {
     await testAgent
       .post("/auth/register")
       .send({ user: "John Doe", pass: "password" });

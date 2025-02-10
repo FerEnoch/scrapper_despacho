@@ -5,7 +5,7 @@ import Database from "better-sqlite3";
 import bcrypt from "bcrypt";
 import { randomUUID } from "node:crypto";
 import { ERRORS } from "../errors/types";
-import { BCRYPT_SALT_ROUNDS } from "../config";
+import { BCRYPT_SALT_ROUNDS, NODE_ENV } from "../config";
 import path from "node:path";
 import { cwd } from "node:process";
 
@@ -28,13 +28,16 @@ export class DatabaseModel implements IDatabaseModel {
   }
 
   createDB(name: string = "default.db") {
-    const dbPath = path.resolve(cwd(), "./db", name);
+    let databaseFolder = "./db";
+    if (NODE_ENV === "test") {
+      databaseFolder = "./db-test";
+    }
+    const dbPath = path.resolve(cwd(), databaseFolder, name);
     const db = new Database(dbPath, {
       // verbose: console.log,
     });
     db.pragma("journal_mode = WAL");
     db.pragma("synchonous = 1");
-
     return db;
   }
 
