@@ -1,3 +1,4 @@
+import { Eye, EyeClosed } from "lucide-react";
 import {
   AlertDialogAction,
   AlertDialogFooter,
@@ -17,6 +18,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { useState } from "react";
 
 interface LoginFormProps {
   actionButton: string;
@@ -24,6 +26,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -31,6 +34,10 @@ export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
       password: "",
     },
   });
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible((isVisible) => !isVisible);
+  };
 
   const onSubmit = (data: z.infer<typeof loginFormSchema>) => {
     console.log("🚀 ~ onSubmit ~ data:", data);
@@ -51,7 +58,7 @@ export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
               <FormLabel htmlFor="username">Usuario SIEM</FormLabel>
               <FormControl>
                 <Input
-                  // className="bg-white cursor-pointer hover:bg-gray-100 rounded-md"
+                  className="ps-2 w-48"
                   type="text"
                   id="username"
                   placeholder="Nombre de usuario"
@@ -70,12 +77,31 @@ export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
             <FormItem>
               <FormLabel htmlFor="pass">Contraseña SIEM</FormLabel>
               <FormControl>
-                <Input
-                  className="bg-white cursor-pointer hover:bg-gray-100 rounded-md"
-                  type="password"
-                  id="pass"
-                  {...field}
-                />
+                <div className="flex items-center justify-between relative">
+                  <Input
+                    className="ps-2 w-48"
+                    type={isPasswordVisible ? "text" : "password"}
+                    id="pass"
+                    {...field}
+                  />
+                  {isPasswordVisible ? (
+                    <Eye
+                      className="
+                        absolute left-40
+                        text-gray-400 hover:text-gray-500 cursor-pointer w-4
+                        "
+                      onClick={togglePasswordVisibility}
+                    />
+                  ) : (
+                    <EyeClosed
+                      className="
+                        absolute left-40
+                        text-gray-400 hover:text-gray-500 cursor-pointer w-4
+                        "
+                      onClick={togglePasswordVisibility}
+                    />
+                  )}
+                </div>
               </FormControl>
               {/* <FormDescription>Contraseña SIEM</FormDescription> */}
               <FormMessage />
