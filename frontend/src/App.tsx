@@ -29,17 +29,23 @@ import { FileStats } from "./types";
 import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
-import { FilesStatsFetchingError } from "./components/errorModal/FilesStatsFetchingError";
-import { CARD_TEXTS, UI_ERROR_MESSAGES } from "./i18n/constants";
+import {
+  CARD_TEXTS,
+  UI_ERROR_MESSAGES,
+  UI_MODAL_MESSAGES,
+} from "./i18n/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
 import { SpeedDial } from "./components/speedDial/SpeedDial";
+import { ErrorModal } from "./components/modal/ErrorModal";
+import { AuthModal } from "./components/modal/AuthModal";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
   const [isSerching, setIsSearching] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
+  const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [modalMsg, setModalMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,8 +69,12 @@ export default function App() {
     setFilesData(data);
   };
 
-  const toggleAlertDialog = () => {
+  const toggleErrorModal = () => {
     setIsError((error) => !error);
+  };
+
+  const toggleAuthModal = () => {
+    setOpenAuthModal((auth) => !auth);
   };
 
   const handleResponseMessages = ({
@@ -72,6 +82,12 @@ export default function App() {
     data,
   }: ApiResponseStats<FileStats | RawFile>) => {
     switch (message) {
+      case API_ERRORS.UNAUTHORIZED:
+        setIsSearching(false);
+        setModalMsg(UI_ERROR_MESSAGES[message]);
+        setOpenAuthModal(true);
+        return;
+
       case API_ERRORS.SERVER_ERROR:
       case API_ERRORS.INVALID_FILE:
       case API_ERRORS.NO_FILE_TO_UPLOAD:
@@ -79,25 +95,21 @@ export default function App() {
       case API_ERRORS.GENERIC_ERROR:
       case API_ERRORS.NO_FILE_STATS_RETRIEVED:
         setIsSearching(false);
-        setErrorMsg(UI_ERROR_MESSAGES[message]);
+        setModalMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
-        // toggleAlertDialog();
         setFilesData([]);
         return;
-
       case API_ERRORS.INVALID_DATA:
-        setErrorMsg(UI_ERROR_MESSAGES[message]);
-        setIsError(true);
-        // toggleAlertDialog();
-        setErrorFiles(data as RawFile[]);
         setIsSearching(false);
+        setModalMsg(UI_ERROR_MESSAGES[message]);
+        setIsError(true);
+        setErrorFiles(data as RawFile[]);
         setFilesData([]);
         return;
 
       case API_ERRORS.NO_FILES_TO_END:
-        setErrorMsg(UI_ERROR_MESSAGES[message]);
+        setModalMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
-        // toggleAlertDialog();
         return;
 
       default:
@@ -218,15 +230,23 @@ export default function App() {
               </div>
             </form>
           </Form>
-          <FilesStatsFetchingError
-            dialogTitle="Error"
-            dialogDescription={errorMsg}
-            errorFiles={errorFiles}
-            isOpen={isError}
-            toggleAlertDialog={toggleAlertDialog}
-          />
         </CardContent>
       </Card>
+      <ErrorModal
+        dialogTitle={UI_MODAL_MESSAGES.ERROR_MODAL.FILES_ERROR.dialogTitle}
+        actionButton={UI_MODAL_MESSAGES.ERROR_MODAL.FILES_ERROR.actionButton}
+        dialogDescription={modalMsg}
+        errorFiles={errorFiles}
+        isOpen={isError}
+        toggleAlertDialog={toggleErrorModal}
+      />
+      <AuthModal
+        dialogTitle={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.dialogTitle}
+        actionButton={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.actionButton}
+        dialogDescription={modalMsg}
+        isOpen={openAuthModal}
+        toggleAlertDialog={toggleAuthModal}
+      />
       {isSerching && <TableSkeleton />}
       {filesData.length > 0 && !isSerching ? (
         <>

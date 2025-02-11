@@ -14,6 +14,20 @@ const UI_ERROR_MESSAGES: uiErrorMessages = {
   [API_ERRORS.NO_FILES_ENDED]: `No se encontraron expediente en curso para finalizar.`,
   [API_ERRORS.NO_FILE_STATS_RETRIEVED]: `No se encontraron datos de expedientes.`,
   [API_ERRORS.GENERIC_ERROR]: `Ocurrió un error. Por favor, intenta nuevamente.`,
+  [API_ERRORS.UNAUTHORIZED]: `Necesitas iniciar sesión para finalizar los expedientes.`,
+} as const;
+
+const UI_MODAL_MESSAGES = {
+  ERROR_MODAL: {
+    FILES_ERROR: {
+      dialogTitle: "Error en los expedientes",
+      actionButton: "Continuar",
+    },
+    AUTH_ERROR: {
+      dialogTitle: "Error de autenticación",
+      actionButton: "Iniciar sesión",
+    },
+  },
 } as const;
 
 const CARD_TEXTS = {
@@ -21,4 +35,4 @@ const CARD_TEXTS = {
   body: `Carga un archivo .csv que contenga una columna "Número" con el número completo de expediente SIEM. Podrás visualizar su estado actual y finalizar su tramitación.`,
 };
 
-export { UI_ERROR_MESSAGES, CARD_TEXTS };
+export { UI_ERROR_MESSAGES, UI_MODAL_MESSAGES, CARD_TEXTS };

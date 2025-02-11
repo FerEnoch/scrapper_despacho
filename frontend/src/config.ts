@@ -1,10 +1,11 @@
 const {
   VITE_API_BASE_URL_LOCAL,
   VITE_API_BASE_URL_REMOTE,
-  VITE_FILE_STATS_PATH,
-  VITE_SIEM_BASE_URL,
   VITE_REMOTE_FLAG = 0,
 } = import.meta.env;
+
+const VITE_SIEM_BASE_URL = "https://siem.santafeciudad.gov.ar";
+const VITE_FILE_STATS_PATH = "/expediente_ver.php?id=";
 
 const SIEM_FILE_STATS_URL = `${VITE_SIEM_BASE_URL}${VITE_FILE_STATS_PATH}`;
 

@@ -87,17 +87,18 @@ export const api = {
         body: JSON.stringify(filesToEnd),
       });
 
-      const responseData =
-        (await response.json()) as ApiResponseStats<FileStats>;
-      if (response.ok) {
+      if (response.status === 401) {
         return {
-          message: responseData.message ?? "",
-          data: responseData.data ?? [],
+          message: API_ERRORS.UNAUTHORIZED,
         };
       }
+
+      const responseData =
+        (await response.json()) as ApiResponseStats<FileStats>;
+
       return {
         message: responseData.message ?? "",
-        data: [],
+        data: responseData?.data ?? [],
       };
     } catch (error) {
       console.log("🚀 ~ endFiles ~ error:", error);

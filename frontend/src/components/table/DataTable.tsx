@@ -65,10 +65,10 @@ export function DataTable<TData, TValue>({
           <div
             className="
             ps-2 md:ps-0
-          h-14 space-y-2 md:space-y-4
-          flex flex-col items-start justify-center
-          md:flex-row md:items-center md:justify-between 
-          "
+            h-14 space-y-2 md:space-y-4
+            flex flex-col items-start justify-center
+            md:flex-row md:items-center md:justify-between 
+            "
           >
             <Button
               className="

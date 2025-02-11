@@ -59,7 +59,7 @@ export const Columns: ColumnDef<FileStats>[] = [
             href={`${SIEM_FILE_STATS_URL}${fileShortNum}`}
             target="_blank"
             rel="noreferrer"
-            className="hover:font-semibold"
+            className="hover:text-gray-950"
           >
             {row.getValue("num")}
           </a>
