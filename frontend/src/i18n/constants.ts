@@ -28,6 +28,10 @@ const UI_MODAL_MESSAGES = {
       actionButton: "Iniciar sesión",
     },
   },
+  LOGIN: {
+    dialogTitle: "Usa tus credenciales de SIEM",
+    actionButton: "Iniciar sesión",
+  }
 } as const;
 
 const CARD_TEXTS = {

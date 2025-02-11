@@ -9,7 +9,6 @@ import { ModalDialog } from "../ui/modal-dialog";
 
 interface LoginAuthModalProps {
   dialogTitle: string;
-  dialogDescription: string;
   actionButton: string;
   isOpen: boolean;
   toggleAlertDialog: () => void;
@@ -21,7 +20,6 @@ interface LoginAuthModalProps {
  */
 export function LoginAuthModal({
   dialogTitle,
-  dialogDescription,
   actionButton,
   isOpen,
   toggleAlertDialog,
@@ -38,7 +36,7 @@ export function LoginAuthModal({
           {dialogTitle}
         </AlertDialogTitle>
         <AlertDialogDescription className="leading-6">
-          {dialogDescription}
+          {""}
         </AlertDialogDescription>
         <AlertDialogDescription className="h-full w-full mt-2">
           {""}

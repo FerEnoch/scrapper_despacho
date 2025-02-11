@@ -21,7 +21,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onEndFilesClick: (apiResponseData: ApiResponseStats<FileStats>) => void;
-  onDataChange: (data: FileStats[]) => void;
+  onDataChange: (data: FileStats[], message: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -46,11 +46,9 @@ export function DataTable<TData, TValue>({
     if (selectedValues.length === 0) {
       return;
     }
-
     setIsLoading(true);
     setIsEndingFiles(true);
     const response = await api.endFiles(selectedValues as FileStats[]);
-
     onEndFilesClick(response);
 
     setIsLoading(false);

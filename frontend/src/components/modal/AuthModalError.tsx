@@ -13,6 +13,7 @@ interface AuthModalErrorProps {
   actionButton: string;
   isOpen: boolean;
   toggleAlertDialog: () => void;
+  toggleLoginModal: () => void;
 }
 export function AuthModalError({
   dialogTitle,
@@ -20,6 +21,7 @@ export function AuthModalError({
   actionButton,
   isOpen,
   toggleAlertDialog,
+  toggleLoginModal,
 }: AuthModalErrorProps) {
   return (
     <ModalDialog isOpen={isOpen}>
@@ -40,7 +42,18 @@ export function AuthModalError({
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter className="mt-4">
-        <AlertDialogAction onClick={() => toggleAlertDialog()}>
+        <AlertDialogAction
+          className="bg-transparent hover:text-red-400 shadow-none"
+          onClick={() => toggleAlertDialog()}
+        >
+          {"Cancelar"}
+        </AlertDialogAction>
+        <AlertDialogAction
+          onClick={() => {
+            toggleAlertDialog();
+            toggleLoginModal();
+          }}
+        >
           {actionButton}
         </AlertDialogAction>
       </AlertDialogFooter>

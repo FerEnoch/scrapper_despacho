@@ -1,4 +1,4 @@
-import { FileStats } from "@/types";
+import { ApiResponseStats, FileStats } from "@/types";
 import {
   getCoreRowModel,
   useReactTable,
@@ -15,7 +15,7 @@ import { useState } from "react";
 interface useTableProps<TData, TValue> {
   data: TData[];
   columns: ColumnDef<TData, TValue>[];
-  onDataChange: (data: FileStats[]) => void;
+  onDataChange: (data: FileStats[], message: string) => void;
 }
 
 export function useTable<TData, TValue>({
@@ -49,23 +49,29 @@ export function useTable<TData, TValue>({
       pagination,
     },
     meta: {
-      updateData: (rowIndex: number, value: FileStats | null | undefined) => {
-        if (!value) return;
+      updateData: (
+        rowIndex: number,
+        apiResponse: ApiResponseStats<FileStats>
+      ) => {
+        const apiResponseMessage = apiResponse.message;
+        const [updatedFileStats] = apiResponse?.data || [];
+
         setIsEndingFiles(true);
         const newData = [...data].map((file, index) => {
           if (index === rowIndex) {
+            if (!updatedFileStats) return file;
             return {
-              ...value,
+              ...updatedFileStats,
               prevStatus:
-                (value.newStatus
-                  ? value.newStatus?.status
-                  : value.prevStatus) ?? "",
+                (updatedFileStats.newStatus
+                  ? updatedFileStats.newStatus?.status
+                  : updatedFileStats.prevStatus) ?? "",
             };
           }
           return file;
         }) as FileStats[];
 
-        onDataChange(newData);
+        onDataChange(newData, apiResponseMessage);
         setIsEndingFiles(false);
       },
     },

@@ -29,21 +29,17 @@ import { FileStats } from "./types";
 import { useState } from "react";
 import { DataTable } from "./components/table/DataTable";
 import { TableSkeleton } from "./components/table/TableSkeleton";
-import {
-  CARD_TEXTS,
-  UI_ERROR_MESSAGES,
-  UI_MODAL_MESSAGES,
-} from "./i18n/constants";
+import { CARD_TEXTS, UI_ERROR_MESSAGES } from "./i18n/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
 import { SpeedDial } from "./components/speedDial/SpeedDial";
-import { FilesErrorModal } from "./components/modal/FilesErrorModal";
-import { AuthModalError } from "./components/modal/AuthModalError";
+import { Modals } from "./components/modal/Modals";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
   const [isSerching, setIsSearching] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
+  const [openLoginModal, setOpenLoginModal] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [modalMsg, setModalMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
@@ -65,12 +61,18 @@ export default function App() {
     }
   };
 
-  const onDataChange = (data: FileStats[]) => {
+  const onDataChange = (data: FileStats[], message: string) => {
+    handleResponseMessages({ message, data });
+
     setFilesData(data);
   };
 
   const toggleErrorModal = () => {
     setIsError((error) => !error);
+  };
+
+  const toggleLoginModal = () => {
+    setOpenLoginModal((login) => !login);
   };
 
   const toggleAuthModal = () => {
@@ -99,6 +101,7 @@ export default function App() {
         setIsError(true);
         setFilesData([]);
         return;
+
       case API_ERRORS.INVALID_DATA:
         setIsSearching(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
@@ -139,6 +142,7 @@ export default function App() {
 
   const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
     const data = handleResponseMessages(apiResponseData);
+    console.log("🚀 ~ onEndFilesClick ~ data:", data);
 
     const newState = filesData.map((currentFile) => {
       if (!data) return currentFile;
@@ -173,7 +177,6 @@ export default function App() {
             </p>
           </CardDescription>
         </CardHeader>
-
         <CardContent>
           <Form {...form}>
             <form
@@ -232,20 +235,15 @@ export default function App() {
           </Form>
         </CardContent>
       </Card>
-      <FilesErrorModal
-        dialogTitle={UI_MODAL_MESSAGES.ERROR_MODAL.FILES_ERROR.dialogTitle}
-        actionButton={UI_MODAL_MESSAGES.ERROR_MODAL.FILES_ERROR.actionButton}
-        dialogDescription={modalMsg}
+      <Modals
+        modalMsg={modalMsg}
+        isError={isError}
         errorFiles={errorFiles}
-        isOpen={isError}
-        toggleAlertDialog={toggleErrorModal}
-      />
-      <AuthModalError
-        dialogTitle={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.dialogTitle}
-        actionButton={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.actionButton}
-        dialogDescription={modalMsg}
-        isOpen={openAuthModal}
-        toggleAlertDialog={toggleAuthModal}
+        toggleErrorModal={toggleErrorModal}
+        openAuthModal={openAuthModal}
+        openLoginModal={openLoginModal}
+        toggleAuthModal={toggleAuthModal}
+        toggleLoginModal={toggleLoginModal}
       />
       {isSerching && <TableSkeleton />}
       {filesData.length > 0 && !isSerching ? (

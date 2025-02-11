@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { FileStats } from "../../types";
+import {  FileStats } from "../../types";
 import { Button } from "../ui/button";
 import { SIEM_FILE_STATS_URL } from "@/config";
 import { ArrowUpDown } from "lucide-react";
@@ -199,11 +199,9 @@ export const Columns: ColumnDef<FileStats>[] = [
         };
 
         const apiResponse = await api.endFiles([selectedValues] as FileStats[]);
-        const [updatedFileStats] = apiResponse?.data || [];
 
         setIsEndingFile(false);
-        if (!updatedFileStats) return;
-        table.options.meta?.updateData(row.index, updatedFileStats);
+        table.options.meta?.updateData(row.index, apiResponse);
       };
 
       const handleSearchFileClick = async () => {
@@ -212,9 +210,8 @@ export const Columns: ColumnDef<FileStats>[] = [
 
         const selectedNum = row.getValue("num") as string;
         const apiResponse = await api.getFilesStats(selectedNum);
-        const [updatedFileStats] = apiResponse?.data || [];
 
-        table.options.meta?.updateData(row.index, updatedFileStats);
+        table.options.meta?.updateData(row.index, apiResponse);
         setIsSearchingStats(false);
       };
 
