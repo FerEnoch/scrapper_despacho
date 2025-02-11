@@ -36,8 +36,8 @@ import {
 } from "./i18n/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
 import { SpeedDial } from "./components/speedDial/SpeedDial";
-import { ErrorModal } from "./components/modal/ErrorModal";
-import { AuthModal } from "./components/modal/AuthModal";
+import { FilesErrorModal } from "./components/modal/FilesErrorModal";
+import { AuthModalError } from "./components/modal/AuthModalError";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
@@ -232,7 +232,7 @@ export default function App() {
           </Form>
         </CardContent>
       </Card>
-      <ErrorModal
+      <FilesErrorModal
         dialogTitle={UI_MODAL_MESSAGES.ERROR_MODAL.FILES_ERROR.dialogTitle}
         actionButton={UI_MODAL_MESSAGES.ERROR_MODAL.FILES_ERROR.actionButton}
         dialogDescription={modalMsg}
@@ -240,7 +240,7 @@ export default function App() {
         isOpen={isError}
         toggleAlertDialog={toggleErrorModal}
       />
-      <AuthModal
+      <AuthModalError
         dialogTitle={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.dialogTitle}
         actionButton={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.actionButton}
         dialogDescription={modalMsg}
