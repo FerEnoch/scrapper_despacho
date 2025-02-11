@@ -1,11 +1,10 @@
 import {
-  AlertDialogAction,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ModalDialog } from "../ui/modal-dialog";
+import { ModalDialog } from "@/components/ui/modal-dialog";
+import { LoginForm } from "../login/LoginForm";
 
 interface LoginAuthModalProps {
   dialogTitle: string;
@@ -35,18 +34,14 @@ export function LoginAuthModal({
         <AlertDialogTitle className="text-gray-700">
           {dialogTitle}
         </AlertDialogTitle>
-        <AlertDialogDescription className="leading-6">
-          {""}
-        </AlertDialogDescription>
-        <AlertDialogDescription className="h-full w-full mt-2">
-          {""}
-        </AlertDialogDescription>
       </AlertDialogHeader>
-      <AlertDialogFooter className="mt-4">
-        <AlertDialogAction onClick={() => toggleAlertDialog()}>
-          {actionButton}
-        </AlertDialogAction>
-      </AlertDialogFooter>
+
+      <AlertDialogDescription className="h-full w-full mt-2">
+        <LoginForm
+          actionButton={actionButton}
+          toggleAlertDialog={toggleAlertDialog}
+        />
+      </AlertDialogDescription>
     </ModalDialog>
   );
 }

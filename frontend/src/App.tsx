@@ -18,8 +18,7 @@ import {
 
 import { Columns } from "./components/table/Columns";
 import { Input } from "@/components/ui/input";
-
-import { formSchema } from "@/schemas/form";
+import { uploadFileFormSchema } from "@/schemas/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -39,12 +38,12 @@ export default function App() {
   const [isSerching, setIsSearching] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
-  const [openLoginModal, setOpenLoginModal] = useState<boolean>(false);
+  const [openLoginModal, setOpenLoginModal] = useState<boolean>(true);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [modalMsg, setModalMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof uploadFileFormSchema>>({
+    resolver: zodResolver(uploadFileFormSchema),
     defaultValues: {
       file: undefined,
     },
@@ -122,7 +121,7 @@ export default function App() {
     }
   };
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof uploadFileFormSchema>) => {
     setIsSearching(true);
     setIsError(false);
     setErrorFiles([]);
@@ -142,7 +141,6 @@ export default function App() {
 
   const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
     const data = handleResponseMessages(apiResponseData);
-    console.log("🚀 ~ onEndFilesClick ~ data:", data);
 
     const newState = filesData.map((currentFile) => {
       if (!data) return currentFile;
