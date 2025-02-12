@@ -37,4 +37,5 @@ export type ApiResponse<T> = {
 export type UserSession = {
   userId: string;
   user: string;
+  pass: string;
 };

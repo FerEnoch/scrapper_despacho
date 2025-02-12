@@ -19,8 +19,7 @@ export class FilesScrapper implements IFileScrapper {
   SIEM_LOCATE_FILE_LOCATION: locationType;
   AUTH_DENIED_PAGE_TITLE: locationType;
   AUTH_DENIED_PAGE_MSG: locationType;
-  AUTH_GRANTED_PAGE_TITLE: locationType;
-  AUTH_GRANTED_PAGE_USER: locationType;
+  AUTH_GRANTED_PAGE_CHECK: locationType;
 
   constructor() {
     const {
@@ -33,8 +32,7 @@ export class FilesScrapper implements IFileScrapper {
       SIEM_LOCATE_FILE_LOCATION,
       AUTH_DENIED_PAGE_TITLE,
       AUTH_DENIED_PAGE_MSG,
-      AUTH_GRANTED_PAGE_TITLE,
-      AUTH_GRANTED_PAGE_USER,
+      AUTH_GRANTED_PAGE_CHECK,
     } = SIEM_PAGE_DATA;
     this.END_FILE_TEXT = END_FILE_TEXT;
     this.SIEM_SEARCH_FILE_PATH = SIEM_SEARCH_FILE_PATH;
@@ -47,13 +45,12 @@ export class FilesScrapper implements IFileScrapper {
     this.SIEM_LOCATE_FILE_LOCATION = SIEM_LOCATE_FILE_LOCATION;
     this.AUTH_DENIED_PAGE_TITLE = AUTH_DENIED_PAGE_TITLE;
     this.AUTH_DENIED_PAGE_MSG = AUTH_DENIED_PAGE_MSG;
-    this.AUTH_GRANTED_PAGE_TITLE = AUTH_GRANTED_PAGE_TITLE;
-    this.AUTH_GRANTED_PAGE_USER = AUTH_GRANTED_PAGE_USER;
+    this.AUTH_GRANTED_PAGE_CHECK = AUTH_GRANTED_PAGE_CHECK;
     this.getBrowserContext.bind(this);
     this.siemLogin.bind(this);
     this.collectData.bind(this);
     this.endFileByNum.bind(this);
-    this.checkSiemLogin.bind(this);
+    // this.checkSiemLogin.bind(this);
   }
 
   async getBrowserContext(): Promise<{ newPage: Page; browser: Browser }> {
@@ -220,13 +217,13 @@ export class FilesScrapper implements IFileScrapper {
       await siemPage.getByRole("button", { name: "acceder" }).click();
       await siemPage.waitForLoadState();
 
-      const isLoggedIn = await this.checkSiemLogin({ page: siemPage, user });
-      if (!isLoggedIn) {
-        throw new ApiError({
-          statusCode: 401,
-          message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
-        });
-      }
+      // const isLoggedIn = await this.checkSiemLogin({ page: siemPage });
+      // if (!isLoggedIn) {
+      //   throw new ApiError({
+      //     statusCode: 401,
+      //     message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
+      //   });
+      // }
 
       return { siemPage, browser };
     } catch (error) {
@@ -241,46 +238,31 @@ export class FilesScrapper implements IFileScrapper {
     }
   }
 
-  async checkSiemLogin({
-    page,
-    user,
-  }: {
-    page: Page;
-    user: string;
-  }): Promise<boolean> {
-    try {
-      const loggedInTitle = await page
-        .locator(this.AUTH_GRANTED_PAGE_TITLE.element, {
-          hasText: this.AUTH_GRANTED_PAGE_TITLE.text,
-        })
-        .textContent();
+  // async checkSiemLogin({ page }: { page: Page }): Promise<boolean> {
+  //   try {
+  //     const checkImgUserLogerin = await page
+  //       .getByRole("img")
+  //       .getAttribute(this.AUTH_GRANTED_PAGE_CHECK.element);
 
-      const loggedInUser = await page
-        .locator(this.AUTH_GRANTED_PAGE_USER.element, {
-          hasText: user,
-        })
-        .textContent();
+  //     return checkImgUserLogerin === this.AUTH_GRANTED_PAGE_CHECK.text;
+  //   } catch (error) {
+  //     const errorTitle = await page
+  //       .locator(this.AUTH_DENIED_PAGE_TITLE.element, {
+  //         hasText: this.AUTH_DENIED_PAGE_TITLE.text,
+  //       })
+  //       .textContent();
+  //     const errorMsg = await page
+  //       .locator(this.AUTH_DENIED_PAGE_MSG.element, {
+  //         hasText: this.AUTH_DENIED_PAGE_MSG.text,
+  //       })
+  //       .textContent();
 
-      if (loggedInTitle && loggedInUser) return true;
-    } catch (error) {
-      const errorTitle = await page
-        .locator(this.AUTH_DENIED_PAGE_TITLE.element, {
-          hasText: this.AUTH_DENIED_PAGE_TITLE.text,
-        })
-        .textContent();
-      const errorMsg = await page
-        .locator(this.AUTH_DENIED_PAGE_MSG.element, {
-          hasText: this.AUTH_DENIED_PAGE_MSG.text,
-        })
-        .textContent();
-
-      console.log(
-        "🚀 ~ FilesScrapper ~ checkSiemLogin ~ error page:",
-        errorTitle,
-        errorMsg
-      );
-      return false;
-    }
-    return false;
-  }
+  //     console.log(
+  //       "🚀 ~ FilesScrapper ~ checkSiemLogin ~ error page:",
+  //       errorTitle,
+  //       errorMsg
+  //     );
+  //     return false;
+  //   }
+  // }
 }

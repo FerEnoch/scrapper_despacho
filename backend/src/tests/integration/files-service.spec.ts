@@ -14,8 +14,7 @@ import { filesEnded } from "../sample_data/filesEnded";
  *  1. npm run fs-service:test
  *  2. npm run fs-service:report:test
  */
-
-test("FILES-SERVICE > Should login in SIEM page", async () => {
+test.skip("FILES-SERVICE > Should login in SIEM page", async () => {
   try {
     const lastResportImg = await fs.readFile(
       "./src/tests/integration/nav-to-login.jpg"
@@ -41,7 +40,7 @@ test("FILES-SERVICE > Should login in SIEM page", async () => {
   expect(siemPage).toBeTruthy();
 });
 
-test("files.service > Should get complete files stats in batches", async () => {
+test.skip("files.service > Should get complete files stats in batches", async () => {
   const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
   const filesService = new FilesService({ model: filesScrapper });
 

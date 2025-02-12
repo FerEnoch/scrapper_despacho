@@ -12,6 +12,6 @@ export interface IAuthController {
   service: IUserService;
   login(req: Request, res: Response, next: NextFunction): Promise<void>;
   register(req: Request, res: Response, next: NextFunction): Promise<void>;
-  getUserById(req: Request, res: Response, next: NextFunction): Promise<void>;
+  // getUserById(req: Request, res: Response, next: NextFunction): Promise<void>;
   logout(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

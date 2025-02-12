@@ -6,8 +6,8 @@
   ],
   "version": "1.0.0",
   "scripts": {
-    "dev:local": "concurrently \"npm run dev:back\" \"VITE_REMOTE_FLAG=0 npm run dev:front\"",
-    "dev:remote": "concurrently \"npm run dev:back\" \"VITE_REMOTE_FLAG=1 npm run dev:front\"",
+    "dev:local": "concurrently \"REMOTE_FLAG=0 npm run dev:back\" \"VITE_REMOTE_FLAG=0 npm run dev:front\"",
+    "dev:remote": "concurrently \"REMOTE_FLAG=1 npm run dev:back\" \"VITE_REMOTE_FLAG=1 npm run dev:front\"",
     "dev:front": "npm run dev --workspace=frontend",
     "dev:back": "npm run dev --workspace=backend",
     "build:back": "npm run build --workspace=backend",

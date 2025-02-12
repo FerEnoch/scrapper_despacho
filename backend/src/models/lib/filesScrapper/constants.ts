@@ -4,13 +4,10 @@ const SIEM_PAGE_DATA = {
   SIEM_BASE_URL: "https://siem.santafeciudad.gov.ar",
   SIEM_LOGIN_PATH: "/login.php",
   SIEM_SEARCH_FILE_PATH: "/expediente_ver.php?id=",
-  AUTH_GRANTED_PAGE_TITLE: {
-    element: "div",
-    text: "USUARIO:",
-  },
-  AUTH_GRANTED_PAGE_USER: {
-    element: "strong",
-    text: "", // to be filled in runtime with username
+  AUTH_GRANTED_PAGE_CHECK: {
+    // NOT WORKING
+    element: "src",
+    text: "templates/imgs/top2_usr.png",
   },
   AUTH_DENIED_PAGE_TITLE: {
     element: "h2",

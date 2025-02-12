@@ -23,7 +23,7 @@ export class DatabaseModel implements IDatabaseModel {
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.getPassByUser = this.getPassByUser.bind(this);
-    this.getUserById = this.getUserById.bind(this);
+    // this.getUserById = this.getUserById.bind(this);
     // this.logout = this.logout.bind(this);
   }
 
@@ -224,36 +224,36 @@ export class DatabaseModel implements IDatabaseModel {
     }
   }
 
-  async getUserById({ userId }: { userId: string }) {
-    try {
-      const getByIdStmt = this.database.prepare(
-        "SELECT id, user FROM users WHERE id = $id"
-      );
+  // async getUserById({ userId }: { userId: string }) {
+  //   try {
+  //     const getByIdStmt = this.database.prepare(
+  //       "SELECT id, user FROM users WHERE id = $id"
+  //     );
 
-      const checkInfo = getByIdStmt.get({
-        id: userId,
-      }) as unknown as { id: string; user: string } | null;
+  //     const checkInfo = getByIdStmt.get({
+  //       id: userId,
+  //     }) as unknown as { id: string; user: string } | null;
 
-      if (!checkInfo) {
-        throw new ApiError({
-          statusCode: 404,
-          message: ERRORS.USER_NOT_FOUND,
-        });
-      }
+  //     if (!checkInfo) {
+  //       throw new ApiError({
+  //         statusCode: 404,
+  //         message: ERRORS.USER_NOT_FOUND,
+  //       });
+  //     }
 
-      return {
-        userId: checkInfo.id,
-        username: checkInfo.user,
-      };
-    } catch (error: any) {
-      console.log("🚀 ~ getUserById ~ error:", error);
-      throw new ApiError({
-        statusCode: 400,
-        message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
-        data: [{ userId }],
-      });
-    }
-  }
+  //     return {
+  //       userId: checkInfo.id,
+  //       username: checkInfo.user,
+  //     };
+  //   } catch (error: any) {
+  //     console.log("🚀 ~ getUserById ~ error:", error);
+  //     throw new ApiError({
+  //       statusCode: 400,
+  //       message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
+  //       data: [{ userId }],
+  //     });
+  //   }
+  // }
 
   /** NOT NEC TO DELETE USER FROM DATABAESE */
   // async logout({ userId }: { userId: string }) {

@@ -32,7 +32,7 @@ import {
   AUTH_API_MESSAGES,
   FILES_API_ERRORS,
 } from "@/types/enums";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CARD_TEXTS,
   UI_ERROR_MESSAGES,
@@ -44,6 +44,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { CircleUser, LogOutIcon } from "lucide-react";
 import { authApi } from "./api/authApi";
 import { useToast } from "./lib/hooks/use-toast";
+import { parseJwt } from "./lib/utils";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
@@ -57,6 +58,7 @@ export default function App() {
   const [activeUser, setActiveUser] = useState<{
     userId: string;
     username: string;
+    password: string;
   } | null>(null);
 
   const { toast } = useToast();
@@ -68,9 +70,20 @@ export default function App() {
     },
   });
 
+  useEffect(() => {
+    const cookie = document.cookie;
+    if (!cookie) return;
+    const data = parseJwt(cookie);
+    const { userId, user, pass } = data;
+    setActiveUser({ userId, username: user, password: pass });
+  }, []);
+
   const handleLogin = async (userData: UserSession) => {
-    const { userId, user: username } = userData;
-    setActiveUser({ userId, username });
+    setActiveUser({
+      userId: userData.userId,
+      username: userData.user,
+      password: userData.pass,
+    });
   };
 
   const handleDownloadData = async () => {
@@ -103,9 +116,8 @@ export default function App() {
   };
 
   const handleAuthResponseMessages = ({
-    message,
-  }: /*data -> unused parameter */
-  ApiResponse<UserSession>) => {
+    message /*data -> unused parameter */,
+  }: ApiResponse<UserSession>) => {
     switch (message) {
       case AUTH_API_MESSAGES.USER_LOGGED_OUT:
         toast({
@@ -213,7 +225,6 @@ export default function App() {
 
   const handleLogout = async () => {
     const apiResponse = await authApi.logout();
-    console.log("🚀 ~ handleLogout ~ apiResponse:", apiResponse);
     handleAuthResponseMessages(apiResponse);
   };
 

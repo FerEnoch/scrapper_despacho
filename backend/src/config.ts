@@ -12,6 +12,7 @@ try {
 
 const {
   NODE_ENV = "development",
+  REMOTE_FLAG = "1",
   SIEM_USER = "",
   SIEM_PASSWORD = "",
   PORT,
@@ -27,8 +28,12 @@ const BCRYPT_SALT_ROUNDS =
 
 const API_PORT = NODE_ENV === "production" ? PORT : 3001;
 
+const REMOTE_DEV_ENV =
+  NODE_ENV === "development" && Boolean(parseInt(REMOTE_FLAG));
+
 export {
   NODE_ENV,
+  REMOTE_DEV_ENV,
   SIEM_USER,
   SIEM_PASSWORD,
   API_PORT,

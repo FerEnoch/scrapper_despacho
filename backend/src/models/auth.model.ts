@@ -9,6 +9,7 @@ import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { IAuthModel } from "./types";
 import ms from "ms";
+import { Auth } from "../schemas/auth";
 
 export class AuthModel implements IAuthModel {
   private readonly JWT_SECRET: Secret;
@@ -39,11 +40,19 @@ export class AuthModel implements IAuthModel {
     }
   }
 
-  generateAccessToken(userId: string): {
+  generateAccessToken({
+    userId,
+    user,
+    pass,
+  }: {
+    userId: string;
+    user: string;
+    pass: string;
+  }): {
     accessToken: string;
   } {
     try {
-      const access = jwt.sign({ userId }, this.JWT_SECRET, {
+      const access = jwt.sign({ userId, user, pass }, this.JWT_SECRET, {
         expiresIn: this.JWT_ACCESS_EXPIRES_IN,
       });
 
@@ -87,7 +96,6 @@ export class AuthModel implements IAuthModel {
   ) {
     try {
       const accessToken = req.cookies.accessToken;
-      console.log("🚀 ~ AuthModel ~ accessToken:", accessToken);
 
       if (!accessToken) {
         throw new ApiError({

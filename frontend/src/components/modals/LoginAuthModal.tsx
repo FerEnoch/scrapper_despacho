@@ -30,7 +30,12 @@ export function LoginAuthModal({
   const [isError, setIsError] = useState<boolean>(false);
   const { toast } = useToast();
 
-  const handleResponseMessages = (message: string) => {
+  const handleResponseMessages = (
+    apiResponseData: ApiResponse<UserSession>
+  ): UserSession | null => {
+    const { message, data } = apiResponseData;
+    const userData: UserSession | null = data?.[0] ?? null;
+
     switch (message) {
       case AUTH_API_MESSAGES.USER_LOGGED_IN:
       case AUTH_API_MESSAGES.USER_REGISTERED:
@@ -42,11 +47,11 @@ export function LoginAuthModal({
           variant: "success",
         });
         toggleAlertDialog();
-        break;
+        return userData;
       case AUTH_API_ERRORS.INVALID_CREDENTIALS:
         setIsSuccessLogin(false);
         setIsError(true);
-        break;
+        return null;
       case AUTH_API_ERRORS.GENERIC_ERROR:
         setIsSuccessLogin(false);
         setIsError(true);
@@ -56,7 +61,7 @@ export function LoginAuthModal({
           description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
           variant: "destructive",
         });
-        break;
+        return null;
       default:
         setIsSuccessLogin(false);
         setIsError(true);
@@ -66,18 +71,16 @@ export function LoginAuthModal({
           description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
           variant: "destructive",
         });
-        break;
+        return null;
     }
   };
 
-  const handleLoginCredentials = async (apiResponseData: ApiResponse<UserSession>) => {
-    // console.log("🚀 ~ handleLogin ~ apiResponseData:", apiResponseData);
-    const { message, data } = apiResponseData;
-    handleResponseMessages(message);
-
-    console.log("🚀 ~ handleLogin ~ data:", data);
-    if (!data || data?.length === 0) return;
-    const [userData] = data;
+  const handleLoginCredentials = async (
+    apiResponseData: ApiResponse<UserSession>
+  ) => {
+    console.log("🚀 ~ handleLogin ~ apiResponseData:", apiResponseData);
+    const userData = handleResponseMessages(apiResponseData);
+    if (!userData) return;
     handleLogin(userData);
   };
 

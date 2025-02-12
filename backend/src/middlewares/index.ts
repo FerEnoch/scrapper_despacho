@@ -23,7 +23,7 @@ export function useMiddlewares(app: Application): Application {
       origin: [
         "https://h9nn1667-5173.brs.devtunnels.ms",
         "https://h9nn1667-4173.brs.devtunnels.ms",
-        "http://localhost:3001",
+        "http://localhost:5173",
       ],
       credentials: true,
     })

@@ -75,6 +75,7 @@ export const filesApi = {
 
       const response = await fetch(`${API_BASE_URL}/files/end`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "content-type": "application/json",
         },

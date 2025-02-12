@@ -5,10 +5,10 @@ import { IAuthController } from "./types";
 import { UserService } from "../sevices/user.service";
 import { modelTypes } from "../types";
 import { MESSAGES } from "./constants";
-import { NODE_ENV } from "../config";
 import { JwtPayload } from "jsonwebtoken";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
+import { setAccessTokenCookie } from "../utils";
 
 export class AuthController implements IAuthController {
   service: IUserService;
@@ -17,7 +17,7 @@ export class AuthController implements IAuthController {
     this.service = new UserService({ model });
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
-    this.getUserById = this.getUserById.bind(this);
+    // this.getUserById = this.getUserById.bind(this);
     this.logout = this.logout.bind(this);
   }
 
@@ -44,17 +44,10 @@ export class AuthController implements IAuthController {
        * set it as a cookie
        */
       if (token) {
-        res.cookie("accessToken", token, {
-          secure: NODE_ENV === "production",
-          httpOnly: true,
-          sameSite: "strict",
-          domain:
-            NODE_ENV === "development" ? ".devtunnels.ms" : ".devtunnels.ms",
-          maxAge: 24 * 60 * 60 * 1000,
-        });
+        setAccessTokenCookie(res, token);
         res.status(201).json({
           message: MESSAGES.USER_LOGGED_IN,
-          data: [{ userId, user: authUser }],
+          data: [{ userId, user: authUser, pass }],
         });
         return;
       }
@@ -94,53 +87,11 @@ export class AuthController implements IAuthController {
         pass,
       });
 
-      res.cookie("accessToken", token, {
-        secure: NODE_ENV === "production",
-        httpOnly: true,
-        sameSite: "strict",
-        domain:
-          NODE_ENV === "development" ? ".devtunnels.ms" : ".devtunnels.ms",
-        maxAge: 24 * 60 * 60 * 1000,
-      });
+      if (token) setAccessTokenCookie(res, token);
 
       res.status(201).json({
         message: MESSAGES.USER_LOGGED_IN,
-        data: [{ userId, user: authUser }],
-      });
-    } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
-    }
-  }
-
-  async getUserById(
-    req: Request & {
-      auth?: {
-        access: string | JwtPayload;
-      };
-    },
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const { id } = req.params as { id: string };
-
-      const access = req.auth?.access;
-      const { userId, user } = await this.service.getUserById({
-        userId: id,
-      });
-
-      res.status(200).json({
-        message: MESSAGES.USER_SESSION_ACTIVE,
-        data: [{ userId, user }],
+        data: [{ userId, user: authUser, pass }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
@@ -162,9 +113,11 @@ export class AuthController implements IAuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { userId } = req.auth?.access as { userId: string };
-      console.log("🚀 ~ AuthController ~ userId:", userId);
-
+      const { userId, user, pass } = req.auth?.access as {
+        userId: string;
+        user: string;
+        pass: string;
+      };
       // await this.service.logout({
       //   userId,
       // });
@@ -173,7 +126,7 @@ export class AuthController implements IAuthController {
 
       res.status(200).json({
         message: MESSAGES.USER_LOGGED_OUT,
-        data: [{ userId, user: "" }],
+        data: [{ userId, user, pass }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
@@ -188,4 +141,38 @@ export class AuthController implements IAuthController {
       }
     }
   }
+  // async getUserById(
+  //   req: Request & {
+  //     auth?: {
+  //       access: string | JwtPayload;
+  //     };
+  //   },
+  //   res: Response,
+  //   next: NextFunction
+  // ): Promise<void> {
+  //   try {
+  //     const { id } = req.params as { id: string };
+
+  //     // const access = req.auth?.access;
+  //     const { userId, user } = await this.service.getUserById({
+  //       userId: id,
+  //     });
+
+  //     res.status(200).json({
+  //       message: MESSAGES.USER_SESSION_ACTIVE,
+  //       data: [{ userId, user }],
+  //     });
+  //   } catch (error: any) {
+  //     if (error instanceof ApiError) {
+  //       next(error);
+  //     } else {
+  //       next(
+  //         new ApiError({
+  //           statusCode: 500,
+  //           message: ERRORS.SERVER_ERROR,
+  //         })
+  //       );
+  //     }
+  //   }
+  // }
 }

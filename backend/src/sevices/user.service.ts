@@ -14,7 +14,7 @@ export class UserService implements IUserService {
     this.authModel = new AuthModel();
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
-    this.getUserById = this.getUserById.bind(this);
+    // this.getUserById = this.getUserById.bind(this);
     // this.logout = this.logout.bind(this);
   }
 
@@ -43,17 +43,8 @@ export class UserService implements IUserService {
   }
 
   async login({ user, pass }: Auth) {
-    /**
-     * Check if user exists: Verify that the user exists in the database.
-     * Authenticate user: Verify the user's credentials (username and password).
-     * Generate access token: Generate a new access token for the user.
-     * Check if refresh token is valid: Verify the validity of the existing refresh token.
-     * Revalidate refresh token if invalid: If the refresh token is invalid, generate a new refresh token.
-     * Return userId and access token: Return the userId and the new access token.
-     */
-
     try {
-      // 1. Check if user exists
+      // 1. Check if user exists: Verify that the user exists in the database.
       const userExists = await this.databaseModel.checkIfUserExists({ user });
       if (!userExists) {
         throw new ApiError({
@@ -61,13 +52,17 @@ export class UserService implements IUserService {
           message: ERRORS.USER_NOT_FOUND,
         });
       }
-      // 2. Authenticate user
+      // 2. Authenticate user: Verify the user's credentials (username and password).
       const { userId } = await this.databaseModel.login({ user, pass });
 
-      // 3. Generate access token
-      const { accessToken } = this.authModel.generateAccessToken(userId);
+      // 3. Generate access token: Generate a new access token for the user.
+      const { accessToken } = this.authModel.generateAccessToken({
+        userId,
+        user,
+        pass,
+      });
 
-      // 4. Check if refresh token is valid
+      // 4. Check if refresh token is valid: Verify the validity of the existing refresh token.
       let { refreshToken } = await this.databaseModel.getRefreshTokenById({
         userId,
       });
@@ -75,7 +70,7 @@ export class UserService implements IUserService {
       try {
         this.authModel.verifyJwt({ token: refreshToken });
       } catch (error: any) {
-        // 5. Revalidate refresh token if invalid
+        // 5. Revalidate refresh token if invalid: If the refresh token is invalid, generate a new refresh token.
         if (error.message === ERRORS.INVALID_TOKEN) {
           const { refreshToken: freshRefreshToken } =
             this.authModel.generateRefreshToken(userId);
@@ -89,6 +84,7 @@ export class UserService implements IUserService {
         }
       }
 
+      // .6 Return user, userId and access token.
       return {
         userId,
         user,
@@ -105,9 +101,9 @@ export class UserService implements IUserService {
     }
   }
 
-  async getUserById({ userId }: { userId: string }) {
-    return await this.databaseModel.getUserById({ userId });
-  }
+  // async getUserById({ userId }: { userId: string }) {
+  //   return await this.databaseModel.getUserById({ userId });
+  // }
 
   /** NOT NEC TO DELETE USER FROM DATABAESE */
   // async logout({ userId }: { userId: string }) {

@@ -16,8 +16,7 @@ export type IFileScrapper = {
   SIEM_LOCATE_FILE_LOCATION: locationType;
   AUTH_DENIED_PAGE_TITLE: locationType;
   AUTH_DENIED_PAGE_MSG: locationType;
-  AUTH_GRANTED_PAGE_TITLE: locationType;
-  AUTH_GRANTED_PAGE_USER: locationType;
+  AUTH_GRANTED_PAGE_CHECK: locationType;
   getBrowserContext(): Promise<{
     newPage: Page;
     browser: Browser;
@@ -44,7 +43,7 @@ export type IFileScrapper = {
     page: Page | null;
   }): Promise<FileStats>;
 
-  checkSiemLogin({ page }: { page: Page; user: string }): Promise<boolean>;
+  // checkSiemLogin({ page }: { page: Page }): Promise<boolean>;
 };
 
 export type IDatabaseModel = {
@@ -70,7 +69,7 @@ export type IDatabaseModel = {
   register({ user, pass }: Auth): Promise<{ userId: string }>;
   login({ user, pass }: Auth): Promise<{ userId: string }>;
   getPassByUser({ user }: { user: string }): Promise<{ pass: string }>;
-  getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
+  // getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
   // logout({ userId }: { userId: string }): Promise<authApiResponse>;
   createDB(name: string): Database.Database;
   createTables(db: Database.Database): void;
@@ -80,7 +79,15 @@ export type IAuthModel = {
   generateRefreshToken(userId: string): {
     refreshToken: string;
   };
-  generateAccessToken(userId: string): {
+  generateAccessToken({
+    userId,
+    user,
+    pass,
+  }: {
+    userId: string;
+    user: string;
+    pass: string;
+  }): {
     accessToken: string;
   };
   verifyJwt({ token }: { token: string }): string | JwtPayload;
@@ -101,6 +108,7 @@ export type IAuthModel = {
 export type authApiResponse = {
   userId: string;
   user?: string;
+  pass?: string;
   token?: string;
 };
 

@@ -25,7 +25,7 @@ export interface IUserService {
   authModel: modelTypes["IAuthModel"];
   register({ user, pass }: Auth): Promise<authApiResponse>;
   login({ user, pass }: Auth): Promise<authApiResponse>;
-  getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
+  // getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
   // logout({ userId }: { userId: string }): Promise<authApiResponse>;
 }
 
