@@ -1,4 +1,4 @@
-import { Browser, chromium, Dialog, Page } from "@playwright/test";
+import { Browser, chromium, Dialog, expect, Page } from "@playwright/test";
 import { FileId, FileStats, IFileScrapper, locationType } from "./types";
 import { ERRORS } from "../errors/types";
 import {
@@ -54,7 +54,9 @@ export class FilesScrapper implements IFileScrapper {
   }
 
   async getBrowserContext(): Promise<{ newPage: Page; browser: Browser }> {
-    const browser = await chromium.launch();
+    const browser = await chromium.launch({
+      headless: true,
+    });
 
     const context = await browser.newContext();
     const newPage = await context.newPage();
@@ -217,13 +219,13 @@ export class FilesScrapper implements IFileScrapper {
       await siemPage.getByRole("button", { name: "acceder" }).click();
       await siemPage.waitForLoadState();
 
-      // const isLoggedIn = await this.checkSiemLogin({ page: siemPage });
-      // if (!isLoggedIn) {
-      //   throw new ApiError({
-      //     statusCode: 401,
-      //     message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
-      //   });
-      // }
+      const isLoggedIn = await this.checkSiemLogin({ page: siemPage });
+      if (!isLoggedIn) {
+        throw new ApiError({
+          statusCode: 401,
+          message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
+        });
+      }
 
       return { siemPage, browser };
     } catch (error) {
@@ -238,31 +240,37 @@ export class FilesScrapper implements IFileScrapper {
     }
   }
 
-  // async checkSiemLogin({ page }: { page: Page }): Promise<boolean> {
-  //   try {
-  //     const checkImgUserLogerin = await page
-  //       .getByRole("img")
-  //       .getAttribute(this.AUTH_GRANTED_PAGE_CHECK.element);
+  async checkSiemLogin({ page }: { page: Page }): Promise<boolean> {
+    // change the following check code to verify the user is logged in
 
-  //     return checkImgUserLogerin === this.AUTH_GRANTED_PAGE_CHECK.text;
-  //   } catch (error) {
-  //     const errorTitle = await page
-  //       .locator(this.AUTH_DENIED_PAGE_TITLE.element, {
-  //         hasText: this.AUTH_DENIED_PAGE_TITLE.text,
-  //       })
-  //       .textContent();
-  //     const errorMsg = await page
-  //       .locator(this.AUTH_DENIED_PAGE_MSG.element, {
-  //         hasText: this.AUTH_DENIED_PAGE_MSG.text,
-  //       })
-  //       .textContent();
+    try {
+      const checkImgUser = await page.locator(
+        this.AUTH_GRANTED_PAGE_CHECK.element
+      );
+      expect(checkImgUser).toBeVisible();
+      expect(checkImgUser).toHaveAttribute(
+        "src",
+        this.AUTH_GRANTED_PAGE_CHECK.text
+      );
+      return true;
+    } catch (error) {
+      const errorTitle = await page
+        .locator(this.AUTH_DENIED_PAGE_TITLE.element, {
+          hasText: this.AUTH_DENIED_PAGE_TITLE.text,
+        })
+        .textContent();
+      const errorMsg = await page
+        .locator(this.AUTH_DENIED_PAGE_MSG.element, {
+          hasText: this.AUTH_DENIED_PAGE_MSG.text,
+        })
+        .textContent();
 
-  //     console.log(
-  //       "🚀 ~ FilesScrapper ~ checkSiemLogin ~ error page:",
-  //       errorTitle,
-  //       errorMsg
-  //     );
-  //     return false;
-  //   }
-  // }
+      console.log(
+        "🚀 ~ FilesScrapper ~ checkSiemLogin ~ error page:",
+        errorTitle,
+        errorMsg
+      );
+      return false;
+    }
+  }
 }

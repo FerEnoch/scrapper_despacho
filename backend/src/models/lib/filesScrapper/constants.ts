@@ -6,7 +6,7 @@ const SIEM_PAGE_DATA = {
   SIEM_SEARCH_FILE_PATH: "/expediente_ver.php?id=",
   AUTH_GRANTED_PAGE_CHECK: {
     // NOT WORKING
-    element: "src",
+    element: "img[src='templates/imgs/top2_usr.png']",
     text: "templates/imgs/top2_usr.png",
   },
   AUTH_DENIED_PAGE_TITLE: {

@@ -10,8 +10,8 @@ import { ERRORS } from "../errors/types";
 
 export class FilesService implements IFilesService {
   model: modelTypes["IFileScrapper"];
-  ENDED_FILE_STATUS_TEXT = "";
   MAX_BATCH_SIZE = 5;
+  ENDED_FILE_STATUS_TEXT = "";
   SIEM_PASSWORD = "";
   SIEM_USER = "";
 
@@ -122,7 +122,6 @@ export class FilesService implements IFilesService {
               }
 
               const [{ num }] = parseFileStats([file]);
-              const { message, detail } = await this.endFileByNum(num);
 
               const fileNewData: FileStats = await this.model.collectData({
                 file: {
@@ -131,6 +130,8 @@ export class FilesService implements IFilesService {
                 },
                 page: null,
               });
+
+              const { message, detail } = await this.endFileByNum(num);
 
               return {
                 ...file,

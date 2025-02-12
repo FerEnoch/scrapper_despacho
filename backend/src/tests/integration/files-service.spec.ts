@@ -7,6 +7,7 @@ import { FilesService } from "../../sevices/files.service";
 import { modelTypes } from "../../types";
 import fs from "node:fs/promises";
 import { filesEnded } from "../sample_data/filesEnded";
+import { fakeEndFiles } from "./utils/fake-endFiles";
 
 /**
  * @description Playwright tests
@@ -14,7 +15,7 @@ import { filesEnded } from "../sample_data/filesEnded";
  *  1. npm run fs-service:test
  *  2. npm run fs-service:report:test
  */
-test.skip("FILES-SERVICE > Should login in SIEM page", async () => {
+test("FILES-SERVICE > Should login in SIEM page", async () => {
   try {
     const lastResportImg = await fs.readFile(
       "./src/tests/integration/nav-to-login.jpg"
@@ -40,7 +41,7 @@ test.skip("FILES-SERVICE > Should login in SIEM page", async () => {
   expect(siemPage).toBeTruthy();
 });
 
-test.skip("files.service > Should get complete files stats in batches", async () => {
+test("files.service > Should get complete files stats in batches", async () => {
   const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
   const filesService = new FilesService({ model: filesScrapper });
 
@@ -52,12 +53,15 @@ test.skip("files.service > Should get complete files stats in batches", async ()
   expect(result).toEqual(filesStats);
 });
 
-test("files.service > Should end files in SIEM system in batches", async () => {
+test.only("files.service > Should end files in SIEM system in batches", async () => {
   const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
   const filesService = new FilesService({ model: filesScrapper });
 
   const filesEndedResult = await filesService.endFiles({ files: filesStats });
 
+  // const filesEndedResult = await fakeEndFiles({
+  //   files: filesStats,
+  // });
   expect(filesEndedResult).toHaveLength(filesStats.length);
   expect(filesEndedResult).toEqual(filesEnded);
 });
