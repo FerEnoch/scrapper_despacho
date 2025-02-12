@@ -9,6 +9,7 @@ export const authApi = {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "content-type": "application/json",
         },
@@ -38,6 +39,7 @@ export const authApi = {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "content-type": "application/json",
         },
@@ -67,17 +69,17 @@ export const authApi = {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/logout`, {
         method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
+        credentials: "include",
       });
 
+      const responseData = (await response.json()) as ApiResponse<UserSession>;
+
       if (response.ok) {
-        return response;
+        return responseData;
       }
 
       return {
-        message: AUTH_API_ERRORS.GENERIC_ERROR,
+        message: AUTH_API_ERRORS.LOGOUT_FAILED,
         data: [],
       };
     } catch (error) {

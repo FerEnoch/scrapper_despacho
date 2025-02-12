@@ -87,6 +87,7 @@ export class AuthModel implements IAuthModel {
   ) {
     try {
       const accessToken = req.cookies.accessToken;
+      console.log("🚀 ~ AuthModel ~ accessToken:", accessToken);
 
       if (!accessToken) {
         throw new ApiError({

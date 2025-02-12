@@ -38,6 +38,7 @@ export class UserService implements IUserService {
 
     return {
       userId,
+      user,
     };
   }
 
@@ -90,6 +91,7 @@ export class UserService implements IUserService {
 
       return {
         userId,
+        user,
         token: accessToken,
       };
     } catch (error: any) {

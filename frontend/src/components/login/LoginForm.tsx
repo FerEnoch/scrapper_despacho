@@ -22,11 +22,12 @@ import { Input } from "../ui/input";
 import { useState } from "react";
 import { authApi } from "@/api/authApi";
 import { ApiResponse, UserSession } from "@/types";
+import { Puff } from "react-loader-spinner";
 
 interface LoginFormProps {
   actionButton: string;
   toggleAlertDialog: () => void;
-  handleLogin: (apiResponseData: ApiResponse<UserSession>) => void;
+  handleLoginCredentials: (apiResponseData: ApiResponse<UserSession>) => void;
   isError: boolean;
   isSuccessLogin: boolean;
 }
@@ -34,11 +35,13 @@ interface LoginFormProps {
 export function LoginForm({
   actionButton,
   toggleAlertDialog,
-  handleLogin,
+  handleLoginCredentials,
   isError,
   isSuccessLogin,
 }: LoginFormProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -52,8 +55,10 @@ export function LoginForm({
   };
 
   const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
+    setIsLoading(true);
     const apiResponse = await authApi.register(data);
-    handleLogin(apiResponse);
+    handleLoginCredentials(apiResponse);
+    setIsLoading(false);
   };
 
   const errorInputStyle =
@@ -144,7 +149,20 @@ export function LoginForm({
             {"Cancelar"}
           </AlertDialogAction>
           <AlertDialogAction className="bg-transparent shadow-none">
-            <Button type="submit">{actionButton}</Button>
+            <Button type="submit" disabled={isLoading}>
+              {actionButton}
+              {isLoading && (
+                <Puff
+                  visible={true}
+                  height="100"
+                  width="100"
+                  color="#000"
+                  ariaLabel="puff-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              )}
+            </Button>
           </AlertDialogAction>
         </AlertDialogFooter>
       </form>

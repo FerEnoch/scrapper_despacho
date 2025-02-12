@@ -18,7 +18,16 @@ export function useMiddlewares(app: Application): Application {
   );
 
   app.use(cookieParser());
-  app.use(cors());
+  app.use(
+    cors({
+      origin: [
+        "https://h9nn1667-5173.brs.devtunnels.ms",
+        "https://h9nn1667-4173.brs.devtunnels.ms",
+        "http://localhost:3001",
+      ],
+      credentials: true,
+    })
+  );
   app.use(urlencoded({ extended: true }));
   app.use(json());
 

@@ -2,7 +2,7 @@ import { UI_MODAL_MESSAGES } from "@/i18n/constants";
 import { FilesErrorModal } from "./FilesErrorModal";
 import { AuthModalError } from "./AuthModalError";
 import { LoginAuthModal } from "./LoginAuthModal";
-import { RawFile } from "@/types";
+import { RawFile, UserSession } from "@/types";
 
 interface ModalsProps {
   modalMsg: string;
@@ -13,6 +13,7 @@ interface ModalsProps {
   toggleErrorModal: () => void;
   toggleAuthModal: () => void;
   toggleLoginModal: () => void;
+  handleLogin: (userData: UserSession) => void;
 }
 
 export function Modals({
@@ -24,6 +25,7 @@ export function Modals({
   toggleErrorModal,
   toggleAuthModal,
   toggleLoginModal,
+  handleLogin,
 }: ModalsProps) {
   return (
     <>
@@ -48,6 +50,7 @@ export function Modals({
         actionButton={UI_MODAL_MESSAGES.LOGIN.actionButton}
         isOpen={openLoginModal}
         toggleAlertDialog={toggleLoginModal}
+        handleLogin={handleLogin}
       />
     </>
   );

@@ -36,5 +36,5 @@ export type ApiResponse<T> = {
 
 export type UserSession = {
   userId: string;
-  username?: string;
+  user: string;
 };

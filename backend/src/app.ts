@@ -11,8 +11,8 @@ export async function initializeApp({
 }) {
   const app = useMiddlewares(express());
 
-  app.get("/", (_req, res) => {
-    res.send("Welcome to files scrapper API");
+  app.get("/api/v1", (_req, res) => {
+    res.send("<h3>Welcome to files scrapper API</h3>");
   });
 
   const v1Router = await v1Routes({ filesModel: model });

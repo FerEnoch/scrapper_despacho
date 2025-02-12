@@ -100,7 +100,7 @@ export type IAuthModel = {
 
 export type authApiResponse = {
   userId: string;
-  username?: string;
+  user?: string;
   token?: string;
 };
 

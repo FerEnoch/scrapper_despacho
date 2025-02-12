@@ -39,13 +39,21 @@ const UI_TOAST_MESSAGES = {
     title: "Sesión iniciada",
     description: "¡Bienvenido! Ahora puedes finalizar expedientes",
   },
+  LOGOUT_SUCCESS: {
+    title: "Sesión cerrada",
+    description: "¡Has cerrado sesión con éxito!",
+  },
+  LOGOUT_ERROR: {
+    title: "Error al cerrar sesión",
+    description: "No se pudo cerrar sesión. Por favor, intenta nuevamente.",
+  },
   LOGIN_ERROR: {
     title: "Error de autenticación",
     description: "No se pudo iniciar sesión. Por favor, intenta nuevamente.",
   },
   GENERIC_ERROR: {
     title: "Error",
-    description: "Ocurrió un error y no es posible iniciar sesión",
+    description: "Ocurrió un error en el sistema. Por favor, intenta nuevamente.",
   },
 } as const;
 

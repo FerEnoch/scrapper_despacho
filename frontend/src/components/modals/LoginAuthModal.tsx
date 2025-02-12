@@ -16,6 +16,7 @@ interface LoginAuthModalProps {
   actionButton: string;
   isOpen: boolean;
   toggleAlertDialog: () => void;
+  handleLogin: (userData: UserSession) => void;
 }
 
 export function LoginAuthModal({
@@ -23,6 +24,7 @@ export function LoginAuthModal({
   actionButton,
   isOpen,
   toggleAlertDialog,
+  handleLogin,
 }: LoginAuthModalProps) {
   const [isSuccessLogin, setIsSuccessLogin] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -68,13 +70,15 @@ export function LoginAuthModal({
     }
   };
 
-  const handleLogin = async (apiResponseData: ApiResponse<UserSession>) => {
+  const handleLoginCredentials = async (apiResponseData: ApiResponse<UserSession>) => {
     // console.log("🚀 ~ handleLogin ~ apiResponseData:", apiResponseData);
     const { message, data } = apiResponseData;
     handleResponseMessages(message);
 
     console.log("🚀 ~ handleLogin ~ data:", data);
-    if (data?.length === 0) return;
+    if (!data || data?.length === 0) return;
+    const [userData] = data;
+    handleLogin(userData);
   };
 
   return (
@@ -94,7 +98,7 @@ export function LoginAuthModal({
         <LoginForm
           actionButton={actionButton}
           toggleAlertDialog={toggleAlertDialog}
-          handleLogin={handleLogin}
+          handleLoginCredentials={handleLoginCredentials}
           isError={isError}
           isSuccessLogin={isSuccessLogin}
         />

@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Form,
   FormControl,
@@ -25,23 +26,40 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { filesApi } from "@/api/filesApi";
-import { FileStats, ApiResponse, RawFile } from "@/types";
-import { FILES_API_ERRORS } from "@/types/enums";
+import { FileStats, ApiResponse, RawFile, UserSession } from "@/types";
+import {
+  AUTH_API_ERRORS,
+  AUTH_API_MESSAGES,
+  FILES_API_ERRORS,
+} from "@/types/enums";
 import { useState } from "react";
-import { CARD_TEXTS, UI_ERROR_MESSAGES } from "@/i18n/constants";
+import {
+  CARD_TEXTS,
+  UI_ERROR_MESSAGES,
+  UI_TOAST_MESSAGES,
+} from "@/i18n/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
 import { Modals } from "./components/modals/Modals";
 import { Toaster } from "@/components/ui/toaster";
+import { CircleUser, LogOutIcon } from "lucide-react";
+import { authApi } from "./api/authApi";
+import { useToast } from "./lib/hooks/use-toast";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
-  const [isSerching, setIsSearching] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean>(false);
+  const [isSerchingFiles, setIsSearchingFiles] = useState<boolean>(false);
+  const [isFilesApiError, setFilesApiError] = useState<boolean>(false);
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
   const [openLoginModal, setOpenLoginModal] = useState<boolean>(true);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [modalMsg, setModalMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
+  const [activeUser, setActiveUser] = useState<{
+    userId: string;
+    username: string;
+  } | null>(null);
+
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof uploadFileFormSchema>>({
     resolver: zodResolver(uploadFileFormSchema),
@@ -49,6 +67,11 @@ export default function App() {
       file: undefined,
     },
   });
+
+  const handleLogin = async (userData: UserSession) => {
+    const { userId, user: username } = userData;
+    setActiveUser({ userId, username });
+  };
 
   const handleDownloadData = async () => {
     try {
@@ -62,13 +85,13 @@ export default function App() {
   };
 
   const onDataChange = (data: FileStats[], message: string) => {
-    handleResponseMessages({ message, data });
+    handleFilesResponseMessages({ message, data });
 
     setFilesData(data);
   };
 
   const toggleErrorModal = () => {
-    setIsError((error) => !error);
+    setFilesApiError((error) => !error);
   };
 
   const toggleLoginModal = () => {
@@ -79,13 +102,49 @@ export default function App() {
     setOpenAuthModal((auth) => !auth);
   };
 
-  const handleResponseMessages = ({
+  const handleAuthResponseMessages = ({
+    message,
+  }: /*data -> unused parameter */
+  ApiResponse<UserSession>) => {
+    switch (message) {
+      case AUTH_API_MESSAGES.USER_LOGGED_OUT:
+        toast({
+          title: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.title,
+          description: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.description,
+          variant: "default",
+        });
+        setActiveUser(null);
+        break;
+      case AUTH_API_ERRORS.LOGOUT_FAILED:
+        toast({
+          title: UI_TOAST_MESSAGES.LOGOUT_ERROR.title,
+          description: UI_TOAST_MESSAGES.LOGOUT_ERROR.description,
+          variant: "destructive",
+        });
+        break;
+      case AUTH_API_ERRORS.SERVER_ERROR:
+        toast({
+          title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
+          description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
+          variant: "destructive",
+        });
+        break;
+      default:
+        toast({
+          title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
+          description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
+          variant: "destructive",
+        });
+    }
+  };
+
+  const handleFilesResponseMessages = ({
     message,
     data,
   }: ApiResponse<FileStats | RawFile>) => {
     switch (message) {
       case FILES_API_ERRORS.UNAUTHORIZED:
-        setIsSearching(false);
+        setIsSearchingFiles(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
         setOpenAuthModal(true);
         return;
@@ -96,35 +155,35 @@ export default function App() {
       case FILES_API_ERRORS.NOT_FOUND:
       case FILES_API_ERRORS.GENERIC_ERROR:
       case FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED:
-        setIsSearching(false);
+        setIsSearchingFiles(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
-        setIsError(true);
+        setFilesApiError(true);
         setFilesData([]);
         return;
 
       case FILES_API_ERRORS.INVALID_DATA:
-        setIsSearching(false);
+        setIsSearchingFiles(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
-        setIsError(true);
+        setFilesApiError(true);
         setErrorFiles(data as RawFile[]);
         setFilesData([]);
         return;
 
       case FILES_API_ERRORS.NO_FILES_TO_END:
         setModalMsg(UI_ERROR_MESSAGES[message]);
-        setIsError(true);
+        setFilesApiError(true);
         return;
 
       default:
         setFilesData(data as FileStats[]);
-        setIsSearching(false);
+        setIsSearchingFiles(false);
         return data;
     }
   };
 
   const onSubmit = async (data: z.infer<typeof uploadFileFormSchema>) => {
-    setIsSearching(true);
-    setIsError(false);
+    setIsSearchingFiles(true);
+    setFilesApiError(false);
     setErrorFiles([]);
 
     const formData = new FormData();
@@ -136,12 +195,12 @@ export default function App() {
       FileStats | RawFile
     >;
 
-    handleResponseMessages(response);
+    handleFilesResponseMessages(response);
     formData.delete("file");
   };
 
   const onEndFilesClick = (apiResponseData: ApiResponse<FileStats>) => {
-    const data = handleResponseMessages(apiResponseData);
+    const data = handleFilesResponseMessages(apiResponseData);
 
     const newState = filesData.map((currentFile) => {
       if (!data) return currentFile;
@@ -150,6 +209,12 @@ export default function App() {
     }) as FileStats[];
 
     setFilesData(newState);
+  };
+
+  const handleLogout = async () => {
+    const apiResponse = await authApi.logout();
+    console.log("🚀 ~ handleLogout ~ apiResponse:", apiResponse);
+    handleAuthResponseMessages(apiResponse);
   };
 
   return (
@@ -162,9 +227,32 @@ export default function App() {
       bg-opacity-60 bg-white backdrop-filter backdrop-blur-lg
       "
       >
-        <CardHeader>
+        <CardHeader className="relative">
+          {activeUser && activeUser.username.length > 0 && (
+            <div className="absolute right-8 top-8 space-y-4 flex flex-col justify-center items-center">
+              <CircleUser
+                className="
+                h-10 w-10 rounded-full
+                bg-primary text-white
+                shadow-md
+                "
+              />
+              <div className="flex justify-center items-center">
+                <Badge className="py-2 px-4" variant="outline">
+                  {activeUser.username}
+                </Badge>
+                <LogOutIcon
+                  className="
+                h-6 w-6 ms-2
+                text-red-300
+                hover:text-red-700 cursor-pointer
+                "
+                  onClick={handleLogout}
+                />
+              </div>
+            </div>
+          )}
           <CardTitle className="text-3xl mb-6">{CARD_TEXTS.title}</CardTitle>
-
           <CardDescription className="my-8">
             <p
               className="
@@ -196,7 +284,7 @@ export default function App() {
                         id="file"
                         placeholder="expedientes.csv"
                         onChange={(e) => {
-                          setIsError(false);
+                          setFilesApiError(false);
                           field.onChange(e.target.files?.[0]);
                         }}
                         onBlur={field.onBlur}
@@ -213,11 +301,11 @@ export default function App() {
                 <Button
                   className="bg-primary hover:bg-green-300"
                   type="submit"
-                  disabled={isSerching}
+                  disabled={isSerchingFiles}
                 >
                   Buscar en SIEM
                 </Button>
-                {isSerching && (
+                {isSerchingFiles && (
                   <MagnifyingGlass
                     visible={true}
                     height="30"
@@ -236,17 +324,18 @@ export default function App() {
       </Card>
       <Modals
         modalMsg={modalMsg}
-        isError={isError}
+        isError={isFilesApiError}
         errorFiles={errorFiles}
         toggleErrorModal={toggleErrorModal}
         openAuthModal={openAuthModal}
         openLoginModal={openLoginModal}
         toggleAuthModal={toggleAuthModal}
         toggleLoginModal={toggleLoginModal}
+        handleLogin={handleLogin}
       />
       <Toaster />
-      {isSerching && <TableSkeleton />}
-      {filesData.length > 0 && !isSerching ? (
+      {isSerchingFiles && <TableSkeleton />}
+      {filesData.length > 0 && !isSerchingFiles ? (
         <>
           <DataTable
             columns={Columns}

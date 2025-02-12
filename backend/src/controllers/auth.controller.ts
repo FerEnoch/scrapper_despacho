@@ -29,7 +29,11 @@ export class AuthController implements IAuthController {
     try {
       const { user, pass } = req.body as Auth;
 
-      const { userId, token } = await this.service.register({
+      const {
+        userId,
+        user: authUser,
+        token,
+      } = await this.service.register({
         user,
         pass,
       });
@@ -41,20 +45,23 @@ export class AuthController implements IAuthController {
        */
       if (token) {
         res.cookie("accessToken", token, {
-          httpOnly: true,
           secure: NODE_ENV === "production",
+          httpOnly: true,
           sameSite: "strict",
+          domain:
+            NODE_ENV === "development" ? ".devtunnels.ms" : ".devtunnels.ms",
+          maxAge: 24 * 60 * 60 * 1000,
         });
         res.status(201).json({
           message: MESSAGES.USER_LOGGED_IN,
-          data: [{ userId }],
+          data: [{ userId, user: authUser }],
         });
         return;
       }
 
       res.status(201).json({
         message: MESSAGES.USER_REGISTERED,
-        data: [{ userId }],
+        data: [{ userId, user: authUser }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
@@ -78,20 +85,27 @@ export class AuthController implements IAuthController {
     try {
       const { user, pass } = req.body as Auth;
 
-      const { userId, token } = await this.service.login({
+      const {
+        userId,
+        user: authUser,
+        token,
+      } = await this.service.login({
         user,
         pass,
       });
 
       res.cookie("accessToken", token, {
-        httpOnly: true,
         secure: NODE_ENV === "production",
+        httpOnly: true,
         sameSite: "strict",
+        domain:
+          NODE_ENV === "development" ? ".devtunnels.ms" : ".devtunnels.ms",
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.status(201).json({
         message: MESSAGES.USER_LOGGED_IN,
-        data: [{ userId }],
+        data: [{ userId, user: authUser }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
@@ -120,15 +134,13 @@ export class AuthController implements IAuthController {
       const { id } = req.params as { id: string };
 
       const access = req.auth?.access;
-      console.log("🚀 ~ AuthController ~ getUserById ~ access:", access);
-
-      const { userId, username } = await this.service.getUserById({
+      const { userId, user } = await this.service.getUserById({
         userId: id,
       });
 
       res.status(200).json({
         message: MESSAGES.USER_SESSION_ACTIVE,
-        data: [{ userId, username }],
+        data: [{ userId, user }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
@@ -151,6 +163,7 @@ export class AuthController implements IAuthController {
   ): Promise<void> {
     try {
       const { userId } = req.auth?.access as { userId: string };
+      console.log("🚀 ~ AuthController ~ userId:", userId);
 
       // await this.service.logout({
       //   userId,
@@ -160,7 +173,7 @@ export class AuthController implements IAuthController {
 
       res.status(200).json({
         message: MESSAGES.USER_LOGGED_OUT,
-        data: [{ userId }],
+        data: [{ userId, user: "" }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
