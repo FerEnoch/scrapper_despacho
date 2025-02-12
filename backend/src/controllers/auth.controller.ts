@@ -29,14 +29,32 @@ export class AuthController implements IAuthController {
     try {
       const { user, pass } = req.body as Auth;
 
-      const { userId } = await this.service.register({
+      const { userId, token } = await this.service.register({
         user,
         pass,
       });
 
+      /**
+       * If token is generated
+       * (i.e. user is forced to log in because he was already registered)
+       * set it as a cookie
+       */
+      if (token) {
+        res.cookie("accessToken", token, {
+          httpOnly: true,
+          secure: NODE_ENV === "production",
+          sameSite: "strict",
+        });
+        res.status(201).json({
+          message: MESSAGES.USER_LOGGED_IN,
+          data: [{ userId }],
+        });
+        return;
+      }
+
       res.status(201).json({
         message: MESSAGES.USER_REGISTERED,
-        userId,
+        data: [{ userId }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
@@ -73,7 +91,7 @@ export class AuthController implements IAuthController {
 
       res.status(201).json({
         message: MESSAGES.USER_LOGGED_IN,
-        userId,
+        data: [{ userId }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
@@ -110,8 +128,7 @@ export class AuthController implements IAuthController {
 
       res.status(200).json({
         message: MESSAGES.USER_SESSION_ACTIVE,
-        userId,
-        username,
+        data: [{ userId, username }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {
@@ -143,7 +160,7 @@ export class AuthController implements IAuthController {
 
       res.status(200).json({
         message: MESSAGES.USER_LOGGED_OUT,
-        userId,
+        data: [{ userId }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {

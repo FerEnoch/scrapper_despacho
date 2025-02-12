@@ -11,6 +11,6 @@ export const uploadFileFormSchema = z.object({
 });
 
 export const loginFormSchema = z.object({
-  username: z.string({ message: "Utiliza tu usuario SIEM" }),
-  password: z.string({ message: "Utiliza tu contraseña SIEM" }),
+  user: z.string({ message: "Utiliza tu usuario SIEM" }),
+  pass: z.string({ message: "Utiliza tu contraseña SIEM" }),
 });

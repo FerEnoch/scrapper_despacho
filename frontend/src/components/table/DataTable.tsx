@@ -11,8 +11,8 @@ import {
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { api } from "@/api";
-import { ApiResponseStats, FileStats } from "@/types";
+import { filesApi } from "@/api/filesApi";
+import { ApiResponse, FileStats } from "@/types";
 import { TableSkeleton } from "./TableSkeleton";
 import { Puff } from "react-loader-spinner";
 import { useTable } from "@/lib/hooks/useTable";
@@ -20,7 +20,7 @@ import { useTable } from "@/lib/hooks/useTable";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onEndFilesClick: (apiResponseData: ApiResponseStats<FileStats>) => void;
+  onEndFilesClick: (apiResponseData: ApiResponse<FileStats>) => void;
   onDataChange: (data: FileStats[], message: string) => void;
 }
 
@@ -48,7 +48,7 @@ export function DataTable<TData, TValue>({
     }
     setIsLoading(true);
     setIsEndingFiles(true);
-    const response = await api.endFiles(selectedValues as FileStats[]);
+    const response = await filesApi.endFiles(selectedValues as FileStats[]);
     onEndFilesClick(response);
 
     setIsLoading(false);

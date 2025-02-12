@@ -20,7 +20,8 @@ describe("API-INTEGRATION > auth-router", () => {
       .send({ user: "John Doe", pass: "password" });
 
     // check response
-    expect(res.body.userId).toBeDefined();
+
+    expect(res.body.data[0].userId).toBeDefined();
     expect(res.body.message).toBe(MESSAGES.USER_REGISTERED);
     expect(res.status).toBe(201);
   });

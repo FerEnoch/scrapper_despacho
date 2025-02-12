@@ -1,10 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
-import {  FileStats } from "../../types";
+import { FileStats } from "../../types";
 import { Button } from "../ui/button";
 import { SIEM_FILE_STATS_URL } from "@/config";
 import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
-import { api } from "@/api";
+import { filesApi } from "@/api/filesApi";
 import { getMessageColor, getStatusColor } from "@/lib/utils";
 import { useState } from "react";
 import { Puff } from "react-loader-spinner";
@@ -198,7 +198,9 @@ export const Columns: ColumnDef<FileStats>[] = [
           location: selectedLocation,
         };
 
-        const apiResponse = await api.endFiles([selectedValues] as FileStats[]);
+        const apiResponse = await filesApi.endFiles([
+          selectedValues,
+        ] as FileStats[]);
 
         setIsEndingFile(false);
         table.options.meta?.updateData(row.index, apiResponse);
@@ -209,7 +211,7 @@ export const Columns: ColumnDef<FileStats>[] = [
         if (!isSelected) return;
 
         const selectedNum = row.getValue("num") as string;
-        const apiResponse = await api.getFilesStats(selectedNum);
+        const apiResponse = await filesApi.getFilesStats(selectedNum);
 
         table.options.meta?.updateData(row.index, apiResponse);
         setIsSearchingStats(false);

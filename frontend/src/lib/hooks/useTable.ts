@@ -1,4 +1,4 @@
-import { ApiResponseStats, FileStats } from "@/types";
+import { ApiResponse, FileStats } from "@/types";
 import {
   getCoreRowModel,
   useReactTable,
@@ -49,12 +49,9 @@ export function useTable<TData, TValue>({
       pagination,
     },
     meta: {
-      updateData: (
-        rowIndex: number,
-        apiResponse: ApiResponseStats<FileStats>
-      ) => {
+      updateData: (rowIndex: number, apiResponse: ApiResponse<FileStats>) => {
         const apiResponseMessage = apiResponse.message;
-        const [updatedFileStats] = apiResponse?.data || [];
+        const updatedFileStats = apiResponse.data?.[0];
 
         setIsEndingFiles(true);
         const newData = [...data].map((file, index) => {

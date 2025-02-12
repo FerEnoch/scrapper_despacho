@@ -19,6 +19,15 @@ export class UserService implements IUserService {
   }
 
   async register({ user, pass }: Auth) {
+    const userExists = await this.databaseModel.checkIfUserExists({ user });
+
+    /**
+     * If user already exists, user is forced to log in because he was already registered
+     */
+    if (userExists) {
+      return this.login({ user, pass });
+    }
+
     const { userId } = await this.databaseModel.register({ user, pass });
 
     const { refreshToken } = this.authModel.generateRefreshToken(userId);

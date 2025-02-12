@@ -1,33 +1,27 @@
 import { API_BASE_URL } from "@/config";
-import {
-  API_ERRORS,
-  ApiResponseStats,
-  FILE_EXPORT_STATS,
-  FileStats,
-  RawFile,
-} from "@/types";
+import { ApiResponse, FileStats, RawFile } from "@/types";
+import { FILES_API_ERRORS, FILE_EXPORT_STATS } from "@/types/enums";
 import { mkConfig, generateCsv, download } from "export-to-csv";
 
-export const api = {
+export const filesApi = {
   getFilesStats: async (id: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/files/stats/${id}`, {
         method: "GET",
       });
 
-      const responseData =
-        (await response.json()) as ApiResponseStats<FileStats>;
+      const responseData = (await response.json()) as ApiResponse<FileStats>;
       if (response.ok) {
         return responseData;
       }
       return {
         message: responseData.message ?? "",
-        data: responseData.data ?? [],
+        data: responseData?.data ?? [],
       };
     } catch (error) {
       console.log("🚀 ~ getFilesStats ~ error:", error);
       return {
-        message: API_ERRORS.GENERIC_ERROR,
+        message: FILES_API_ERRORS.GENERIC_ERROR,
         data: [],
       };
     }
@@ -43,7 +37,7 @@ export const api = {
         body: formData,
       });
 
-      const responseData = (await response.json()) as ApiResponseStats<
+      const responseData = (await response.json()) as ApiResponse<
         FileStats | RawFile
       >;
       console.log("🚀 ~ uploadFile: ~ responseData:", responseData);
@@ -53,12 +47,12 @@ export const api = {
       }
       return {
         message: responseData.message ?? "",
-        data: responseData.data ?? [],
+        data: responseData?.data ?? [],
       };
     } catch (error) {
       console.log("🚀 ~ uploadFile ~ error:", error);
       return {
-        message: API_ERRORS.GENERIC_ERROR,
+        message: FILES_API_ERRORS.GENERIC_ERROR,
         data: [],
       };
     }
@@ -72,9 +66,9 @@ export const api = {
       );
 
       if (filesToEnd.length === 0) {
-        console.log("🚀 ~ endFiles ~ ", API_ERRORS.NO_FILES_TO_END);
+        console.log("🚀 ~ endFiles ~ ", FILES_API_ERRORS.NO_FILES_TO_END);
         return {
-          message: API_ERRORS.NO_FILES_TO_END,
+          message: FILES_API_ERRORS.NO_FILES_TO_END,
           data: [],
         };
       }
@@ -89,12 +83,11 @@ export const api = {
 
       if (response.status === 401) {
         return {
-          message: API_ERRORS.UNAUTHORIZED,
+          message: FILES_API_ERRORS.UNAUTHORIZED,
         };
       }
 
-      const responseData =
-        (await response.json()) as ApiResponseStats<FileStats>;
+      const responseData = (await response.json()) as ApiResponse<FileStats>;
 
       return {
         message: responseData.message ?? "",
@@ -103,7 +96,7 @@ export const api = {
     } catch (error) {
       console.log("🚀 ~ endFiles ~ error:", error);
       return {
-        message: API_ERRORS.GENERIC_ERROR,
+        message: FILES_API_ERRORS.GENERIC_ERROR,
         data: [],
       };
     }
@@ -133,7 +126,7 @@ export const api = {
       download(csvConfig)(csv);
     } catch (error) {
       console.log("🚀 ~ downloadFiles ~ error:", error);
-      throw new Error(API_ERRORS.GENERIC_ERROR);
+      throw new Error(FILES_API_ERRORS.GENERIC_ERROR);
     }
   },
 };

@@ -12,6 +12,7 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,19 +20,30 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { useState } from "react";
+import { authApi } from "@/api/authApi";
+import { ApiResponse, UserSession } from "@/types";
 
 interface LoginFormProps {
   actionButton: string;
   toggleAlertDialog: () => void;
+  handleLogin: (apiResponseData: ApiResponse<UserSession>) => void;
+  isError: boolean;
+  isSuccessLogin: boolean;
 }
 
-export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
+export function LoginForm({
+  actionButton,
+  toggleAlertDialog,
+  handleLogin,
+  isError,
+  isSuccessLogin,
+}: LoginFormProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      user: "",
+      pass: "",
     },
   });
 
@@ -39,9 +51,13 @@ export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
     setIsPasswordVisible((isVisible) => !isVisible);
   };
 
-  const onSubmit = (data: z.infer<typeof loginFormSchema>) => {
-    console.log("🚀 ~ onSubmit ~ data:", data);
+  const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
+    const apiResponse = await authApi.register(data);
+    handleLogin(apiResponse);
   };
+
+  const errorInputStyle =
+    "text-red-300 border-red-400 focus:ring-transparent placeholder-red-300 focus:outline-none";
 
   return (
     <Form {...form}>
@@ -51,27 +67,33 @@ export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
         className="space-y-8"
       >
         <FormField
-          {...form.register("username")}
+          {...form.register("user")}
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor="username">Usuario SIEM</FormLabel>
+              <FormLabel htmlFor="user">Usuario SIEM</FormLabel>
               <FormControl>
                 <Input
-                  className="ps-2 w-48"
+                  className={`${
+                    isError && !isSuccessLogin && errorInputStyle
+                  } ps-2 w-48 placeholder:text-muted`}
                   type="text"
-                  id="username"
+                  id="user"
                   placeholder="Nombre de usuario"
                   {...field}
                 />
               </FormControl>
-              {/* <FormDescription>Usuario SIEM</FormDescription> */}
+              {isError && !isSuccessLogin && (
+                <FormDescription className="text-red-300 absolute">
+                  Revisa tu usuario
+                </FormDescription>
+              )}
               <FormMessage />
             </FormItem>
           )}
         />
         <FormField
-          {...form.register("password")}
+          {...form.register("pass")}
           control={form.control}
           render={({ field }) => (
             <FormItem>
@@ -79,7 +101,9 @@ export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
               <FormControl>
                 <div className="flex items-center justify-between relative">
                   <Input
-                    className="ps-2 w-48"
+                    className={`${
+                      isError && !isSuccessLogin && errorInputStyle
+                    } ps-2 w-48`}
                     type={isPasswordVisible ? "text" : "password"}
                     id="pass"
                     {...field}
@@ -103,7 +127,11 @@ export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
                   )}
                 </div>
               </FormControl>
-              {/* <FormDescription>Contraseña SIEM</FormDescription> */}
+              {isError && !isSuccessLogin && (
+                <FormDescription className="text-red-300 absolute">
+                  Revisa tu contraseña
+                </FormDescription>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -115,7 +143,7 @@ export function LoginForm({ actionButton, toggleAlertDialog }: LoginFormProps) {
           >
             {"Cancelar"}
           </AlertDialogAction>
-          <AlertDialogAction>
+          <AlertDialogAction className="bg-transparent shadow-none">
             <Button type="submit">{actionButton}</Button>
           </AlertDialogAction>
         </AlertDialogFooter>

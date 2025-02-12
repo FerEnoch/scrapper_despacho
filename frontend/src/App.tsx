@@ -15,23 +15,23 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import { Columns } from "./components/table/Columns";
+import { DataTable } from "@/components/table/DataTable";
+import { TableSkeleton } from "@/components/table/TableSkeleton";
+import { SpeedDial } from "@/components/speedDial/SpeedDial";
 import { Input } from "@/components/ui/input";
+import { Columns } from "@/components/table/Columns";
 import { uploadFileFormSchema } from "@/schemas/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { api } from "./api";
-import { API_ERRORS, ApiResponseStats, RawFile } from "./types";
-import { FileStats } from "./types";
+import { filesApi } from "@/api/filesApi";
+import { FileStats, ApiResponse, RawFile } from "@/types";
+import { FILES_API_ERRORS } from "@/types/enums";
 import { useState } from "react";
-import { DataTable } from "./components/table/DataTable";
-import { TableSkeleton } from "./components/table/TableSkeleton";
-import { CARD_TEXTS, UI_ERROR_MESSAGES } from "./i18n/constants";
+import { CARD_TEXTS, UI_ERROR_MESSAGES } from "@/i18n/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
-import { SpeedDial } from "./components/speedDial/SpeedDial";
-import { Modals } from "./components/modal/Modals";
+import { Modals } from "./components/modals/Modals";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
@@ -42,6 +42,7 @@ export default function App() {
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [modalMsg, setModalMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
+
   const form = useForm<z.infer<typeof uploadFileFormSchema>>({
     resolver: zodResolver(uploadFileFormSchema),
     defaultValues: {
@@ -51,10 +52,10 @@ export default function App() {
 
   const handleDownloadData = async () => {
     try {
-      await api.downloadFiles(filesData, fileName);
+      await filesApi.downloadFiles(filesData, fileName);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      if (error.message === API_ERRORS.GENERIC_ERROR) {
+      if (error.message === FILES_API_ERRORS.GENERIC_ERROR) {
         return;
       }
     }
@@ -81,27 +82,27 @@ export default function App() {
   const handleResponseMessages = ({
     message,
     data,
-  }: ApiResponseStats<FileStats | RawFile>) => {
+  }: ApiResponse<FileStats | RawFile>) => {
     switch (message) {
-      case API_ERRORS.UNAUTHORIZED:
+      case FILES_API_ERRORS.UNAUTHORIZED:
         setIsSearching(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
         setOpenAuthModal(true);
         return;
 
-      case API_ERRORS.SERVER_ERROR:
-      case API_ERRORS.INVALID_FILE:
-      case API_ERRORS.NO_FILE_TO_UPLOAD:
-      case API_ERRORS.NOT_FOUND:
-      case API_ERRORS.GENERIC_ERROR:
-      case API_ERRORS.NO_FILE_STATS_RETRIEVED:
+      case FILES_API_ERRORS.SERVER_ERROR:
+      case FILES_API_ERRORS.INVALID_FILE:
+      case FILES_API_ERRORS.NO_FILE_TO_UPLOAD:
+      case FILES_API_ERRORS.NOT_FOUND:
+      case FILES_API_ERRORS.GENERIC_ERROR:
+      case FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED:
         setIsSearching(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
         setFilesData([]);
         return;
 
-      case API_ERRORS.INVALID_DATA:
+      case FILES_API_ERRORS.INVALID_DATA:
         setIsSearching(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
@@ -109,7 +110,7 @@ export default function App() {
         setFilesData([]);
         return;
 
-      case API_ERRORS.NO_FILES_TO_END:
+      case FILES_API_ERRORS.NO_FILES_TO_END:
         setModalMsg(UI_ERROR_MESSAGES[message]);
         setIsError(true);
         return;
@@ -131,7 +132,7 @@ export default function App() {
 
     setFileName(data.file.name);
 
-    const response = (await api.uploadFile(formData)) as ApiResponseStats<
+    const response = (await filesApi.uploadFile(formData)) as ApiResponse<
       FileStats | RawFile
     >;
 
@@ -139,7 +140,7 @@ export default function App() {
     formData.delete("file");
   };
 
-  const onEndFilesClick = (apiResponseData: ApiResponseStats<FileStats>) => {
+  const onEndFilesClick = (apiResponseData: ApiResponse<FileStats>) => {
     const data = handleResponseMessages(apiResponseData);
 
     const newState = filesData.map((currentFile) => {
@@ -243,6 +244,7 @@ export default function App() {
         toggleAuthModal={toggleAuthModal}
         toggleLoginModal={toggleLoginModal}
       />
+      <Toaster />
       {isSerching && <TableSkeleton />}
       {filesData.length > 0 && !isSerching ? (
         <>
