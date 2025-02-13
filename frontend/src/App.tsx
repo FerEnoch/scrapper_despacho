@@ -201,7 +201,9 @@ export default function App() {
     const formData = new FormData();
     formData.append("file", data.file);
 
-    setFileName(data.file.name);
+    // slice extention from file name
+    const [fileRawName] = data.file.name.split(".csv");
+    setFileName(`${fileRawName}.download`);
 
     const response = (await filesApi.uploadFile(formData)) as ApiResponse<
       FileStats | RawFile

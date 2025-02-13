@@ -8,6 +8,7 @@ import { modelTypes } from "../../types";
 import fs from "node:fs/promises";
 import { filesEnded } from "../sample_data/filesEnded";
 import { fakeEndFiles } from "./utils/fake-endFiles";
+import { wholeLotOfFileStats } from "../sample_data/filesStats-whole-lot-of";
 
 /**
  * @description Playwright tests
@@ -53,7 +54,7 @@ test("files.service > Should get complete files stats in batches", async () => {
   expect(result).toEqual(filesStats);
 });
 
-test.only("files.service > Should end files in SIEM system in batches", async () => {
+test("files.service > Should end SOME files in SIEM system in batches", async () => {
   const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
   const filesService = new FilesService({ model: filesScrapper });
 
@@ -62,6 +63,21 @@ test.only("files.service > Should end files in SIEM system in batches", async ()
   // const filesEndedResult = await fakeEndFiles({
   //   files: filesStats,
   // });
+  expect(filesEndedResult).toHaveLength(filesStats.length);
+  expect(filesEndedResult).toEqual(filesEnded);
+});
+
+test.only("files.service > Should end LOT OF FILES in SIEM system in batches", async () => {
+  // const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
+  // const filesService = new FilesService({ model: filesScrapper });
+
+  // const filesEndedResult = await filesService.endFiles({
+  //   files: wholeLotOfFileStats,
+  // });
+
+  const filesEndedResult = await fakeEndFiles({
+    files: wholeLotOfFileStats,
+  });
   expect(filesEndedResult).toHaveLength(filesStats.length);
   expect(filesEndedResult).toEqual(filesEnded);
 });

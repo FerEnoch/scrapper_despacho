@@ -24,7 +24,7 @@ const UI_MODAL_MESSAGES = {
       actionButton: "Continuar",
     },
     AUTH_ERROR: {
-      dialogTitle: "Error de autenticación",
+      dialogTitle: "Se necesita autenticación",
       actionButton: "Iniciar sesión",
     },
   },
@@ -53,7 +53,8 @@ const UI_TOAST_MESSAGES = {
   },
   GENERIC_ERROR: {
     title: "Error",
-    description: "Ocurrió un error en el sistema. Por favor, intenta nuevamente.",
+    description:
+      "Ocurrió un error en el sistema. Por favor, intenta nuevamente.",
   },
 } as const;
 

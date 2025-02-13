@@ -3,6 +3,7 @@ import { testAgent } from "../setup";
 import { MESSAGES } from "../../controllers/constants";
 import { ERRORS } from "../../errors/types";
 import { filesStats } from "../sample_data/filesStats";
+import { wholeLotOfFileStats } from "../sample_data/filesStats-whole-lot-of";
 
 /**
  * @description This test suite is for testing the API files routes
@@ -16,7 +17,7 @@ describe("API-INTEGRATION > files-router", () => {
    * @method POST
    * @description Upload a csv file
    */
-  it("should upload a csv file and search files stats", async () => {
+  it("should upload a csv file and search for SOME files stats", async () => {
     const res = await testAgent
       .post("/api/v1/files")
       .attach("file", "src/tests/sample_data/files.csv");
@@ -26,7 +27,19 @@ describe("API-INTEGRATION > files-router", () => {
     expect(res.status).toBe(201);
     expect(res.body.message).toBe(MESSAGES.FILE_UPLOADED);
     expect(data).toEqual(filesStats);
-  });
+  }); // 2254 ms
+
+  it("should upload a csv file and search for WHOLE LOT OF files stats", async () => {
+    const res = await testAgent
+      .post("/api/v1/files")
+      .attach("file", "src/tests/sample_data/files-whole-lot-of.csv");
+
+    const { data } = res.body;
+
+    expect(res.status).toBe(201);
+    expect(res.body.message).toBe(MESSAGES.FILE_UPLOADED);
+    expect(data).toEqual(wholeLotOfFileStats);
+  }, 15000); // 11355 ms
 
   it("should return 400 & correct msg if file is not a csv", async () => {
     const res = await testAgent

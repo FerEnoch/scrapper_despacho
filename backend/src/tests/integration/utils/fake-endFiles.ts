@@ -15,10 +15,10 @@ export async function fakeEndFiles({ files }: { files: FileStats[] }) {
   const filesEndedResult: Array<FileEndedStats> = [];
 
   const batched =
-    files.length > 5 // this.MAX_BATCH_SIZE
+    files.length > 10 // this.MAX_BATCH_SIZE
       ? getFilesBatches<FileStats>({
           arr: files,
-          size: 5, // this.MAX_BATCH_SIZE,
+          size: 10, // this.MAX_BATCH_SIZE,
         })
       : [files];
 

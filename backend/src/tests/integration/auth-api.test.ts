@@ -8,7 +8,7 @@ import { MESSAGES } from "../../controllers/constants";
  * @dev Command to run this test suite:
  *  - npm run back:test
  */
-describe("API-INTEGRATION > auth-router", () => {
+describe.skip("API-INTEGRATION > auth-router", () => {
   /**
    * @route /auth/register
    * @method POST

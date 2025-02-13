@@ -10,7 +10,7 @@ import { ERRORS } from "../errors/types";
 
 export class FilesService implements IFilesService {
   model: modelTypes["IFileScrapper"];
-  MAX_BATCH_SIZE = 5;
+  MAX_BATCH_SIZE = 10;
   ENDED_FILE_STATUS_TEXT = "";
   SIEM_PASSWORD = "";
   SIEM_USER = "";
