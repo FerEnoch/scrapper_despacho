@@ -1,6 +1,6 @@
-import { FileStats } from "../../models/types";
+import { FileEndedStats } from "../../models/types";
 
-export const wholeLotOfFileStats: Array<FileStats> = [
+export const filesEndedWholeLotOf: Array<FileEndedStats> = [
   {
     index: 0,
     num: "DE-0963-01012967-4 (NI)",
@@ -8,6 +8,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "COCUZZA NESTOR DONATO. Inscripción Nº 2230-5.   Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 1,
@@ -16,6 +17,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "PEREZLINDO WALTER DANIEL. Inscripción Nº 27129-5. Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 2,
@@ -24,6 +26,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "COMPAGNUCCI ALEJANDRO MIGUEL INSCRIPCION Nº 32365-9 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 3,
@@ -32,6 +39,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "VAZQUEZ MARIA ESTER INSCRIPCION Nº 30864-3 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 4,
@@ -40,6 +52,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "ZANAZZI SABRINA ELSA INSCRIPCION Nº 30608-5 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 5,
@@ -48,6 +65,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "LENARDUZZI VIVIANA ESTER. Inscripción Nº 48-8      Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 6,
@@ -56,6 +74,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "CHICCO RUIZ ANIBAL LEONARDO INSCRIPCION Nº 32170-1 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 7,
@@ -64,6 +87,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "ESTRUCH MIGUEL IGNACIO INSCRIPCION Nº 31627-3 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 8,
@@ -72,6 +100,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "DUARTE RUBEN RODOLFO INSCRIPCION Nº 23929-5 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 9,
@@ -80,6 +113,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "CASTAGNO JOSE MARIA INSCRIPCION Nº 21236-0 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 10,
@@ -88,6 +126,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "CABRERA RODRIGO MANUEL INSCRIPCION Nº 31888-6 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 11,
@@ -96,6 +139,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "RACHID MARIA GABRIELA INSCRIPCION Nº 18584-0 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 12,
@@ -103,6 +151,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "SOL. EXTRACCION DE ARBOL",
     prevStatus: "EN CURSO",
     location: "D107 - D. ESPACIOS VERDES",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 13,
@@ -111,6 +164,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "RACHID MARIA GABRIELA INSCRIPCION Nº 18584-0 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 14,
@@ -119,6 +177,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "BULAY MONICA RAQUEL INSCRIPCION Nº 28543-6 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 15,
@@ -127,6 +190,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "OJEDA GABRIEL RAUL INSCRIPCION Nº 31005-3 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 16,
@@ -135,6 +203,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "ZERVA GUILLERMO ARIEL INSCRIPCION Nº 30131-2 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 17,
@@ -143,6 +216,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "BENITEZ ALEJANDRO SEBASTIAN INSCRIPCION Nº 30426-7 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 18,
@@ -151,6 +229,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "CANCELLIERI ADRIANA FIORELLA INSCRIPCION Nº 31904-3 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 19,
@@ -159,6 +242,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "SEQUEIRA Roberto Faustino. Inscripción Nº 6570-8.  Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 20,
@@ -167,6 +251,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "AGUIRRE FERNANDO OSMAR INSCRIPCION Nº 32179-3 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 21,
@@ -174,6 +263,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "IBARRA CAROLINA NOEMI",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 22,
@@ -181,6 +275,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "COPIA DE FORMULARIO DE OCUPACION DE ACERANº 7137- AYALA, JOSE",
     prevStatus: "EN CURSO",
     location: "P165 - TRIBUTOS SOBRE LA ACTIVIDAD ECONOMICA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 23,
@@ -188,6 +287,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "MATHIER MARIANA GABRIELA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 24,
@@ -195,6 +299,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "IGLESIA ARIEL ORLANDO",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 25,
@@ -202,6 +311,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "CAITO FABRICIO",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 26,
@@ -209,6 +323,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "DASTUGUEZ ADRIAN LUIS",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 27,
@@ -216,6 +335,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "SCHALBETTER PAMELA MELINA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 28,
@@ -223,6 +347,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "NASIMBERA GRACIELA NATALIA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 29,
@@ -230,6 +359,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "DUDIUK CATIANA BEATRIZ",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 30,
@@ -238,6 +372,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "ZAPATA MARIA CRISTINA. Inscripción Nº 21590-9. Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 31,
@@ -245,6 +380,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "GOMEZ WALTER RUBEN INSCRIPCION Nº 886-2 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 32,
@@ -253,6 +393,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "MARTINEZ CRISTIAN GUSTAVO INSCRIPCION Nº31055-8 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 33,
@@ -260,6 +401,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "GRANDOLI YOLANDA INSCRIPCION Nº 31823-5 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 34,
@@ -267,6 +413,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "BARRERA AMELIA GUADALUPE",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 35,
@@ -275,6 +426,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "DMV. SE ADJUNTA SOLIC DE PEDIDO N° 050/2014 DE ADQ. BOTAS TRAJES IMP.WADERS GUANTES. EMERG.HÍDRICA",
     prevStatus: "EN CURSO",
     location: "C273 - ARCHIVO FINANZAS",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 36,
@@ -283,6 +439,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "GABRIELA ROMINA GUTIERREZ GANI INSCRIPCION Nº 28594-4 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 37,
@@ -291,6 +452,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "Previtali María Andrea. Inscripción Nº 32518-7.     Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 38,
@@ -299,6 +461,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "ROLDAN MARIA ESTHER INSCRIPCION Nº 15816-3 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 39,
@@ -306,6 +473,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "ESPINDOLA MARIA JOSE",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 40,
@@ -313,6 +485,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "HERRERA SILVIA INES",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 41,
@@ -320,6 +497,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "PARAJON ANDRES",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 42,
@@ -328,6 +510,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "Pighin Mauro -Orden Nº 129.                         Programa Mi Tierra Mi Casa - PRO.CRE.AR.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 43,
@@ -336,6 +519,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "Asnailler Esteban. Inscripción Nº 30968-2.          Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 44,
@@ -343,6 +527,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     title: "SOSA GONZALO MARTIN D.N.I.Nº 31257727 (PROCREAR)",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 45,
@@ -351,6 +540,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "AGUIRRE ENRIQUE OMAR FRANCISCO. Inscrip. Nº 32562-4. Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
   {
     index: 46,
@@ -359,6 +549,11 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "DORATTO VERONICA VIVIANA INSCRIPCION Nº 29092-2 PROGRAMA MI TIERRA MI CASA",
     prevStatus: "EN CURSO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
+    newStatus: {
+      status: "EN CURSO",
+      message: "ERROR",
+      detail: "El documento no se encuentra en las reparticiones del usuario.",
+    },
   },
   {
     index: 47,
@@ -367,5 +562,6 @@ export const wholeLotOfFileStats: Array<FileStats> = [
       "Arce Mónica Andrea. Inscripción Nº 17695-2.         Programa Mi Tierra Mi Casa.",
     prevStatus: "FINALIZADO",
     location: "S116 - AGENCIA SANTA FE HABITAT",
+    newStatus: null,
   },
 ];

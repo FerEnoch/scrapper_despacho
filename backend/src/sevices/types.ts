@@ -17,7 +17,7 @@ export interface IFilesService {
   searchFilesStats(files: FileId[]): Promise<FileStats[]>;
   endFiles({ files }: { files: FileStats[] }): Promise<FileEndedStats[]>;
   endFileByNum(num: string): Promise<{ message: string; detail: string }>;
-  siemLogin(): Promise<{ siemPage: Page; browser: Browser }>;
+  siemLogin(): Promise<void>;
 }
 
 export interface IUserService {

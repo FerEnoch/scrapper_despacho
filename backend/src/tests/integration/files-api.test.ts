@@ -4,6 +4,8 @@ import { MESSAGES } from "../../controllers/constants";
 import { ERRORS } from "../../errors/types";
 import { filesStats } from "../sample_data/filesStats";
 import { wholeLotOfFileStats } from "../sample_data/filesStats-whole-lot-of";
+import { filesEnded } from "../sample_data/filesEnded";
+import { filesEndedWholeLotOf } from "../sample_data/filesEnded-whole-lot-of";
 
 /**
  * @description This test suite is for testing the API files routes
@@ -29,17 +31,21 @@ describe("API-INTEGRATION > files-router", () => {
     expect(data).toEqual(filesStats);
   }); // 2254 ms
 
-  it("should upload a csv file and search for WHOLE LOT OF files stats", async () => {
-    const res = await testAgent
-      .post("/api/v1/files")
-      .attach("file", "src/tests/sample_data/files-whole-lot-of.csv");
+  it(
+    "should upload a csv file and search for WHOLE LOT OF files stats",
+    async () => {
+      const res = await testAgent
+        .post("/api/v1/files")
+        .attach("file", "src/tests/sample_data/files-whole-lot-of.csv");
 
-    const { data } = res.body;
+      const { data } = res.body;
 
-    expect(res.status).toBe(201);
-    expect(res.body.message).toBe(MESSAGES.FILE_UPLOADED);
-    expect(data).toEqual(wholeLotOfFileStats);
-  }, 15000); // 11355 ms
+      expect(res.status).toBe(201);
+      expect(res.body.message).toBe(MESSAGES.FILE_UPLOADED);
+      expect(data).toEqual(wholeLotOfFileStats);
+    },
+    15 * 1000 // 11355 ms / 9756 ms
+  );
 
   it("should return 400 & correct msg if file is not a csv", async () => {
     const res = await testAgent
@@ -59,9 +65,9 @@ describe("API-INTEGRATION > files-router", () => {
    * @route /files/end
    * @method POST
    * @description End files in SIEM system
-   * @description Requires authentication
+   * @description Requires authentication - By pass middleware to test without issues
    */
-  it.skip("should not end files that are already ended", async () => {
+  it("should not end files that are already ended", async () => {
     const endedFiles = [
       {
         prevStatus: "FINALIZADO",
@@ -73,4 +79,26 @@ describe("API-INTEGRATION > files-router", () => {
     expect(res.body.message).toEqual(ERRORS.NO_FILES_TO_END);
     expect(res.body.data).toEqual(null);
   });
+
+  it("should end SOME files in SIEM system", async () => {
+    const res = await testAgent.post("/api/v1/files/end").send(filesStats);
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe(MESSAGES.FILES_ENDED);
+    expect(res.body.data).toEqual(filesEnded);
+  });
+
+  it(
+    "should end LOT OF files in SIEM system",
+    async () => {
+      const res = await testAgent
+        .post("/api/v1/files/end")
+        .send(wholeLotOfFileStats);
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe(MESSAGES.FILES_ENDED);
+      expect(res.body.data).toEqual(filesEndedWholeLotOf);
+    },
+    25 * 1000 // 21s
+  );
 });

@@ -99,7 +99,6 @@ export default function App() {
 
   const onDataChange = (data: FileStats[], message: string) => {
     handleFilesResponseMessages({ message, data });
-
     setFilesData(data);
   };
 

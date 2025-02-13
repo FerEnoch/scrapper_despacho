@@ -3,11 +3,12 @@ const SIEM_PAGE_DATA = {
   ENDED_FILE_STATUS_TEXT: "FINALIZADO",
   SIEM_BASE_URL: "https://siem.santafeciudad.gov.ar",
   SIEM_LOGIN_PATH: "/login.php",
-  SIEM_SEARCH_FILE_PATH: "/expediente_ver.php?id=",
+  SIEM_SEE_FILE_PATH: "/expediente_ver.php?id=",
+  SIEM_SEARCH_FILE_PATH: "/expediente_buscar.php",
+  SIEM_END_FILE_PATH: "/expediente_finalizar.php?id=",
   AUTH_GRANTED_PAGE_CHECK: {
-    // NOT WORKING
-    element: "img[src='templates/imgs/top2_usr.png']",
-    text: "templates/imgs/top2_usr.png",
+    element: 'td[width="25%"]',
+    text: "", // To be filled in runtime with "user"
   },
   AUTH_DENIED_PAGE_TITLE: {
     element: "h2",

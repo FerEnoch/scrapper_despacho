@@ -1,16 +1,18 @@
-import { Browser, Page } from "@playwright/test";
 import { FileEndedStats, FileId, FileStats } from "../models/types";
 import { modelTypes } from "../types";
 import { getFilesBatches, parseFileStats } from "../models/lib/filesScrapper";
 import { IFilesService, BatchOpResultType } from "./types";
-import { SIEM_PAGE_DATA } from "../models/lib/filesScrapper/constants";
-import { SIEM_PASSWORD, SIEM_USER } from "../config";
+import {
+  COLLECTION_ERRORS,
+  SIEM_PAGE_DATA,
+} from "../models/lib/filesScrapper/constants";
+import { NODE_ENV, SIEM_PASSWORD, SIEM_USER } from "../config";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 
 export class FilesService implements IFilesService {
   model: modelTypes["IFileScrapper"];
-  MAX_BATCH_SIZE = 10;
+  MAX_BATCH_SIZE = 5;
   ENDED_FILE_STATUS_TEXT = "";
   SIEM_PASSWORD = "";
   SIEM_USER = "";
@@ -18,7 +20,7 @@ export class FilesService implements IFilesService {
   constructor({ model }: { model: modelTypes }) {
     this.model = model;
     this.ENDED_FILE_STATUS_TEXT = SIEM_PAGE_DATA.ENDED_FILE_STATUS_TEXT;
-    this.MAX_BATCH_SIZE = 5;
+    this.MAX_BATCH_SIZE = 10;
     this.SIEM_USER = SIEM_USER;
     this.SIEM_PASSWORD = SIEM_PASSWORD;
 
@@ -29,9 +31,11 @@ export class FilesService implements IFilesService {
   }
 
   async searchFilesStats(files: FileId[]) {
+    await this.model.createBrowserContext();
+
     const scrappedData: Array<FileStats> = [];
 
-    const batched =
+    const batchedFiles =
       files.length > this.MAX_BATCH_SIZE
         ? getFilesBatches<FileId>({
             arr: files,
@@ -40,16 +44,13 @@ export class FilesService implements IFilesService {
         : [files];
 
     const results = (await Promise.allSettled(
-      batched.map(async (batch) => {
+      batchedFiles.map(async (batch) => {
         return Promise.all(
           batch.map(async (file) => {
-            const { newPage, browser } = await this.model.getBrowserContext();
             try {
               const fileStats = await this.model.collectData({
                 file,
-                page: newPage,
               });
-              await browser.close();
               return { ...fileStats };
             } catch (error) {
               return { error };
@@ -65,6 +66,10 @@ export class FilesService implements IFilesService {
           scrappedData.push(file);
         });
       } else {
+        console.log(
+          " 🚀 ~ file: files.service.searchFilesStats ~ batchResult.error.message",
+          batchResult.error.message
+        );
         // throw new ApiError({
         //   statusCode: 400,
         //   message: ERRORS.NO_FILE_STATS_RETRIEVED,
@@ -74,6 +79,9 @@ export class FilesService implements IFilesService {
     });
 
     scrappedData.sort((a, b) => a.index - b.index);
+
+    await this.model.closeBrowserContext();
+    return scrappedData;
 
     /* old-method
     let dataCollection: FileStats;
@@ -93,12 +101,14 @@ export class FilesService implements IFilesService {
     });
     scrappedData.splice(0, 1, firstFileData);
     */
-
-    return scrappedData;
   }
 
   async endFiles({ files }: { files: FileStats[] }) {
+    await this.model.createBrowserContext();
+
     const filesEndedResult: Array<FileEndedStats> = [];
+
+    await this.siemLogin();
 
     const batched =
       files.length > this.MAX_BATCH_SIZE
@@ -110,11 +120,14 @@ export class FilesService implements IFilesService {
 
     const results = (await Promise.allSettled(
       batched.map(async (batch) => {
-        return Promise.all(
+        return await Promise.all(
           batch.map(async (file) => {
             try {
               const { prevStatus } = file;
-              if (prevStatus === this.ENDED_FILE_STATUS_TEXT) {
+              if (
+                prevStatus === this.ENDED_FILE_STATUS_TEXT ||
+                prevStatus === COLLECTION_ERRORS.DATA_MISSING
+              ) {
                 return {
                   ...file,
                   newStatus: null,
@@ -123,20 +136,19 @@ export class FilesService implements IFilesService {
 
               const [{ num }] = parseFileStats([file]);
 
-              const fileNewData: FileStats = await this.model.collectData({
-                file: {
-                  ...file,
-                  num, // only middle long number
-                },
-                page: null,
-              });
+              // const fileNewData: FileStats = await this.model.collectData({
+              //   file: {
+              //     ...file,
+              //     num, // only middle long number
+              //   },
+              // });
 
               const { message, detail } = await this.endFileByNum(num);
 
               return {
                 ...file,
                 newStatus: {
-                  status: fileNewData?.prevStatus ?? "",
+                  status: prevStatus ?? COLLECTION_ERRORS.DATA_MISSING,
                   message,
                   detail,
                 },
@@ -155,6 +167,11 @@ export class FilesService implements IFilesService {
           filesEndedResult.push(file);
         });
       } else {
+        // replace :rocket with a rocket emoji 🚀
+        console.log(
+          " 🚀 ~ file: files.service.endFiles ~ batchResult.error.message",
+          batchResult.error.message
+        );
         // throw new ApiError({
         //   statusCode: 400,
         //   message: ERRORS.NO_FILES_ENDED,
@@ -163,13 +180,15 @@ export class FilesService implements IFilesService {
       }
     });
 
+    await this.model.closeBrowserContext();
+
     filesEndedResult.sort((a, b) => a.index - b.index);
     return filesEndedResult;
     /** old-method */
     // const result: FileEndedStats[] = [];
     // let updatedFile: FileEndedStats, message: string, detail: string;
 
-    // const filesToEndChunks = files.reduce((acc, file, index) => {
+    // const filesChunks = files.reduce((acc, file, index) => {
     //   if (index % 10 === 0) {
     //     acc.push([file]);
     //   } else {
@@ -179,7 +198,7 @@ export class FilesService implements IFilesService {
     // }, [] as FileStats[][]);
 
     // await Promise.all(
-    //   filesToEndChunks.map(async (filesChunk) => {
+    //   filesChunks.map(async (filesChunk) => {
     //     let fileNewData: FileStats,
     //       siemPage: Page | null = null,
     //       newBrowser: Browser | null = null;
@@ -247,28 +266,22 @@ export class FilesService implements IFilesService {
   async endFileByNum(
     num: string
   ): Promise<{ message: string; detail: string }> {
-    const { siemPage, browser } = await this.siemLogin();
     const { message, detail } = await this.model.endFileByNum({
       num,
-      page: siemPage,
     });
-    browser.close();
-
     return { message, detail };
   }
 
-  async siemLogin(): Promise<{ siemPage: Page; browser: Browser }> {
+  async siemLogin(): Promise<void> {
     if (!this.SIEM_USER || !this.SIEM_PASSWORD) {
       throw new ApiError({
         statusCode: 401,
         message: ERRORS.CREDENTIALS_NOT_PROVIDED,
       });
     }
-    const { siemPage, browser } = await this.model.siemLogin({
+    await this.model.siemLogin({
       user: this.SIEM_USER,
       pass: this.SIEM_PASSWORD,
     });
-
-    return { siemPage, browser };
   }
 }

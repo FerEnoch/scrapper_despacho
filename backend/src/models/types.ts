@@ -1,4 +1,4 @@
-import { Browser, Page } from "@playwright/test";
+import { BrowserContext, Page, Route } from "@playwright/test";
 import { Auth } from "../schemas/auth";
 import Database from "better-sqlite3";
 import { Request, Response, NextFunction } from "express";
@@ -9,41 +9,38 @@ export type IFileScrapper = {
   SIEM_BASE_URL: string;
   SIEM_LOGIN_PATH: string;
   SIEM_LOGIN_URL: string;
+  SIEM_SEE_FILE_PATH: string;
   SIEM_SEARCH_FILE_PATH: string;
   SIEM_SEARCH_FILE_URL: string;
+  SIEM_SEE_FILE_URL: string;
+  SIEM_END_FILE_PATH: string;
+  SIEM_END_FILE_URL: string;
   SIEM_LOCATE_FILE_TITLE: locationType;
   SIEM_LOCATE_FILE_STATUS: locationType;
   SIEM_LOCATE_FILE_LOCATION: locationType;
   AUTH_DENIED_PAGE_TITLE: locationType;
   AUTH_DENIED_PAGE_MSG: locationType;
   AUTH_GRANTED_PAGE_CHECK: locationType;
-  getBrowserContext(): Promise<{
-    newPage: Page;
-    browser: Browser;
-  }>;
-
+  context: BrowserContext | null;
+  // page: Page | null;
+  createBrowserContext(): Promise<void>;
+  intercept(route: Route): Promise<void>;
+  closeBrowserContext(): Promise<void>;
   siemLogin({
     user,
     pass,
   }: {
     user: string;
     pass: string;
-  }): Promise<{ siemPage: Page; browser: Browser }>;
+  }): Promise<void | null>;
 
-  endFileByNum({ num, page }: { num: string; page: Page }): Promise<{
+  endFileByNum({ num }: { num: string }): Promise<{
     message: string;
     detail: string;
   }>;
 
-  collectData({
-    file,
-    page,
-  }: {
-    file: FileId;
-    page: Page | null;
-  }): Promise<FileStats>;
-
-  // checkSiemLogin({ page }: { page: Page }): Promise<boolean>;
+  collectData({ file }: { file: FileId }): Promise<FileStats | null>;
+  checkSiemLogin({ page }: { page: Page }): Promise<boolean>;
 };
 
 export type IDatabaseModel = {

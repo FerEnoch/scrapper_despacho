@@ -1,4 +1,11 @@
-import { Browser, chromium, Dialog, expect, Page } from "@playwright/test";
+import {
+  BrowserContext,
+  chromium,
+  Dialog,
+  expect,
+  Page,
+  Route,
+} from "@playwright/test";
 import { FileId, FileStats, IFileScrapper, locationType } from "./types";
 import { ERRORS } from "../errors/types";
 import {
@@ -11,8 +18,12 @@ export class FilesScrapper implements IFileScrapper {
   SIEM_BASE_URL = "";
   SIEM_LOGIN_PATH = "";
   SIEM_LOGIN_URL = "";
+  SIEM_SEE_FILE_PATH = "";
+  SIEM_SEE_FILE_URL = "";
   SIEM_SEARCH_FILE_PATH = "";
   SIEM_SEARCH_FILE_URL = "";
+  SIEM_END_FILE_PATH = "";
+  SIEM_END_FILE_URL = "";
   END_FILE_TEXT = "";
   SIEM_LOCATE_FILE_TITLE: locationType;
   SIEM_LOCATE_FILE_STATUS: locationType;
@@ -20,13 +31,17 @@ export class FilesScrapper implements IFileScrapper {
   AUTH_DENIED_PAGE_TITLE: locationType;
   AUTH_DENIED_PAGE_MSG: locationType;
   AUTH_GRANTED_PAGE_CHECK: locationType;
+  context: BrowserContext | null = null;
+  // page: Page | null = null;
 
   constructor() {
     const {
       END_FILE_TEXT,
       SIEM_BASE_URL,
       SIEM_LOGIN_PATH,
+      SIEM_SEE_FILE_PATH,
       SIEM_SEARCH_FILE_PATH,
+      SIEM_END_FILE_PATH,
       SIEM_LOCATE_FILE_TITLE,
       SIEM_LOCATE_FILE_STATUS,
       SIEM_LOCATE_FILE_LOCATION,
@@ -35,10 +50,14 @@ export class FilesScrapper implements IFileScrapper {
       AUTH_GRANTED_PAGE_CHECK,
     } = SIEM_PAGE_DATA;
     this.END_FILE_TEXT = END_FILE_TEXT;
+    this.SIEM_SEE_FILE_PATH = SIEM_SEE_FILE_PATH;
+    this.SIEM_SEE_FILE_URL = `${SIEM_BASE_URL}${SIEM_SEE_FILE_PATH}`;
     this.SIEM_SEARCH_FILE_PATH = SIEM_SEARCH_FILE_PATH;
     this.SIEM_SEARCH_FILE_URL = `${SIEM_BASE_URL}${SIEM_SEARCH_FILE_PATH}`;
     this.SIEM_BASE_URL = SIEM_BASE_URL;
     this.SIEM_LOGIN_PATH = SIEM_LOGIN_PATH;
+    this.SIEM_END_FILE_PATH = SIEM_END_FILE_PATH;
+    this.SIEM_END_FILE_URL = `${SIEM_BASE_URL}${SIEM_END_FILE_PATH}`;
     this.SIEM_LOGIN_URL = `${SIEM_BASE_URL}${SIEM_LOGIN_PATH}`;
     this.SIEM_LOCATE_FILE_TITLE = SIEM_LOCATE_FILE_TITLE;
     this.SIEM_LOCATE_FILE_STATUS = SIEM_LOCATE_FILE_STATUS;
@@ -46,88 +65,67 @@ export class FilesScrapper implements IFileScrapper {
     this.AUTH_DENIED_PAGE_TITLE = AUTH_DENIED_PAGE_TITLE;
     this.AUTH_DENIED_PAGE_MSG = AUTH_DENIED_PAGE_MSG;
     this.AUTH_GRANTED_PAGE_CHECK = AUTH_GRANTED_PAGE_CHECK;
-    this.getBrowserContext.bind(this);
+    this.createBrowserContext.bind(this);
     this.siemLogin.bind(this);
     this.collectData.bind(this);
     this.endFileByNum.bind(this);
     // this.checkSiemLogin.bind(this);
   }
 
-  async getBrowserContext(): Promise<{ newPage: Page; browser: Browser }> {
+  async createBrowserContext(): Promise<void> {
     const browser = await chromium.launch({
       headless: true,
     });
 
     const context = await browser.newContext();
-    const newPage = await context.newPage();
+    await context.route("**/*", this.intercept);
 
-    return { newPage, browser };
+    this.context = context;
   }
 
-  async collectData({
-    file,
-    page,
-  }: {
-    file: FileId;
-    page: Page | null;
-  }): Promise<FileStats> {
-    try {
-      let siemPage: Page | null = page,
-        newBrowser: Browser | null = null;
-      if (!siemPage) {
-        const { newPage, browser } = await this.getBrowserContext();
-        siemPage = newPage;
-        newBrowser = browser;
-      }
-      const { num } = file;
-      await siemPage.goto(`${this.SIEM_SEARCH_FILE_URL}${num}`);
-      await siemPage.waitForLoadState();
+  async intercept(route: Route): Promise<void> {
+    const unwantedResources = ["stylesheet", "image", "fonts", "script"];
+    if (unwantedResources.includes(route.request().resourceType())) {
+      await route.abort();
+    } else {
+      await route.continue();
+    }
+  }
 
-      let titleRow = await siemPage.locator(
-        this.SIEM_LOCATE_FILE_TITLE.element,
-        {
-          hasText: this.SIEM_LOCATE_FILE_TITLE.text,
-        }
-      );
-      let statusRow = await siemPage.locator(
-        this.SIEM_LOCATE_FILE_STATUS.element,
-        {
-          hasText: this.SIEM_LOCATE_FILE_STATUS.text,
-        }
-      );
-      let locationRow = await siemPage.locator(
+  async closeBrowserContext(): Promise<void> {
+    if (this.context) {
+      await this.context.close();
+    }
+  }
+
+  async collectData({ file }: { file: FileId }): Promise<FileStats | null> {
+    if (!this.context) {
+      await this.createBrowserContext();
+      return null;
+    }
+    const page = await this.context.newPage();
+    const { num } = file;
+
+    try {
+      await page.goto(`${this.SIEM_SEE_FILE_URL}${num}`);
+      await page.waitForLoadState();
+
+      let titleRow = await page.locator(this.SIEM_LOCATE_FILE_TITLE.element, {
+        hasText: this.SIEM_LOCATE_FILE_TITLE.text,
+      });
+      let statusRow = await page.locator(this.SIEM_LOCATE_FILE_STATUS.element, {
+        hasText: this.SIEM_LOCATE_FILE_STATUS.text,
+      });
+      let locationRow = await page.locator(
         this.SIEM_LOCATE_FILE_LOCATION.element,
         {
           hasText: this.SIEM_LOCATE_FILE_LOCATION.text,
         }
       );
 
-      // retry to get the data
-      if (!titleRow || !statusRow || !locationRow) {
-        titleRow = await siemPage.locator(this.SIEM_LOCATE_FILE_TITLE.element, {
-          hasText: this.SIEM_LOCATE_FILE_TITLE.text,
-        });
-        statusRow = await siemPage.locator(
-          this.SIEM_LOCATE_FILE_STATUS.element,
-          {
-            hasText: this.SIEM_LOCATE_FILE_STATUS.text,
-          }
-        );
-        locationRow = await siemPage.locator(
-          this.SIEM_LOCATE_FILE_LOCATION.element,
-          {
-            hasText: this.SIEM_LOCATE_FILE_LOCATION.text,
-          }
-        );
-      }
-
       const rawTitle = await titleRow?.textContent();
       const rawStatus = await statusRow?.textContent();
       const rawLocation = await locationRow?.textContent();
-
-      if (newBrowser) {
-        await newBrowser.close();
-      }
 
       return {
         index: file.index,
@@ -154,25 +152,34 @@ export class FilesScrapper implements IFileScrapper {
 
   async endFileByNum({
     num,
-    page,
   }: {
     num: string;
-    page: Page;
   }): Promise<{ message: string; detail: string }> {
+    if (!this.context) {
+      await this.createBrowserContext();
+      return { message: "", detail: "" };
+    }
+
+    const page = await this.context.newPage();
     page.addListener("dialog", (alert: Dialog) => {
       alert.accept();
     });
 
     try {
-      await page.goto(`${this.SIEM_SEARCH_FILE_URL}${num}`);
-      await page.waitForLoadState();
+      await page.goto(`${this.SIEM_SEE_FILE_URL}${num}`);
+      await page.waitForURL(`${this.SIEM_SEE_FILE_URL}${num}`, {
+        waitUntil: "load",
+      });
+
       await page
         .locator("a", {
           hasText: this.END_FILE_TEXT,
         })
         .click();
 
-      await page.waitForLoadState();
+      await page.goto(`${this.SIEM_END_FILE_URL}${num}`, {
+        waitUntil: "load",
+      });
 
       const message =
         (await page.locator("h2").textContent()) ??
@@ -180,6 +187,8 @@ export class FilesScrapper implements IFileScrapper {
       const detail =
         (await page.locator("h3").textContent()) ??
         COLLECTION_ERRORS.DATA_MISSING;
+
+      // page.close();
 
       return { message, detail };
     } catch (error) {
@@ -199,35 +208,42 @@ export class FilesScrapper implements IFileScrapper {
   }: {
     user: string;
     pass: string;
-  }): Promise<{ siemPage: Page; browser: Browser }> {
+  }): Promise<void | null> {
     if (!this.SIEM_LOGIN_URL) {
       throw new ApiError({
         statusCode: 500,
         message: ERRORS.SERVER_ERROR,
       });
     }
+    if (!this.context) {
+      await this.createBrowserContext();
+      return null;
+    }
+    const page = await this.context.newPage();
 
     try {
-      let { newPage: siemPage, browser } = await this.getBrowserContext();
+      await page.goto(this.SIEM_LOGIN_URL);
+      await page.waitForURL(this.SIEM_LOGIN_URL, {
+        waitUntil: "load",
+      });
+      await page.locator("input[name='login']").fill(user);
+      await page.locator("input[name='password']").fill(pass);
 
-      await siemPage.goto(this.SIEM_LOGIN_URL);
-      await siemPage.waitForLoadState();
+      const responsePromise = page.waitForResponse(`${this.SIEM_LOGIN_URL}`);
+      await page.getByRole("button", { name: "acceder" }).click();
+      await responsePromise;
 
-      await siemPage.locator("input[name='login']").fill(user);
-      await siemPage.locator("input[name='password']").fill(pass);
+      await page.waitForURL(`${this.SIEM_SEARCH_FILE_URL}`, {
+        waitUntil: "load",
+      });
 
-      await siemPage.getByRole("button", { name: "acceder" }).click();
-      await siemPage.waitForLoadState();
-
-      const isLoggedIn = await this.checkSiemLogin({ page: siemPage });
+      const isLoggedIn = await this.checkSiemLogin({ page, user });
       if (!isLoggedIn) {
         throw new ApiError({
           statusCode: 401,
           message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
         });
       }
-
-      return { siemPage, browser };
     } catch (error) {
       console.log("🚀 ~ FilesScrapper ~ error:", error);
       if (error instanceof ApiError) {
@@ -240,18 +256,31 @@ export class FilesScrapper implements IFileScrapper {
     }
   }
 
-  async checkSiemLogin({ page }: { page: Page }): Promise<boolean> {
-    // change the following check code to verify the user is logged in
+  async checkSiemLogin({
+    page,
+    user,
+  }: {
+    page: Page;
+    user: string;
+  }): Promise<boolean> {
+    if (!this.context) {
+      await this.createBrowserContext();
+      return false;
+    }
+
+    await page.screenshot({
+      fullPage: true,
+      path: "./src/tests/integration/login.jpg",
+    });
+
+    expect(page).toBeTruthy();
 
     try {
-      const checkImgUser = await page.locator(
-        this.AUTH_GRANTED_PAGE_CHECK.element
+      const checkUser = await page.locator(
+        this.AUTH_GRANTED_PAGE_CHECK.element,
+        { hasText: user }
       );
-      expect(checkImgUser).toBeVisible();
-      expect(checkImgUser).toHaveAttribute(
-        "src",
-        this.AUTH_GRANTED_PAGE_CHECK.text
-      );
+      await checkUser.waitFor({ state: "visible" });
       return true;
     } catch (error) {
       const errorTitle = await page
