@@ -55,10 +55,6 @@ export function useTable<TData, TValue>({
 
         setIsEndingFiles(true);
         const newData = [...data].map((file, index) => {
-          console.log(
-            "🚀 ~ newData ~ rowSelection[index]:",
-            rowSelection[index]
-          );
           if (rowSelection[index]) {
             if (!updatedFileStats) return file;
             return {

@@ -44,14 +44,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { CircleUser, LogOutIcon } from "lucide-react";
 import { authApi } from "./api/authApi";
 import { useToast } from "./lib/hooks/use-toast";
-import { parseJwt } from "./lib/utils";
+import { parseCookie } from "./lib/utils";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
   const [isSerchingFiles, setIsSearchingFiles] = useState<boolean>(false);
   const [isFilesApiError, setFilesApiError] = useState<boolean>(false);
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
-  const [openLoginModal, setOpenLoginModal] = useState<boolean>(true);
+  const [openLoginModal, setOpenLoginModal] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [modalMsg, setModalMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
@@ -71,10 +71,17 @@ export default function App() {
   });
 
   useEffect(() => {
-    const cookie = document.cookie;
-    if (!cookie) return;
-    const data = parseJwt(cookie);
-    const { userId, user, pass } = data;
+    const accessTokenCookieName = "accessToken";
+    const cookies = document.cookie;
+    const cookieKVString = cookies
+      .split(";")
+      .find((cookie) => cookie.includes(accessTokenCookieName));
+
+    if (!cookieKVString) return;
+
+    const {
+      value: { userId, user, pass },
+    } = parseCookie(cookieKVString);
     setActiveUser({ userId, username: user, password: pass });
   }, []);
 

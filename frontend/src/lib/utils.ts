@@ -1,3 +1,4 @@
+import { UserSession } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -38,7 +39,7 @@ export function getMessageColor(message: string) {
   return messageColor;
 }
 
-export function parseJwt(token: string) {
+function parseJwt(token: string) {
   // Split the token and taken the second
   const base64Url = token.split(".")[1];
 
@@ -47,4 +48,14 @@ export function parseJwt(token: string) {
 
   // return the result parsed in JSON
   return JSON.parse(window.atob(base64));
+}
+
+export function parseCookie(cookieKVString: string): {
+  value: UserSession;
+} {
+  const [, cookieValue] = cookieKVString.split("=");
+
+  const parsedValue: UserSession = parseJwt(cookieValue);
+
+  return { value: parsedValue };
 }
