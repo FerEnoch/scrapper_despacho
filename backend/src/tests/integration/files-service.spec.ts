@@ -1,7 +1,7 @@
 import { FileStats } from "../../models/types";
 import { filesStats } from "../sample_data/filesStats";
 import { expect, test } from "@playwright/test";
-import { FilesScrapper } from "../../models/filesScrapper.model";
+import { FilesScrapperV1 } from "../../models/filesScrapper.model";
 import { parsedFilesIds } from "../sample_data/parsedFilesIds";
 import { FilesService } from "../../sevices/files.service";
 import { modelTypes } from "../../types";
@@ -30,7 +30,7 @@ test("FILES-SERVICE > Should login in SIEM page", async () => {
     console.log("No file login.jpg to remove");
   }
 
-  const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
+  const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapperV1();
   const filesService = new FilesService({ model: filesScrapper });
 
   try {
@@ -49,7 +49,7 @@ test("FILES-SERVICE > Should login in SIEM page", async () => {
 });
 
 test("files.service > Should get complete files stats in batches", async () => {
-  const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
+  const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapperV1();
   const filesService = new FilesService({ model: filesScrapper });
 
   const result: Array<FileStats> = await filesService.searchFilesStats(
@@ -61,7 +61,7 @@ test("files.service > Should get complete files stats in batches", async () => {
 });
 
 test("files.service > Should end SOME files in SIEM system in batches", async () => {
-  const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
+  const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapperV1();
   const filesService = new FilesService({ model: filesScrapper });
 
   const filesEndedResult = await filesService.endFiles({ files: filesStats });
@@ -76,7 +76,7 @@ test("files.service > Should end SOME files in SIEM system in batches", async ()
  * @description vitest api integration tests.
  *  */
 test.skip("files.service > Should end LOT OF FILES in SIEM system in batches", async () => {
-  const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapper();
+  const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapperV1();
   const filesService = new FilesService({ model: filesScrapper });
 
   const filesEndedResult = await filesService.endFiles({

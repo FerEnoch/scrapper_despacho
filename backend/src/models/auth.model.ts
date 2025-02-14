@@ -104,6 +104,7 @@ export class AuthModel implements IAuthModel {
       }
 
       const decoded = jwt.verify(accessToken, this.JWT_SECRET);
+      console.log("🚀 ~ AuthModel ~ decoded:", decoded)
 
       if (!decoded) {
         throw new ApiError({ statusCode: 401, message: ERRORS.INVALID_TOKEN });

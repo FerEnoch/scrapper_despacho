@@ -1,5 +1,5 @@
 import { initializeApp } from "../app";
-import { FilesScrapper } from "../models/filesScrapper.model";
+import { FilesScrapperV1 } from "../models/filesScrapper.model";
 import supertest, { Test } from "supertest";
 import { Server } from "node:http";
 import TestAgent from "supertest/lib/agent";
@@ -17,7 +17,7 @@ beforeEach(async () => {
     await fs.mkdir(path.resolve(cwd(), "db-test"));
   } catch (error) {}
 
-  let app = await initializeApp({ model: new FilesScrapper() });
+  let app = await initializeApp({ model: new FilesScrapperV1() });
   app = useMiddlewares(app);
 
   server = app.listen(0, () => {

@@ -10,6 +10,8 @@ try {
   config();
 }
 
+const CURRENT_PROD_VERSION = 1;
+
 const {
   NODE_ENV = "development",
   REMOTE_FLAG = "1",
@@ -32,6 +34,7 @@ const REMOTE_DEV_ENV =
   NODE_ENV === "development" && Boolean(parseInt(REMOTE_FLAG));
 
 export {
+  CURRENT_PROD_VERSION,
   NODE_ENV,
   REMOTE_DEV_ENV,
   SIEM_USER,

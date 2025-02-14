@@ -6,7 +6,7 @@ import {
   Page,
   Route,
 } from "@playwright/test";
-import { FileId, FileStats, IFileScrapper, locationType } from "./types";
+import { FileId, FileStats, IFileScrapperV1, locationType } from "./types";
 import { ERRORS } from "../errors/types";
 import {
   COLLECTION_ERRORS,
@@ -14,7 +14,7 @@ import {
 } from "../models/lib/filesScrapper/constants";
 import { ApiError } from "../errors/api-error";
 
-export class FilesScrapper implements IFileScrapper {
+export class FilesScrapperV1 implements IFileScrapperV1 {
   SIEM_BASE_URL = "";
   SIEM_LOGIN_PATH = "";
   SIEM_LOGIN_URL = "";

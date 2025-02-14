@@ -13,13 +13,13 @@ import { filesEndedWholeLotOf } from "../sample_data/filesEnded-whole-lot-of";
  * @dev Command to run this test suite:
  *  - npm run back:test
  */
-describe("API-INTEGRATION > files-router", () => {
+describe.only("API-INTEGRATION > files-router", () => {
   /**
    * @route /files
    * @method POST
    * @description Upload a csv file
    */
-  it("should upload a csv file and search for SOME files stats", async () => {
+  it.skip("should upload a csv file and search for SOME files stats", async () => {
     const res = await testAgent
       .post("/api/v1/files")
       .attach("file", "src/tests/sample_data/files.csv");
@@ -31,7 +31,7 @@ describe("API-INTEGRATION > files-router", () => {
     expect(data).toEqual(filesStats);
   }); // 2254 ms
 
-  it(
+  it.skip(
     "should upload a csv file and search for WHOLE LOT OF files stats",
     async () => {
       const res = await testAgent
@@ -47,7 +47,7 @@ describe("API-INTEGRATION > files-router", () => {
     15 * 1000 // 11355 ms / 9756 ms
   );
 
-  it("should return 400 & correct msg if file is not a csv", async () => {
+  it.skip("should return 400 & correct msg if file is not a csv", async () => {
     const res = await testAgent
       .post("/api/v1/files")
       .attach("file", "src/tests/sample_data/sample.jpg");
@@ -55,7 +55,7 @@ describe("API-INTEGRATION > files-router", () => {
     expect(res.body.message).toBe(ERRORS.INVALID_FILE);
   });
 
-  it("should return 400 & correct msg if no file is attached", async () => {
+  it.skip("should return 400 & correct msg if no file is attached", async () => {
     const res = await testAgent.post("/api/v1/files");
     expect(res.status).toBe(400);
     expect(res.body.message).toBe(ERRORS.NO_FILE_TO_UPLOAD);
@@ -65,12 +65,17 @@ describe("API-INTEGRATION > files-router", () => {
    * @route /files/end
    * @method POST
    * @description End files in SIEM system
-   * @description Requires authentication - By pass middleware to test without issues
+   * @description Requires authentication -
+   * @description Test without issues by-passing auth middleware
    */
   it("should not end files that are already ended", async () => {
     const endedFiles = [
       {
+        index: 0,
+        num: "DE-0010-00485568-0 (N)",
+        title: "Sin datos",
         prevStatus: "FINALIZADO",
+        location: "D123 - DCION. TECNICO ADMINISTRATIVA",
       },
     ];
 

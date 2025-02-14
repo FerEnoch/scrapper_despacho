@@ -25,6 +25,7 @@
     "@playwright/test": "1.49.1",
     "bcrypt": "5.1.1",
     "better-sqlite3": "11.8.1",
+    "chalk": "^5.4.1",
     "convert-csv-to-json": "2.50.0",
     "cookie-parser": "1.4.7",
     "cors": "2.8.5",

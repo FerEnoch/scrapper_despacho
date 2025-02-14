@@ -4,7 +4,7 @@ import Database from "better-sqlite3";
 import { Request, Response, NextFunction } from "express";
 import { JwtPayload } from "jsonwebtoken";
 
-export type IFileScrapper = {
+export type IFileScrapperV1 = {
   END_FILE_TEXT: string;
   SIEM_BASE_URL: string;
   SIEM_LOGIN_PATH: string;
