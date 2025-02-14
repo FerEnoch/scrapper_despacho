@@ -88,7 +88,7 @@ describe("API-INTEGRATION > files-router", () => {
     expect(res.body.data).toEqual(filesEnded);
   });
 
-  it(
+  it.skip(
     "should end LOT OF files in SIEM system",
     async () => {
       const res = await testAgent

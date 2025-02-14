@@ -6,8 +6,6 @@ interface SpeedDialProps {
 
 export function SpeedDial({ handleDownloadData }: SpeedDialProps) {
   const [showButtons, setShowButtons] = useState(false);
-  // const [isDownloading, setIsDownloading] = useState<boolean>(false);
-  //
 
   const handleMenuToggle = () => {
     setShowButtons((state) => !state);

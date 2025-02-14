@@ -88,7 +88,12 @@ export default function App() {
 
   const handleDownloadData = async () => {
     try {
-      await filesApi.downloadFiles(filesData, fileName);
+      const userFileName = window.prompt(
+        "Introduce un nombre para el archivo .csv",
+        fileName
+      );
+      if (!userFileName) return;
+      await filesApi.downloadFiles(filesData, userFileName);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.message === FILES_API_ERRORS.GENERIC_ERROR) {
@@ -200,9 +205,11 @@ export default function App() {
     const formData = new FormData();
     formData.append("file", data.file);
 
-    // slice extention from file name
     const [fileRawName] = data.file.name.split(".csv");
-    setFileName(`${fileRawName}.download`);
+
+    const defaultFileName = `${fileRawName}.download`;
+
+    setFileName(defaultFileName);
 
     const response = (await filesApi.uploadFile(formData)) as ApiResponse<
       FileStats | RawFile

@@ -203,7 +203,7 @@ export const Columns: ColumnDef<FileStats>[] = [
         ] as FileStats[]);
 
         setIsEndingFile(false);
-        table.options.meta?.updateData(row.index, apiResponse);
+        table.options.meta?.updateData(apiResponse);
       };
 
       const handleSearchFileClick = async () => {
@@ -213,7 +213,7 @@ export const Columns: ColumnDef<FileStats>[] = [
         const selectedNum = row.getValue("num") as string;
         const apiResponse = await filesApi.getFilesStats(selectedNum);
 
-        table.options.meta?.updateData(row.index, apiResponse);
+        table.options.meta?.updateData(apiResponse);
         setIsSearchingStats(false);
       };
 

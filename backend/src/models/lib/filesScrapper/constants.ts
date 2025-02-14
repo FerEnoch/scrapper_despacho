@@ -39,11 +39,15 @@ const VALIDATION_REGEX = {
   FILE_NUMBER_COLUMN_NO_LETTERS: /^\w{2}-\d{4}-\d{7,9}-\d+$/,
 };
 
+/**
+ * This messages are used to inform the user about the error that occurred
+ */
 const COLLECTION_ERRORS = {
   DATA_MISSING: "Sin datos",
-  NO_DATA_COLLECTED: "NO_DATA_COLLECTED",
-  COULD_NOT_END_FILE_MESSAGE: "COULD_NOT_END_FILE_MESSAGE",
-  COULD_NOT_END_FILE_DETAIL: "COULD_NOT_END_FILE_DETAIL",
+  NO_DATA_COLLECTED: "No se recolectaron datos",
+  COULD_NOT_END_FILE_MESSAGE: "ERROR",
+  COULD_NOT_END_FILE_DETAIL:
+    "Ocurrió un error al intentar finalizar el archivo",
 };
 
 export {

@@ -9,7 +9,6 @@ import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { IAuthModel } from "./types";
 import ms from "ms";
-import { Auth } from "../schemas/auth";
 
 export class AuthModel implements IAuthModel {
   private readonly JWT_SECRET: Secret;

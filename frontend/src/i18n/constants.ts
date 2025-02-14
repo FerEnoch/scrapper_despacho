@@ -4,7 +4,7 @@ type uiErrorMessages = Record<keyof typeof FILES_API_ERRORS, string>;
 
 const UI_ERROR_MESSAGES: uiErrorMessages = {
   [FILES_API_ERRORS.SERVER_ERROR]:
-    "Ocurrió un error al analizar los archivos, por favor intenta con otro. No cargues archivos que contengan más de 50 expedientes",
+    "Ocurrió un error al analizar los archivos. Por favor, intenta nuevamente.",
   [FILES_API_ERRORS.INVALID_FILE]: `No se cargó el archivo. Por favor, intenta nuevamente.`,
   [FILES_API_ERRORS.INVALID_DATA]: `No se pudieron recuperar los datos. Revisa que la columna de número de expediente sea 'Número", y que el formato de números sea el mismo para cada expediente, por ejemplo: DE-0963-01656388-4 (NI).`,
   [FILES_API_ERRORS.NO_FILE_TO_UPLOAD]:

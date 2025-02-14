@@ -25,7 +25,7 @@ export function useTable<TData, TValue>({
 }: useTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [rowSelection, setRowSelection] = useState({});
+  const [rowSelection, setRowSelection] = useState<Record<number, boolean>>({});
   const [isEndingFiles, setIsEndingFiles] = useState<boolean>(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0, //initial page index
@@ -49,13 +49,17 @@ export function useTable<TData, TValue>({
       pagination,
     },
     meta: {
-      updateData: (rowIndex: number, apiResponse: ApiResponse<FileStats>) => {
+      updateData: (apiResponse: ApiResponse<FileStats>) => {
         const apiResponseMessage = apiResponse.message;
         const updatedFileStats = apiResponse.data?.[0];
 
         setIsEndingFiles(true);
         const newData = [...data].map((file, index) => {
-          if (index === rowIndex) {
+          console.log(
+            "🚀 ~ newData ~ rowSelection[index]:",
+            rowSelection[index]
+          );
+          if (rowSelection[index]) {
             if (!updatedFileStats) return file;
             return {
               ...updatedFileStats,

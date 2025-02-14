@@ -49,7 +49,6 @@ export function DataTable<TData, TValue>({
     setIsLoading(true);
     setIsEndingFiles(true);
     const response = await filesApi.endFiles(selectedValues as FileStats[]);
-    console.log("🚀 ~ handleEndFiles ~ response:", response);
     onEndFilesClick(response);
 
     setIsLoading(false);
