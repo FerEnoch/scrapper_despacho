@@ -6,7 +6,6 @@ import {
   COLLECTION_ERRORS,
   SIEM_PAGE_DATA,
 } from "../models/lib/filesScrapper/constants";
-import { NODE_ENV, SIEM_PASSWORD, SIEM_USER } from "../config";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 
@@ -21,13 +20,14 @@ export class FilesService implements IFilesService {
     this.model = model;
     this.ENDED_FILE_STATUS_TEXT = SIEM_PAGE_DATA.ENDED_FILE_STATUS_TEXT;
     this.MAX_BATCH_SIZE = 10;
-    this.SIEM_USER = SIEM_USER;
-    this.SIEM_PASSWORD = SIEM_PASSWORD;
+    this.SIEM_USER = "";
+    this.SIEM_PASSWORD = "";
 
     this.searchFilesStats.bind(this);
     this.endFiles.bind(this);
     this.endFileByNum.bind(this);
     this.siemLogin.bind(this);
+    this.populateUserCredentials.bind(this);
   }
 
   async searchFilesStats(files: FileId[]) {
@@ -103,6 +103,26 @@ export class FilesService implements IFilesService {
     */
   }
 
+  async populateUserCredentials({
+    user,
+    pass,
+  }: {
+    user: string;
+    pass: string;
+  }) {
+    this.SIEM_USER = user;
+    this.SIEM_PASSWORD = pass;
+    if (!this.SIEM_USER || !this.SIEM_PASSWORD) {
+      throw new ApiError({
+        statusCode: 401,
+        message: ERRORS.CREDENTIALS_NOT_PROVIDED,
+      });
+    }
+    await this.model.createBrowserContext();
+    await this.siemLogin();
+    await this.model.closeBrowserContext();
+  }
+
   async endFiles({ files }: { files: FileStats[] }) {
     await this.model.createBrowserContext();
 
@@ -167,7 +187,6 @@ export class FilesService implements IFilesService {
           filesEndedResult.push(file);
         });
       } else {
-        // replace :rocket with a rocket emoji 🚀
         console.log(
           " 🚀 ~ file: files.service.endFiles ~ batchResult.error.message",
           batchResult.error.message
@@ -179,88 +198,9 @@ export class FilesService implements IFilesService {
         // });
       }
     });
-
     await this.model.closeBrowserContext();
-
     filesEndedResult.sort((a, b) => a.index - b.index);
     return filesEndedResult;
-    /** old-method */
-    // const result: FileEndedStats[] = [];
-    // let updatedFile: FileEndedStats, message: string, detail: string;
-
-    // const filesChunks = files.reduce((acc, file, index) => {
-    //   if (index % 10 === 0) {
-    //     acc.push([file]);
-    //   } else {
-    //     acc[acc.length - 1].push(file);
-    //   }
-    //   return acc;
-    // }, [] as FileStats[][]);
-
-    // await Promise.all(
-    //   filesChunks.map(async (filesChunk) => {
-    //     let fileNewData: FileStats,
-    //       siemPage: Page | null = null,
-    //       newBrowser: Browser | null = null;
-    //     await Promise.all(
-    //       filesChunk.map(async (file) => {
-    //         const loginResult = await this.siemLogin();
-    //         siemPage = loginResult.siemPage;
-    //         newBrowser = loginResult.browser;
-
-    //         siemPage.addListener("dialog", (alert) => {
-    //           alert.accept();
-    //         });
-    //         try {
-    //           const [{ num }] = parseFileStats([file]);
-    //           await siemPage.goto(`${SIEM_BASE_URL}${FILE_STATS_PATH}${num}`);
-    //           await siemPage.waitForLoadState();
-
-    //           await siemPage
-    //             .locator('.menu_contexto a:text-matches("finalizar", "i")')
-    //             .click();
-
-    //           await siemPage.waitForLoadState();
-    //           message = (await siemPage.locator("h2").textContent()) ?? "";
-    //           detail = (await siemPage.locator("h3").textContent()) ?? "";
-
-    //           fileNewData = await this.model.collectData({
-    //             file: {
-    //               ...file,
-    //               num, // only middle long number
-    //             },
-    //             page: null,
-    //           });
-
-    //           updatedFile = {
-    //             ...file,
-    //             newStatus: {
-    //               status: fileNewData?.prevStatus ?? "",
-    //               message,
-    //               detail,
-    //             },
-    //           };
-    //           result.push(updatedFile);
-    //         } catch (error) {
-    //           updatedFile = {
-    //             ...file,
-    //             newStatus: {
-    //               status: fileNewData?.prevStatus ?? "",
-    //               message,
-    //               detail,
-    //             },
-    //           };
-    //           result.push(updatedFile);
-    //         } finally {
-    //           await siemPage?.removeListener("dialog", () => {});
-    //           await newBrowser?.close();
-    //         }
-    //       })
-    //     );
-    //   })
-    // );
-
-    // return result;
   }
 
   async endFileByNum(

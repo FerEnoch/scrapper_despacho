@@ -182,6 +182,7 @@ export default function App() {
       case FILES_API_ERRORS.NO_FILE_TO_UPLOAD:
       case FILES_API_ERRORS.NOT_FOUND:
       case FILES_API_ERRORS.GENERIC_ERROR:
+      case FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED:
       case FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED:
         setIsSearchingFiles(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);

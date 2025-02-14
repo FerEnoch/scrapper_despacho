@@ -141,6 +141,7 @@ export class AuthController implements IAuthController {
       }
     }
   }
+
   // async getUserById(
   //   req: Request & {
   //     auth?: {

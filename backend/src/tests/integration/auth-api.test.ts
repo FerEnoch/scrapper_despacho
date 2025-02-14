@@ -3,12 +3,12 @@ import { testAgent } from "../setup";
 import { MESSAGES } from "../../controllers/constants";
 
 /**
- * @description This test suite is for testing the API auth routes
+ * @description This test suite is for testing the v1 API auth routes
  * @dev To run this test suite, you need to have a running SIEM system user and password
  * @dev Command to run this test suite:
  *  - npm run back:test
  */
-describe.skip("API-INTEGRATION > auth-router", () => {
+describe("API-INTEGRATION > auth-router", () => {
   /**
    * @route /auth/register
    * @method POST
@@ -18,8 +18,6 @@ describe.skip("API-INTEGRATION > auth-router", () => {
     const res = await testAgent
       .post("/api/v1/auth/register")
       .send({ user: "John Doe", pass: "password" });
-
-    // check response
 
     expect(res.body.data[0].userId).toBeDefined();
     expect(res.body.message).toBe(MESSAGES.USER_REGISTERED);

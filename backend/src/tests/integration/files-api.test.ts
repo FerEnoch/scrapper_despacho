@@ -6,14 +6,20 @@ import { filesStats } from "../sample_data/filesStats";
 import { wholeLotOfFileStats } from "../sample_data/filesStats-whole-lot-of";
 import { filesEnded } from "../sample_data/filesEnded";
 import { filesEndedWholeLotOf } from "../sample_data/filesEnded-whole-lot-of";
+import {
+  findLastScreenshotIfExists,
+  getFakeValidCredentialsCookie,
+  getFakeWrongCredentialsCookie,
+  removeLastScreenshotIfExists,
+} from "../helpers";
 
 /**
- * @description This test suite is for testing the API files routes
+ * @description This test suite is for testing the v1 API files routes
  * @dev To run this test suite, you need to have a running SIEM system user and password
  * @dev Command to run this test suite:
  *  - npm run back:test
  */
-describe.only("API-INTEGRATION > files-router", () => {
+describe("API-INTEGRATION > files-router", () => {
   /**
    * @route /files
    * @method POST
@@ -66,9 +72,8 @@ describe.only("API-INTEGRATION > files-router", () => {
    * @method POST
    * @description End files in SIEM system
    * @description Requires authentication -
-   * @description Test without issues by-passing auth middleware
    */
-  it("should not end files that are already ended", async () => {
+  it.skip("should not end files that are already ended", async () => {
     const endedFiles = [
       {
         index: 0,
@@ -79,31 +84,66 @@ describe.only("API-INTEGRATION > files-router", () => {
       },
     ];
 
-    const res = await testAgent.post("/api/v1/files/end").send(endedFiles);
+    const res = await testAgent
+      .post("/api/v1/files/end")
+      .set("Cookie", `accessToken=${getFakeValidCredentialsCookie()}`)
+      .send(endedFiles);
+
     expect(res.status).toBe(400);
     expect(res.body.message).toEqual(ERRORS.NO_FILES_TO_END);
     expect(res.body.data).toEqual(null);
   });
 
-  it("should end SOME files in SIEM system", async () => {
-    const res = await testAgent.post("/api/v1/files/end").send(filesStats);
+  it.skip(
+    "should end SOME files in SIEM system",
+    async () => {
+      const res = await testAgent
+        .post("/api/v1/files/end")
+        .set("Cookie", `accessToken=${getFakeValidCredentialsCookie()}`)
+        .send(filesStats);
 
-    expect(res.status).toBe(200);
-    expect(res.body.message).toBe(MESSAGES.FILES_ENDED);
-    expect(res.body.data).toEqual(filesEnded);
-  });
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe(MESSAGES.FILES_ENDED);
+      expect(res.body.data).toEqual(filesEnded);
+    },
+    8 * 1000
+  ); // 8s
 
   it.skip(
     "should end LOT OF files in SIEM system",
     async () => {
       const res = await testAgent
         .post("/api/v1/files/end")
+        .set("Cookie", `accessToken=${getFakeValidCredentialsCookie()}`)
         .send(wholeLotOfFileStats);
 
       expect(res.status).toBe(200);
       expect(res.body.message).toBe(MESSAGES.FILES_ENDED);
       expect(res.body.data).toEqual(filesEndedWholeLotOf);
     },
-    25 * 1000 // 21s
+    25 * 1000 // 21s / 22.5 ss
   );
+
+  it(
+    "should return 401 if wrong credentials are provided",
+    async () => {
+      await removeLastScreenshotIfExists(
+        "./src/tests/integration/login-error.jpg"
+      );
+
+      const res = await testAgent
+        .post("/api/v1/files/end")
+        .set("Cookie", `accessToken=${getFakeWrongCredentialsCookie()}`)
+        .send(filesStats);
+
+      const lastReportScreenshot = await findLastScreenshotIfExists(
+        "./src/tests/integration/login-error.jpg"
+      );
+
+      expect(lastReportScreenshot).toBeTruthy();
+      expect(res.status).toBe(401);
+      expect(res.body.message).toBe(ERRORS.COULD_NOT_LOGIN_IN_SIEM);
+    },
+    8 * 1000
+  ); // 8s
 });

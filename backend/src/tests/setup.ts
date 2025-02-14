@@ -17,7 +17,8 @@ beforeEach(async () => {
     await fs.mkdir(path.resolve(cwd(), "db-test"));
   } catch (error) {}
 
-  let app = await initializeApp({ model: new FilesScrapperV1() });
+  let app = await initializeApp({ model: new FilesScrapperV1(), version: 1 });
+  if (!app) return;
   app = useMiddlewares(app);
 
   server = app.listen(0, () => {

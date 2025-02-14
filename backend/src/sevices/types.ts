@@ -14,6 +14,13 @@ export interface IFilesService {
   MAX_BATCH_SIZE: number;
   SIEM_PASSWORD: string;
   SIEM_USER: string;
+  populateUserCredentials({
+    user,
+    pass,
+  }: {
+    user: string;
+    pass: string;
+  }): Promise<void>;
   searchFilesStats(files: FileId[]): Promise<FileStats[]>;
   endFiles({ files }: { files: FileStats[] }): Promise<FileEndedStats[]>;
   endFileByNum(num: string): Promise<{ message: string; detail: string }>;

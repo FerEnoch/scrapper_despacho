@@ -14,6 +14,7 @@ const UI_ERROR_MESSAGES: uiErrorMessages = {
   [FILES_API_ERRORS.NO_FILES_ENDED]: `No se encontraron expediente en curso para finalizar.`,
   [FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED]: `No se encontraron datos de expedientes.`,
   [FILES_API_ERRORS.GENERIC_ERROR]: `Ocurrió un error. Por favor, intenta nuevamente.`,
+  [FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED]: `No se proporcionaron correctamente las credenciales de SIEM debido a un error. No puedes finalizar expedientes.`,
   [FILES_API_ERRORS.UNAUTHORIZED]: `Necesitas iniciar sesión para finalizar los expedientes.`,
 } as const;
 

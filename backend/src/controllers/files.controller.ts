@@ -10,6 +10,7 @@ import { parseRawFiles } from "../models/lib/filesScrapper";
 import { UploadedFile } from "express-fileupload";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
+import { JwtPayload } from "jsonwebtoken";
 
 export class FilesController implements IFilesController {
   service: IFilesService;
@@ -106,7 +107,15 @@ export class FilesController implements IFilesController {
     }
   }
 
-  async endFiles(req: Request, res: Response, next: NextFunction) {
+  async endFiles(
+    req: Request & {
+      auth?: {
+        access: string | JwtPayload;
+      };
+    },
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const files = req.body as FileStats[];
       const filesToEnd = files?.filter(
@@ -120,6 +129,12 @@ export class FilesController implements IFilesController {
           message: ERRORS.NO_FILES_TO_END,
         });
       }
+
+      const { user, pass } = req?.auth?.access as {
+        user: string;
+        pass: string;
+      };
+      await this.service.populateUserCredentials({ user, pass });
 
       const endedFiles = await this.service.endFiles({ files });
 

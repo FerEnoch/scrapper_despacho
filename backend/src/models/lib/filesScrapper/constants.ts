@@ -10,13 +10,9 @@ const SIEM_PAGE_DATA = {
     element: 'td[width="25%"]',
     text: "", // To be filled in runtime with "user"
   },
-  AUTH_DENIED_PAGE_TITLE: {
-    element: "h2",
-    text: "ERROR",
-  },
   AUTH_DENIED_PAGE_MSG: {
-    element: "h3",
-    text: "Falló la autenticación en SIMGEI.",
+    element: "h3[color:maroon;]",
+    text: "Falló la autenticación",
   },
   SIEM_LOCATE_FILE_TITLE: {
     element: "tr",

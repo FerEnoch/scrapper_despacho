@@ -1,4 +1,4 @@
-import { BrowserContext, Page, Route } from "@playwright/test";
+import { Browser, BrowserContext, Page, Route } from "@playwright/test";
 import { Auth } from "../schemas/auth";
 import Database from "better-sqlite3";
 import { Request, Response, NextFunction } from "express";
@@ -18,13 +18,12 @@ export type IFileScrapperV1 = {
   SIEM_LOCATE_FILE_TITLE: locationType;
   SIEM_LOCATE_FILE_STATUS: locationType;
   SIEM_LOCATE_FILE_LOCATION: locationType;
-  AUTH_DENIED_PAGE_TITLE: locationType;
   AUTH_DENIED_PAGE_MSG: locationType;
   AUTH_GRANTED_PAGE_CHECK: locationType;
   context: BrowserContext | null;
-  // page: Page | null;
+  browser: Browser | null;
   createBrowserContext(): Promise<void>;
-  intercept(route: Route): Promise<void>;
+  interceptRoutes(route: Route): Promise<void>;
   closeBrowserContext(): Promise<void>;
   siemLogin({
     user,
@@ -40,7 +39,7 @@ export type IFileScrapperV1 = {
   }>;
 
   collectData({ file }: { file: FileId }): Promise<FileStats | null>;
-  checkSiemLogin({ page }: { page: Page }): Promise<boolean>;
+  checkSiemLogin({ page }: { page: Page }): Promise<void>;
 };
 
 export type IDatabaseModel = {

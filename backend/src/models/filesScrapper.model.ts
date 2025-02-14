@@ -1,11 +1,12 @@
 import {
-  BrowserContext,
   chromium,
   Dialog,
-  expect,
   Page,
   Route,
-} from "@playwright/test";
+  BrowserContext,
+  Browser,
+  errors as PwErrors,
+} from "playwright";
 import { FileId, FileStats, IFileScrapperV1, locationType } from "./types";
 import { ERRORS } from "../errors/types";
 import {
@@ -13,6 +14,7 @@ import {
   SIEM_PAGE_DATA,
 } from "../models/lib/filesScrapper/constants";
 import { ApiError } from "../errors/api-error";
+import { SCRAPPER_TIMEOUT } from "../config";
 
 export class FilesScrapperV1 implements IFileScrapperV1 {
   SIEM_BASE_URL = "";
@@ -28,11 +30,11 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
   SIEM_LOCATE_FILE_TITLE: locationType;
   SIEM_LOCATE_FILE_STATUS: locationType;
   SIEM_LOCATE_FILE_LOCATION: locationType;
-  AUTH_DENIED_PAGE_TITLE: locationType;
   AUTH_DENIED_PAGE_MSG: locationType;
   AUTH_GRANTED_PAGE_CHECK: locationType;
   context: BrowserContext | null = null;
-  // page: Page | null = null;
+  browser: Browser | null = null;
+  timeout = SCRAPPER_TIMEOUT;
 
   constructor() {
     const {
@@ -45,7 +47,6 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
       SIEM_LOCATE_FILE_TITLE,
       SIEM_LOCATE_FILE_STATUS,
       SIEM_LOCATE_FILE_LOCATION,
-      AUTH_DENIED_PAGE_TITLE,
       AUTH_DENIED_PAGE_MSG,
       AUTH_GRANTED_PAGE_CHECK,
     } = SIEM_PAGE_DATA;
@@ -62,14 +63,14 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
     this.SIEM_LOCATE_FILE_TITLE = SIEM_LOCATE_FILE_TITLE;
     this.SIEM_LOCATE_FILE_STATUS = SIEM_LOCATE_FILE_STATUS;
     this.SIEM_LOCATE_FILE_LOCATION = SIEM_LOCATE_FILE_LOCATION;
-    this.AUTH_DENIED_PAGE_TITLE = AUTH_DENIED_PAGE_TITLE;
     this.AUTH_DENIED_PAGE_MSG = AUTH_DENIED_PAGE_MSG;
     this.AUTH_GRANTED_PAGE_CHECK = AUTH_GRANTED_PAGE_CHECK;
     this.createBrowserContext.bind(this);
+    this.interceptRoutes.bind(this);
     this.siemLogin.bind(this);
     this.collectData.bind(this);
     this.endFileByNum.bind(this);
-    // this.checkSiemLogin.bind(this);
+    this.checkSiemLogin.bind(this);
   }
 
   async createBrowserContext(): Promise<void> {
@@ -78,12 +79,13 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
     });
 
     const context = await browser.newContext();
-    await context.route("**/*", this.intercept);
+    await context.route("**/*", this.interceptRoutes);
 
     this.context = context;
+    this.browser = browser;
   }
 
-  async intercept(route: Route): Promise<void> {
+  async interceptRoutes(route: Route): Promise<void> {
     const unwantedResources = ["stylesheet", "image", "fonts", "script"];
     if (unwantedResources.includes(route.request().resourceType())) {
       await route.abort();
@@ -96,12 +98,19 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
     if (this.context) {
       await this.context.close();
     }
+
+    if (this.browser) {
+      await this.browser.close();
+    }
   }
 
   async collectData({ file }: { file: FileId }): Promise<FileStats | null> {
     if (!this.context) {
       await this.createBrowserContext();
-      return null;
+      throw new ApiError({
+        statusCode: 500,
+        message: ERRORS.SERVER_ERROR,
+      });
     }
     const page = await this.context.newPage();
     const { num } = file;
@@ -209,15 +218,12 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
     user: string;
     pass: string;
   }): Promise<void | null> {
-    if (!this.SIEM_LOGIN_URL) {
+    if (!this.context) {
+      await this.createBrowserContext();
       throw new ApiError({
         statusCode: 500,
         message: ERRORS.SERVER_ERROR,
       });
-    }
-    if (!this.context) {
-      await this.createBrowserContext();
-      return null;
     }
     const page = await this.context.newPage();
 
@@ -233,17 +239,7 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
       await page.getByRole("button", { name: "acceder" }).click();
       await responsePromise;
 
-      await page.waitForURL(`${this.SIEM_SEARCH_FILE_URL}`, {
-        waitUntil: "load",
-      });
-
-      const isLoggedIn = await this.checkSiemLogin({ page, user });
-      if (!isLoggedIn) {
-        throw new ApiError({
-          statusCode: 401,
-          message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
-        });
-      }
+      await this.checkSiemLogin({ page, user });
     } catch (error) {
       console.log("🚀 ~ FilesScrapper ~ error:", error);
       if (error instanceof ApiError) {
@@ -262,44 +258,54 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
   }: {
     page: Page;
     user: string;
-  }): Promise<boolean> {
-    if (!this.context) {
-      await this.createBrowserContext();
-      return false;
-    }
-
-    await page.screenshot({
-      fullPage: true,
-      path: "./src/tests/integration/login.jpg",
-    });
-
-    expect(page).toBeTruthy();
-
+  }): Promise<void> {
     try {
+      await page.waitForURL(`${this.SIEM_SEARCH_FILE_URL}`, {
+        waitUntil: "load",
+        timeout: this.timeout,
+      });
+      // check screenshot to see if login was successful
+      await page.screenshot({
+        fullPage: true,
+        path: "./src/tests/integration/login.jpg",
+      });
+
       const checkUser = await page.locator(
         this.AUTH_GRANTED_PAGE_CHECK.element,
         { hasText: user }
       );
-      await checkUser.waitFor({ state: "visible" });
-      return true;
-    } catch (error) {
-      const errorTitle = await page
-        .locator(this.AUTH_DENIED_PAGE_TITLE.element, {
-          hasText: this.AUTH_DENIED_PAGE_TITLE.text,
-        })
-        .textContent();
-      const errorMsg = await page
-        .locator(this.AUTH_DENIED_PAGE_MSG.element, {
-          hasText: this.AUTH_DENIED_PAGE_MSG.text,
-        })
-        .textContent();
+      await checkUser.waitFor({ state: "visible", timeout: this.timeout });
+    } catch (loginError) {
+      if (loginError instanceof PwErrors.TimeoutError) {
+        try {
+          await page.screenshot({
+            fullPage: true,
+            path: "./src/tests/integration/login-error.jpg",
+          });
+          const loginErrorMsg = await page
+            .locator(this.AUTH_DENIED_PAGE_MSG.element, {
+              hasText: this.AUTH_DENIED_PAGE_MSG.text,
+            })
+            .textContent({ timeout: this.timeout });
 
-      console.log(
-        "🚀 ~ FilesScrapper ~ checkSiemLogin ~ error page:",
-        errorTitle,
-        errorMsg
-      );
-      return false;
+          console.log("🚀 ~ FilesScrapperV1 ~ loginErrorMsg:", loginErrorMsg);
+          if (loginErrorMsg) {
+            throw new ApiError({
+              statusCode: 401,
+              message: ERRORS.COULD_NOT_LOGIN_IN_SIEM,
+            });
+          }
+        } catch (getPageDataError) {
+          if (getPageDataError instanceof PwErrors.TimeoutError) {
+            await page.screenshot({
+              fullPage: true,
+              path: "./src/tests/integration/login-error.jpg",
+            });
+            throw getPageDataError;
+          }
+        }
+        throw loginError;
+      }
     }
   }
 }

@@ -8,44 +8,31 @@ import { modelTypes } from "../../types";
 import fs from "node:fs/promises";
 import { filesEnded } from "../sample_data/filesEnded";
 import { wholeLotOfFileStats } from "../sample_data/filesStats-whole-lot-of";
+import {
+  findLastScreenshotIfExists,
+  removeLastScreenshotIfExists,
+} from "../helpers";
 
 /**
- * @description Playwright tests
+ * @description Playwright tests for v1 of the files scrapper service
  * @description These tests use the enviroment variables of SIEM_USER and SIEM_PASSWORD
  * @dev To run tests:
  *  1. npm run fs-service:test
  *  2. npm run fs-service:report:test
  */
-test("FILES-SERVICE > Should login in SIEM page", async () => {
-  let lastReportScreenshot;
-  try {
-    lastReportScreenshot = await fs.readFile(
-      "./src/tests/integration/login.jpg"
-    );
-
-    if (lastReportScreenshot) {
-      await fs.rm("./src/tests/integration/login.jpg");
-    }
-  } catch (error: any) {
-    console.log("No file login.jpg to remove");
-  }
+test("FILES-SERVICE > Should NOT login in SIEM without credentials", async () => {
+  await removeLastScreenshotIfExists("./src/tests/integration/login.jpg");
 
   const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapperV1();
   const filesService = new FilesService({ model: filesScrapper });
 
-  try {
-    await filesService.siemLogin();
+  await filesService.siemLogin();
 
-    fs.readFile("./src/tests/integration/login.jpg")
-      .then((file) => {
-        lastReportScreenshot = file;
-      })
-      .catch((_err: any) => console.log("No file login.jpg to remove"));
-  } catch (error: any) {
-    console.log("😭 Something whent wrong with SIEM login");
-  }
+  const lastReportScreenshot = await findLastScreenshotIfExists(
+    "./src/tests/integration/login.jpg"
+  );
 
-  expect(lastReportScreenshot).toBeTruthy();
+  expect(lastReportScreenshot).toBeNull();
 });
 
 test("files.service > Should get complete files stats in batches", async () => {
@@ -72,8 +59,8 @@ test("files.service > Should end SOME files in SIEM system in batches", async ()
 
 /**
  * @description This test is for testing large amount of files (~50)
- * @description It is skipped because IT FAILS in playwright test runtime, but it works in
- * @description vitest api integration tests.
+ * @description It is skipped because IT FAILS in playwright test runtime.
+ * @description It works in vitest api integration tests.
  *  */
 test.skip("files.service > Should end LOT OF FILES in SIEM system in batches", async () => {
   const filesScrapper: modelTypes["IFileScrapper"] = new FilesScrapperV1();
