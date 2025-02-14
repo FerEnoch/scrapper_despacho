@@ -48,6 +48,7 @@ import { parseCookie } from "./lib/utils";
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
+  const [filteredFiles, setFilteredFiles] = useState<FileStats[]>([]);
   const [isSerchingFiles, setIsSearchingFiles] = useState<boolean>(false);
   const [isFilesApiError, setFilesApiError] = useState<boolean>(false);
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
@@ -85,6 +86,10 @@ export default function App() {
     setActiveUser({ userId, username: user, password: pass });
   }, []);
 
+  const onFilterData = (filteredFiles: FileStats[]) => {
+    setFilteredFiles(filteredFiles);
+  };
+
   const handleLogin = async (userData: UserSession) => {
     setActiveUser({
       userId: userData.userId,
@@ -100,7 +105,7 @@ export default function App() {
         fileName
       );
       if (!userFileName) return;
-      await filesApi.downloadFiles(filesData, userFileName);
+      await filesApi.downloadFiles(filteredFiles, userFileName);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.message === FILES_API_ERRORS.GENERIC_ERROR) {
@@ -368,6 +373,7 @@ export default function App() {
             data={filesData}
             onEndFilesClick={onEndFilesClick}
             onDataChange={onDataChange}
+            onFilterData={onFilterData}
           />
           <SpeedDial handleDownloadData={handleDownloadData} />
         </>

@@ -15,13 +15,14 @@ import { filesApi } from "@/api/filesApi";
 import { ApiResponse, FileStats } from "@/types";
 import { TableSkeleton } from "./TableSkeleton";
 import { Puff } from "react-loader-spinner";
-import { useTable } from "@/lib/hooks/useTable";
+import { useTable } from "@/lib/hooks/use-table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onEndFilesClick: (apiResponseData: ApiResponse<FileStats>) => void;
   onDataChange: (data: FileStats[], message: string) => void;
+  onFilterData: (filteredFiles: FileStats[]) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -29,6 +30,7 @@ export function DataTable<TData, TValue>({
   data,
   onEndFilesClick,
   onDataChange,
+  onFilterData,
 }: DataTableProps<TData, TValue>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -36,6 +38,7 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     onDataChange,
+    onFilterData,
   });
 
   const handleEndFiles = async () => {

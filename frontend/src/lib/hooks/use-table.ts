@@ -10,18 +10,20 @@ import {
   ColumnDef,
 } from "@tanstack/react-table";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface useTableProps<TData, TValue> {
   data: TData[];
   columns: ColumnDef<TData, TValue>[];
   onDataChange: (data: FileStats[], message: string) => void;
+  onFilterData: (filteredFiles: FileStats[]) => void;
 }
 
 export function useTable<TData, TValue>({
   data,
   columns,
   onDataChange,
+  onFilterData,
 }: useTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -74,5 +76,22 @@ export function useTable<TData, TValue>({
     },
   });
 
-  return { table, setIsEndingFiles, isEndingFiles };
+  const getFilteredValues = useCallback(() => {
+    return (
+      data as unknown as {
+        [key: string]: string | undefined;
+      }[]
+    ).filter((file) => {
+      return columnFilters.every(({ id, value }) => {
+        return RegExp(value as string, "i").test(file[id] as string);
+      });
+    });
+  }, [columnFilters, data]);
+
+  useEffect(() => {
+    const filtered = getFilteredValues() as unknown as FileStats[];
+    onFilterData(filtered);
+  }, [columnFilters, getFilteredValues, onFilterData]);
+
+  return { table, setIsEndingFiles, isEndingFiles, getFilteredValues };
 }
