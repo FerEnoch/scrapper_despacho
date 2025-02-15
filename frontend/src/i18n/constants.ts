@@ -16,12 +16,13 @@ const UI_ERROR_MESSAGES: uiErrorMessages = {
   [FILES_API_ERRORS.GENERIC_ERROR]: `Ocurrió un error. Por favor, intenta nuevamente.`,
   [FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED]: `No se proporcionaron correctamente las credenciales de SIEM debido a un error. No puedes finalizar expedientes.`,
   [FILES_API_ERRORS.UNAUTHORIZED]: `Necesitas iniciar sesión para finalizar los expedientes.`,
+  [FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM]: `No se pudo iniciar sesión en SIEM. Por favor revisa tus credenciales de usuario y vuelve a intentarlo.`,
 } as const;
 
 const UI_MODAL_MESSAGES = {
   ERROR_MODAL: {
     FILES_ERROR: {
-      dialogTitle: "Error en los expedientes",
+      dialogTitle: "Ocurrió un error al intentar enviar los expedientes",
       actionButton: "Continuar",
     },
     AUTH_ERROR: {
@@ -36,9 +37,13 @@ const UI_MODAL_MESSAGES = {
 } as const;
 
 const UI_TOAST_MESSAGES = {
-  LOGGIN_SUCCESS: {
+  LOGIN_SUCCESS: {
     title: "Sesión iniciada",
     description: "¡Bienvenido! Ahora puedes finalizar expedientes",
+  },
+  LOGIN_ERROR: {
+    title: "Error de autenticación",
+    description: "No se pudo iniciar sesión. Por favor, intenta nuevamente.",
   },
   LOGOUT_SUCCESS: {
     title: "Sesión cerrada",
@@ -48,9 +53,9 @@ const UI_TOAST_MESSAGES = {
     title: "Error al cerrar sesión",
     description: "No se pudo cerrar sesión. Por favor, intenta nuevamente.",
   },
-  LOGIN_ERROR: {
-    title: "Error de autenticación",
-    description: "No se pudo iniciar sesión. Por favor, intenta nuevamente.",
+  NO_FILES_TO_END: {
+    title: "No hay expedientes seleccionados",
+    description: "Selecciona expedientes para poder finalizarlos",
   },
   GENERIC_ERROR: {
     title: "Error",
@@ -62,6 +67,6 @@ const UI_TOAST_MESSAGES = {
 const CARD_TEXTS = {
   title: "Santa Fe Hábitat - Depto. Admin. y Despacho",
   body: `Carga un archivo .csv que contenga una columna "Número" con el número completo de expediente SIEM. Podrás visualizar su estado actual y finalizar su tramitación.`,
-};
+} as const;
 
 export { UI_TOAST_MESSAGES, UI_ERROR_MESSAGES, UI_MODAL_MESSAGES, CARD_TEXTS };

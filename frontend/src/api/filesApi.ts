@@ -82,11 +82,11 @@ export const filesApi = {
         body: JSON.stringify(filesToEnd),
       });
 
-      if (response.status === 401) {
-        return {
-          message: FILES_API_ERRORS.UNAUTHORIZED,
-        };
-      }
+      // if (response.status === 401) {
+      //   return {
+      //     message: FILES_API_ERRORS.UNAUTHORIZED,
+      //   };
+      // }
 
       const responseData = (await response.json()) as ApiResponse<FileStats>;
 

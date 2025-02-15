@@ -1,5 +1,4 @@
 import { ColumnDef, flexRender } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -16,6 +15,8 @@ import { ApiResponse, FileStats } from "@/types";
 import { TableSkeleton } from "./TableSkeleton";
 import { Puff } from "react-loader-spinner";
 import { useTable } from "@/lib/hooks/use-table";
+import { toast } from "@/lib/hooks/use-toast";
+import { UI_TOAST_MESSAGES } from "@/i18n/constants";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -47,7 +48,11 @@ export function DataTable<TData, TValue>({
       .rows.map(({ original }) => original);
 
     if (selectedValues.length === 0) {
-      return;
+      return toast({
+        title: UI_TOAST_MESSAGES.NO_FILES_TO_END.title,
+        description: UI_TOAST_MESSAGES.NO_FILES_TO_END.description,
+        variant: "default",
+      });
     }
     setIsLoading(true);
     setIsEndingFiles(true);

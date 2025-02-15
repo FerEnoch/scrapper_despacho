@@ -73,6 +73,9 @@ export class FilesController implements IFilesController {
       const data = file.data.toString("utf-8");
       const jsonData = (await convertData(data)) as RawFile[];
 
+      /**
+       *  TODO -> update parser to admit files wwith "963" and no letters
+       */
       const { ok, parsedData } = await parseRawFiles(jsonData, {
         withLetters: true,
       });

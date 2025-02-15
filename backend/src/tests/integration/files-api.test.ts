@@ -14,6 +14,10 @@ import {
 } from "../helpers";
 
 /**
+ * TODO -> test buggy files sent to api
+ */
+
+/**
  * @description This test suite is for testing the v1 API files routes
  * @dev To run this test suite, you need to have a running SIEM system user and password
  * @dev Command to run this test suite:
@@ -25,7 +29,7 @@ describe("API-INTEGRATION > files-router", () => {
    * @method POST
    * @description Upload a csv file
    */
-  it.skip("should upload a csv file and search for SOME files stats", async () => {
+  it("should upload a csv file and search for SOME files stats", async () => {
     const res = await testAgent
       .post("/api/v1/files")
       .attach("file", "src/tests/sample_data/files.csv");
@@ -37,7 +41,7 @@ describe("API-INTEGRATION > files-router", () => {
     expect(data).toEqual(filesStats);
   }); // 2254 ms
 
-  it.skip(
+  it(
     "should upload a csv file and search for WHOLE LOT OF files stats",
     async () => {
       const res = await testAgent
@@ -53,7 +57,7 @@ describe("API-INTEGRATION > files-router", () => {
     15 * 1000 // 11355 ms / 9756 ms
   );
 
-  it.skip("should return 400 & correct msg if file is not a csv", async () => {
+  it("should return 400 & correct msg if file is not a csv", async () => {
     const res = await testAgent
       .post("/api/v1/files")
       .attach("file", "src/tests/sample_data/sample.jpg");
@@ -61,7 +65,7 @@ describe("API-INTEGRATION > files-router", () => {
     expect(res.body.message).toBe(ERRORS.INVALID_FILE);
   });
 
-  it.skip("should return 400 & correct msg if no file is attached", async () => {
+  it("should return 400 & correct msg if no file is attached", async () => {
     const res = await testAgent.post("/api/v1/files");
     expect(res.status).toBe(400);
     expect(res.body.message).toBe(ERRORS.NO_FILE_TO_UPLOAD);
@@ -73,7 +77,7 @@ describe("API-INTEGRATION > files-router", () => {
    * @description End files in SIEM system
    * @description Requires authentication -
    */
-  it.skip("should not end files that are already ended", async () => {
+  it("should not end files that are already ended", async () => {
     const endedFiles = [
       {
         index: 0,
@@ -94,7 +98,7 @@ describe("API-INTEGRATION > files-router", () => {
     expect(res.body.data).toEqual(null);
   });
 
-  it.skip(
+  it(
     "should end SOME files in SIEM system",
     async () => {
       const res = await testAgent
@@ -109,7 +113,7 @@ describe("API-INTEGRATION > files-router", () => {
     8 * 1000
   ); // 8s
 
-  it.skip(
+  it(
     "should end LOT OF files in SIEM system",
     async () => {
       const res = await testAgent

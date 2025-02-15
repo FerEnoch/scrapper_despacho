@@ -184,6 +184,7 @@ export default function App() {
       case FILES_API_ERRORS.GENERIC_ERROR:
       case FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED:
       case FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED:
+      case FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM:
         setIsSearchingFiles(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
         setFilesApiError(true);

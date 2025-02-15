@@ -42,8 +42,8 @@ export function LoginAuthModal({
         setIsSuccessLogin(true);
         setIsError(false);
         toast({
-          title: UI_TOAST_MESSAGES.LOGGIN_SUCCESS.title,
-          description: UI_TOAST_MESSAGES.LOGGIN_SUCCESS.description,
+          title: UI_TOAST_MESSAGES.LOGIN_SUCCESS.title,
+          description: UI_TOAST_MESSAGES.LOGIN_SUCCESS.description,
           variant: "success",
         });
         toggleAlertDialog();
