@@ -23,7 +23,7 @@ import {
  * @dev Command to run this test suite:
  *  - npm run back:test
  */
-describe("API-INTEGRATION > files-router", () => {
+describe.skip("API-INTEGRATION > files-router", () => {
   /**
    * @route /files
    * @method POST

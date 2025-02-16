@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { IFilesService, IUserService } from "../sevices/types";
+import { JwtPayload } from "jsonwebtoken";
 
 export interface IFilesController {
   service: IFilesService;
@@ -14,4 +15,9 @@ export interface IAuthController {
   register(req: Request, res: Response, next: NextFunction): Promise<void>;
   // getUserById(req: Request, res: Response, next: NextFunction): Promise<void>;
   logout(req: Request, res: Response, next: NextFunction): Promise<void>;
+  updateUserCredentials(
+    req: Request & { auth?: { access: string | JwtPayload } },
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
 }

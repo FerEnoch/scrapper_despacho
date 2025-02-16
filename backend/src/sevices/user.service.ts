@@ -1,7 +1,7 @@
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { AuthModel } from "../models/auth.model";
-import { Auth } from "../schemas/auth";
+import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import { modelTypes } from "../types";
 import { IUserService } from "./types";
 
@@ -14,6 +14,8 @@ export class UserService implements IUserService {
     this.authModel = new AuthModel();
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
+    this.updateUserCredentials = this.updateUserCredentials.bind(this);
+    this.handleRefreshToken = this.handleRefreshToken.bind(this);
     // this.getUserById = this.getUserById.bind(this);
     // this.logout = this.logout.bind(this);
   }
@@ -44,7 +46,7 @@ export class UserService implements IUserService {
 
   async login({ user, pass }: Auth) {
     try {
-      // 1. Check if user exists: Verify that the user exists in the database.
+      // Check if user exists: Verify that the user exists in the database.
       const userExists = await this.databaseModel.checkIfUserExists({ user });
       if (!userExists) {
         throw new ApiError({
@@ -52,39 +54,19 @@ export class UserService implements IUserService {
           message: ERRORS.USER_NOT_FOUND,
         });
       }
-      // 2. Authenticate user: Verify the user's credentials (username and password).
+      // Authenticate user: Verify the user's credentials (username and password).
       const { userId } = await this.databaseModel.login({ user, pass });
 
-      // 3. Generate access token: Generate a new access token for the user.
+      await this.handleRefreshToken({ userId });
+
+      // Generate access token: Generate a new access token for the user.
       const { accessToken } = this.authModel.generateAccessToken({
         userId,
         user,
         pass,
       });
 
-      // 4. Check if refresh token is valid: Verify the validity of the existing refresh token.
-      let { refreshToken } = await this.databaseModel.getRefreshTokenById({
-        userId,
-      });
-
-      try {
-        this.authModel.verifyJwt({ token: refreshToken });
-      } catch (error: any) {
-        // 5. Revalidate refresh token if invalid: If the refresh token is invalid, generate a new refresh token.
-        if (error.message === ERRORS.INVALID_TOKEN) {
-          const { refreshToken: freshRefreshToken } =
-            this.authModel.generateRefreshToken(userId);
-          await this.databaseModel.saveRefreshToken({
-            userId,
-            refreshToken,
-          });
-          refreshToken = freshRefreshToken;
-        } else {
-          throw error;
-        }
-      }
-
-      // .6 Return user, userId and access token.
+      // Return user, userId and access token.
       return {
         userId,
         user,
@@ -98,6 +80,55 @@ export class UserService implements IUserService {
         statusCode: 400,
         message: ERRORS.INVALID_CREDENTIALS,
       });
+    }
+  }
+
+  async updateUserCredentials({
+    userId,
+    user,
+    pass,
+  }: CompleteAuthWithId): Promise<{ token: string }> {
+    await this.handleRefreshToken({ userId });
+
+    await this.databaseModel.updateUserCredentials({
+      userId,
+      user,
+      pass,
+    });
+
+    // Generate access token: Generate a new access token for the user.
+    const { accessToken } = this.authModel.generateAccessToken({
+      userId,
+      user,
+      pass,
+    });
+
+    return {
+      token: accessToken,
+    };
+  }
+
+  async handleRefreshToken({ userId }: { userId: string }): Promise<void> {
+    // Check if refresh token is valid: Verify the validity of the existing refresh token.
+    let { refreshToken } = await this.databaseModel.getRefreshTokenById({
+      userId,
+    });
+
+    try {
+      this.authModel.verifyJwt({ token: refreshToken });
+    } catch (error: any) {
+      // Revalidate refresh token if invalid:
+      // If the refresh token is invalid, generate a new refresh token.
+      if (error.message === ERRORS.INVALID_TOKEN) {
+        const { refreshToken: freshRefreshToken } =
+          this.authModel.generateRefreshToken(userId);
+        await this.databaseModel.saveRefreshToken({
+          userId,
+          refreshToken: freshRefreshToken,
+        });
+      } else {
+        throw error;
+      }
     }
   }
 

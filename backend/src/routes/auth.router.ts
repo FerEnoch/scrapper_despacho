@@ -10,9 +10,10 @@ export async function initializeAuthRouter({
 }: {
   model: modelTypes["IDatabaseModel"];
 }) {
-  const { login, register, /*getUserById,*/ logout } = new AuthController({
-    model,
-  });
+  const { login, register, /*getUserById,*/ updateUserCredentials, logout } =
+    new AuthController({
+      model,
+    });
   const { verifyJwtMiddleware } = new AuthModel();
 
   const router = Router();
@@ -20,6 +21,6 @@ export async function initializeAuthRouter({
   router.post("/login", validateAuthReq(AuthSchema), login);
   // router.get("/user/:id", verifyJwtMiddleware, getUserById);
   router.post("/logout", verifyJwtMiddleware, logout);
-
+  router.patch("/user/:id", verifyJwtMiddleware, updateUserCredentials);
   return router;
 }

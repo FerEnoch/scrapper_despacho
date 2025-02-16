@@ -4,6 +4,10 @@ import { parseRawFiles } from "../../models/lib/filesScrapper/index.js";
 import { getJsonSampleDataFile } from "../json-imports.js";
 
 /**
+ * TODO -> test buggy files algorithm
+ */
+
+/**
  * @description This test suite is for testing the API lib functions
  * @dev Command to run this test suite:
  *  - npm run back:test

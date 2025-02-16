@@ -7,7 +7,7 @@ import {
 import { NextFunction, Response, Request } from "express";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
-import { IAuthModel } from "./types";
+import { IAuthModel, UserAuthData } from "./types";
 import ms from "ms";
 
 export class AuthModel implements IAuthModel {
@@ -39,15 +39,7 @@ export class AuthModel implements IAuthModel {
     }
   }
 
-  generateAccessToken({
-    userId,
-    user,
-    pass,
-  }: {
-    userId: string;
-    user: string;
-    pass: string;
-  }): {
+  generateAccessToken({ userId, user, pass }: UserAuthData): {
     accessToken: string;
   } {
     try {
@@ -94,7 +86,7 @@ export class AuthModel implements IAuthModel {
     next: NextFunction
   ) {
     try {
-      const accessToken = req.cookies.accessToken;
+      const accessToken: string = req.cookies.accessToken;
 
       if (!accessToken) {
         throw new ApiError({

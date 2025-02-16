@@ -1,6 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { testAgent } from "../setup";
 import { MESSAGES } from "../../controllers/constants";
+import { parseCookie } from "../helpers";
 
 /**
  * @description This test suite is for testing the v1 API auth routes
@@ -29,7 +30,7 @@ describe("API-INTEGRATION > auth-router", () => {
    * @method POST
    * @description Login a user
    */
-  test("should login a user", async () => {
+  test("should login a user after register", async () => {
     await testAgent
       .post("/api/v1/auth/register")
       .send({ user: "John Doe", pass: "password" });
@@ -55,21 +56,15 @@ describe("API-INTEGRATION > auth-router", () => {
    * @method POST
    * @description Logout a user
    */
-  test("should logout a user", async () => {
-    await testAgent
+  test("should register/login and logout a user", async () => {
+    const registerResponse = await testAgent
       .post("/api/v1/auth/register")
       .send({ user: "John Doe", pass: "password" });
 
-    const loginResponse = await testAgent
-      .post("/api/v1/auth/login")
-      .send({ user: "John Doe", pass: "password" });
-
-    expect(loginResponse.headers["set-cookie"]).toBeDefined();
-    expect("cookie", "accessToken");
-
-    const loginCookies = loginResponse.headers[
+    const loginCookies = registerResponse.headers[
       "set-cookie"
     ] as unknown as string[];
+
     const accessToken = loginCookies
       .find((cookie) => cookie.startsWith("accessToken="))
       ?.split(";")[0]
@@ -82,6 +77,7 @@ describe("API-INTEGRATION > auth-router", () => {
     const logoutCookies = logoutResponse.headers[
       "set-cookie"
     ] as unknown as string[];
+
     const logoutAccessToken = logoutCookies
       .find((cookie) => cookie.startsWith("accessToken="))
       ?.split(";")[0]
@@ -90,5 +86,65 @@ describe("API-INTEGRATION > auth-router", () => {
     expect(logoutAccessToken).toBeFalsy();
     expect(logoutResponse.body.message).toBe(MESSAGES.USER_LOGGED_OUT);
     expect(logoutResponse.status).toBe(200);
+  });
+
+  /**
+   * @route /auth/user/:id
+   * @method PATCH
+   * @description Update user credentials
+   */
+  test("should update user credentials", async () => {
+    const registerResponse = await testAgent
+      .post("/api/v1/auth/register")
+      .send({ user: "John Doe", pass: "password" });
+
+    const registerCookies = registerResponse.headers[
+      "set-cookie"
+    ] as unknown as string[];
+
+    const registerAccessToken = registerCookies
+      .find((cookie) => cookie.startsWith("accessToken="))
+      ?.split(";")[0]
+      .split("=")[1];
+
+    const [{ userId: registeredUserId }] = registerResponse.body.data;
+
+    const updateUserResponse = await testAgent
+      .patch(`/api/v1/auth/user/${registeredUserId}`)
+      .set("Cookie", `accessToken=${registerAccessToken}`)
+      .send({ user: "Jane Doe", pass: "password-jane" });
+
+    expect(updateUserResponse.status).toBe(200);
+    expect(updateUserResponse.body.message).toBe(
+      MESSAGES.USER_CREDENTIALS_UPDATED
+    );
+
+    const updateUserResponseCookies = updateUserResponse.headers[
+      "set-cookie"
+    ] as unknown as string[];
+
+    const updateUserCookieValue = updateUserResponseCookies.find((cookie) =>
+      cookie.startsWith("accessToken=")
+    );
+
+    const {
+      value: { userId, user, pass },
+    } = parseCookie(updateUserCookieValue || "");
+
+    expect(userId).toBe(registeredUserId);
+    expect(user).toBe("Jane Doe");
+    expect(pass).toBe("password-jane");
+
+    const updateUserAccessToken = updateUserCookieValue
+      ?.split(";")[0]
+      .split("=")[1];
+
+    const loginResponse = await testAgent
+      .post("/api/v1/auth/login")
+      .set("Cookie", `accessToken=${updateUserAccessToken}`)
+      .send({ user: "Jane Doe", pass: "password-jane" });
+
+    expect(loginResponse.body.message).toBe(MESSAGES.USER_LOGGED_IN);
+    expect(loginResponse.status).toBe(201);
   });
 });

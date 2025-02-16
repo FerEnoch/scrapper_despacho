@@ -1,5 +1,5 @@
 import { IDatabaseModel } from "./types";
-import { Auth } from "../schemas/auth";
+import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import { ApiError } from "../errors/api-error";
 import Database from "better-sqlite3";
 import bcrypt from "bcrypt";
@@ -23,6 +23,7 @@ export class DatabaseModel implements IDatabaseModel {
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.getPassByUser = this.getPassByUser.bind(this);
+    this.updateUserCredentials = this.updateUserCredentials.bind(this);
     // this.getUserById = this.getUserById.bind(this);
     // this.logout = this.logout.bind(this);
   }
@@ -105,7 +106,7 @@ export class DatabaseModel implements IDatabaseModel {
 
       if (result.changes === 0) {
         throw new ApiError({
-          statusCode: 400,
+          statusCode: 500,
           message: ERRORS.REFRESH_TOKEN_SAVE_FAILED,
           data: [{ userId }],
         });
@@ -113,7 +114,7 @@ export class DatabaseModel implements IDatabaseModel {
     } catch (error: any) {
       console.log("🚀 ~ saveRefreshToken ~ error:", error);
       throw new ApiError({
-        statusCode: 400,
+        statusCode: 500,
         message:
           error?.message ?? error?.code ?? ERRORS.REFRESH_TOKEN_SAVE_FAILED,
         data: [{ userId }],
@@ -138,7 +139,7 @@ export class DatabaseModel implements IDatabaseModel {
 
       if (loginResult.changes === 0) {
         throw new ApiError({
-          statusCode: 400,
+          statusCode: 500,
           message: ERRORS.DB_TRANSACTION_FAILURE,
         });
       }
@@ -147,7 +148,7 @@ export class DatabaseModel implements IDatabaseModel {
     } catch (error: any) {
       console.log("🚀 ~ login ~ error:", error);
       throw new ApiError({
-        statusCode: 400,
+        statusCode: 500,
         message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
         data: [{ user }],
       });
@@ -162,7 +163,7 @@ export class DatabaseModel implements IDatabaseModel {
 
       if (!isValidPass) {
         throw new ApiError({
-          statusCode: 400,
+          statusCode: 500,
           message: ERRORS.INVALID_CREDENTIALS,
           data: [{ user }],
         });
@@ -188,7 +189,7 @@ export class DatabaseModel implements IDatabaseModel {
     } catch (error: any) {
       console.log("🚀 ~ login ~ error:", error);
       throw new ApiError({
-        statusCode: 400,
+        statusCode: 500,
         message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
         data: [{ user }],
       });
@@ -217,9 +218,41 @@ export class DatabaseModel implements IDatabaseModel {
     } catch (error: any) {
       console.log("🚀 ~ getPassByUser ~ error:", error);
       throw new ApiError({
-        statusCode: 400,
+        statusCode: 500,
         message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
         data: [{ user }],
+      });
+    }
+  }
+
+  async updateUserCredentials({ userId, user, pass }: CompleteAuthWithId) {
+    const hashedPass = await bcrypt.hash(pass, this.BCRYPT_SALT_ROUNDS);
+
+    try {
+      const updateUserStmt = this.database.prepare(
+        "UPDATE users SET user = $user, pass = $pass WHERE id = $id"
+      );
+
+      const stmtResult = updateUserStmt.run({
+        id: userId,
+        user,
+        pass: hashedPass,
+      });
+
+      if (stmtResult.changes === 0) {
+        throw new ApiError({
+          statusCode: 500,
+          message: ERRORS.DB_TRANSACTION_FAILURE,
+        });
+      }
+
+      return { userId };
+    } catch (error: any) {
+      console.log("🚀 ~ updateUserCredentials ~ error:", error);
+      throw new ApiError({
+        statusCode: 500,
+        message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
+        data: [{ userId, user, pass }],
       });
     }
   }
@@ -248,7 +281,7 @@ export class DatabaseModel implements IDatabaseModel {
   //   } catch (error: any) {
   //     console.log("🚀 ~ getUserById ~ error:", error);
   //     throw new ApiError({
-  //       statusCode: 400,
+  //       statusCode: 500,
   //       message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
   //       data: [{ userId }],
   //     });

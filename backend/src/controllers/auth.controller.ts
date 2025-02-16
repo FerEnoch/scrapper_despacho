@@ -9,6 +9,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { setAccessTokenCookie } from "../utils";
+import { UserAuthData } from "../models/types";
 
 export class AuthController implements IAuthController {
   service: IUserService;
@@ -19,6 +20,7 @@ export class AuthController implements IAuthController {
     this.login = this.login.bind(this);
     // this.getUserById = this.getUserById.bind(this);
     this.logout = this.logout.bind(this);
+    this.updateUserCredentials = this.updateUserCredentials.bind(this);
   }
 
   async register(
@@ -127,6 +129,42 @@ export class AuthController implements IAuthController {
       res.status(200).json({
         message: MESSAGES.USER_LOGGED_OUT,
         data: [{ userId, user, pass }],
+      });
+    } catch (error: any) {
+      if (error instanceof ApiError) {
+        next(error);
+      } else {
+        next(
+          new ApiError({
+            statusCode: 500,
+            message: ERRORS.SERVER_ERROR,
+          })
+        );
+      }
+    }
+  }
+
+  async updateUserCredentials(
+    req: Request & { auth?: { access: string | JwtPayload } },
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      let { userId /*user, pass*/ } = req.auth?.access as UserAuthData;
+
+      const { user: newUser, pass: newPass } = req.body as Auth;
+
+      const { token } = await this.service.updateUserCredentials({
+        userId,
+        user: newUser,
+        pass: newPass,
+      });
+
+      if (token) setAccessTokenCookie(res, token);
+
+      res.status(200).json({
+        message: MESSAGES.USER_CREDENTIALS_UPDATED,
+        data: [{ userId, user: newUser, pass: newPass }],
       });
     } catch (error: any) {
       if (error instanceof ApiError) {

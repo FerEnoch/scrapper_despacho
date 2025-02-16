@@ -1,11 +1,10 @@
-import { Browser, Page } from "@playwright/test";
 import {
-  authApiResponse,
+  UserAuthData,
   FileEndedStats,
   FileId,
   FileStats,
 } from "../models/types";
-import { Auth } from "../schemas/auth";
+import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import { modelTypes } from "../types";
 
 export interface IFilesService {
@@ -30,8 +29,14 @@ export interface IFilesService {
 export interface IUserService {
   databaseModel: modelTypes["IDatabaseModel"];
   authModel: modelTypes["IAuthModel"];
-  register({ user, pass }: Auth): Promise<authApiResponse>;
-  login({ user, pass }: Auth): Promise<authApiResponse>;
+  register({ user, pass }: Auth): Promise<UserAuthData>;
+  login({ user, pass }: Auth): Promise<UserAuthData>;
+  updateUserCredentials({
+    userId,
+    user,
+    pass,
+  }: CompleteAuthWithId): Promise<{ token: string }>;
+  handleRefreshToken({ userId }: { userId: string }): Promise<void>;
   // getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
   // logout({ userId }: { userId: string }): Promise<authApiResponse>;
 }

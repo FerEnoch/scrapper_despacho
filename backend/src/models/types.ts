@@ -1,5 +1,5 @@
 import { Browser, BrowserContext, Page, Route } from "@playwright/test";
-import { Auth } from "../schemas/auth";
+import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import Database from "better-sqlite3";
 import { Request, Response, NextFunction } from "express";
 import { JwtPayload } from "jsonwebtoken";
@@ -45,6 +45,8 @@ export type IFileScrapperV1 = {
 export type IDatabaseModel = {
   database: Database.Database;
   BCRYPT_SALT_ROUNDS: number;
+  createDB(name: string): Database.Database;
+  createTables(db: Database.Database): void;
   checkIfUserExists({
     user,
   }: {
@@ -65,25 +67,20 @@ export type IDatabaseModel = {
   register({ user, pass }: Auth): Promise<{ userId: string }>;
   login({ user, pass }: Auth): Promise<{ userId: string }>;
   getPassByUser({ user }: { user: string }): Promise<{ pass: string }>;
+  updateUserCredentials({
+    userId,
+    user,
+    pass,
+  }: CompleteAuthWithId): Promise<{ userId: string }>;
   // getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
   // logout({ userId }: { userId: string }): Promise<authApiResponse>;
-  createDB(name: string): Database.Database;
-  createTables(db: Database.Database): void;
 };
 
 export type IAuthModel = {
   generateRefreshToken(userId: string): {
     refreshToken: string;
   };
-  generateAccessToken({
-    userId,
-    user,
-    pass,
-  }: {
-    userId: string;
-    user: string;
-    pass: string;
-  }): {
+  generateAccessToken({ userId, user, pass }: UserAuthData): {
     accessToken: string;
   };
   verifyJwt({ token }: { token: string }): string | JwtPayload;
@@ -101,10 +98,17 @@ export type IAuthModel = {
 /****************************************************************** */
 /***************************************************************** */
 
-export type authApiResponse = {
+export type UserAuthData = {
   userId: string;
-  user?: string;
+  user: string;
   pass?: string;
+  token?: string;
+};
+
+export type UpdatedUserData = {
+  updatedUser: string;
+  updatedPass: string;
+  userId?: string;
   token?: string;
 };
 
