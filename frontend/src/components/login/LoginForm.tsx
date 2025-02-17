@@ -29,7 +29,6 @@ interface LoginFormProps {
   toggleAlertDialog: () => void;
   handleLoginCredentials: (apiResponseData: ApiResponse<UserSession>) => void;
   isError: boolean;
-  isSuccessLogin: boolean;
 }
 
 export function LoginForm({
@@ -37,10 +36,9 @@ export function LoginForm({
   toggleAlertDialog,
   handleLoginCredentials,
   isError,
-  isSuccessLogin,
 }: LoginFormProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -80,7 +78,7 @@ export function LoginForm({
               <FormControl>
                 <Input
                   className={`${
-                    isError && !isSuccessLogin && errorInputStyle
+                    isError && errorInputStyle
                   } ps-2 w-48 placeholder:text-muted`}
                   type="text"
                   id="user"
@@ -88,7 +86,7 @@ export function LoginForm({
                   {...field}
                 />
               </FormControl>
-              {isError && !isSuccessLogin && (
+              {isError && (
                 <FormDescription className="text-red-300 absolute">
                   Revisa tu usuario
                 </FormDescription>
@@ -106,9 +104,7 @@ export function LoginForm({
               <FormControl>
                 <div className="flex items-center justify-between relative">
                   <Input
-                    className={`${
-                      isError && !isSuccessLogin && errorInputStyle
-                    } ps-2 w-48`}
+                    className={`${isError && errorInputStyle} ps-2 w-48`}
                     type={isPasswordVisible ? "text" : "password"}
                     id="pass"
                     {...field}
@@ -132,7 +128,7 @@ export function LoginForm({
                   )}
                 </div>
               </FormControl>
-              {isError && !isSuccessLogin && (
+              {isError && (
                 <FormDescription className="text-red-300 absolute">
                   Revisa tu contraseña
                 </FormDescription>

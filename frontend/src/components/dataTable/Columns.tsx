@@ -5,7 +5,7 @@ import { SIEM_FILE_STATS_URL } from "@/config";
 import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { filesApi } from "@/api/filesApi";
-import { getMessageColor, getStatusColor } from "@/lib/utils";
+import { getMessageColor, getStatusColor } from "@/utils";
 import { useState } from "react";
 import { Puff } from "react-loader-spinner";
 

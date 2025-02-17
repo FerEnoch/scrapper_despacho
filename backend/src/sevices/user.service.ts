@@ -59,7 +59,7 @@ export class UserService implements IUserService {
 
       await this.handleRefreshToken({ userId });
 
-      // Generate access token: Generate a new access token for the user.
+      // Generate a new access token for the user.
       const { accessToken } = this.authModel.generateAccessToken({
         userId,
         user,

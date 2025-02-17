@@ -28,7 +28,7 @@ export function setAccessTokenCookie(res: Response, accessToken: string) {
   res.cookie("accessToken", accessToken, {
     secure: NODE_ENV === "production",
     httpOnly: false,
-    sameSite: "strict",
+    sameSite: "lax",
     /**
      * ".devtunnels.ms" would be production domain too
      */

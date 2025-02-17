@@ -8,7 +8,7 @@ import { LoginForm } from "../login/LoginForm";
 import { useState } from "react";
 import { ApiResponse, UserSession } from "@/types";
 import { AUTH_API_ERRORS, AUTH_API_MESSAGES } from "@/types/enums";
-import { useToast } from "@/lib/hooks/use-toast";
+import { useToast } from "@/utils/hooks/use-toast";
 import { UI_TOAST_MESSAGES } from "@/i18n/constants";
 
 interface LoginAuthModalProps {
@@ -16,17 +16,16 @@ interface LoginAuthModalProps {
   actionButton: string;
   isOpen: boolean;
   toggleAlertDialog: () => void;
-  handleLogin: (userData: UserSession) => void;
+  handleSubmit: (userData: UserSession) => Promise<void>;
 }
 
-export function LoginAuthModal({
+export function AuthModal({
   dialogTitle,
   actionButton,
   isOpen,
   toggleAlertDialog,
-  handleLogin,
+  handleSubmit,
 }: LoginAuthModalProps) {
-  const [isSuccessLogin, setIsSuccessLogin] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const { toast } = useToast();
 
@@ -37,9 +36,17 @@ export function LoginAuthModal({
     const userData: UserSession | null = data?.[0] ?? null;
 
     switch (message) {
+      case AUTH_API_MESSAGES.USER_CREDENTIALS_UPDATED:
+        setIsError(false);
+        toast({
+          title: UI_TOAST_MESSAGES.CREDENTIALS_UPDATED_SUCCESS.title,
+          description:
+            UI_TOAST_MESSAGES.CREDENTIALS_UPDATED_SUCCESS.description,
+          variant: "success",
+        });
+        return userData;
       case AUTH_API_MESSAGES.USER_LOGGED_IN:
       case AUTH_API_MESSAGES.USER_REGISTERED:
-        setIsSuccessLogin(true);
         setIsError(false);
         toast({
           title: UI_TOAST_MESSAGES.LOGIN_SUCCESS.title,
@@ -49,11 +56,9 @@ export function LoginAuthModal({
         toggleAlertDialog();
         return userData;
       case AUTH_API_ERRORS.INVALID_CREDENTIALS:
-        setIsSuccessLogin(false);
         setIsError(true);
         return null;
       case AUTH_API_ERRORS.GENERIC_ERROR:
-        setIsSuccessLogin(false);
         setIsError(true);
         toggleAlertDialog();
         toast({
@@ -63,7 +68,6 @@ export function LoginAuthModal({
         });
         return null;
       default:
-        setIsSuccessLogin(false);
         setIsError(true);
         toggleAlertDialog();
         toast({
@@ -81,7 +85,7 @@ export function LoginAuthModal({
     console.log("🚀 ~ handleLogin ~ apiResponseData:", apiResponseData);
     const userData = handleResponseMessages(apiResponseData);
     if (!userData) return;
-    handleLogin(userData);
+    await handleSubmit(userData);
   };
 
   return (
@@ -103,7 +107,6 @@ export function LoginAuthModal({
           toggleAlertDialog={toggleAlertDialog}
           handleLoginCredentials={handleLoginCredentials}
           isError={isError}
-          isSuccessLogin={isSuccessLogin}
         />
       </AlertDialogDescription>
     </ModalDialog>

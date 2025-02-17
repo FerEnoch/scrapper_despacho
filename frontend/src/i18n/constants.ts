@@ -1,8 +1,6 @@
 import { FILES_API_ERRORS } from "@/types/enums";
 
-type uiErrorMessages = Record<keyof typeof FILES_API_ERRORS, string>;
-
-const UI_ERROR_MESSAGES: uiErrorMessages = {
+export const UI_ERROR_MESSAGES = {
   [FILES_API_ERRORS.SERVER_ERROR]:
     "Ocurrió un error al analizar los archivos. Por favor, intenta nuevamente.",
   [FILES_API_ERRORS.INVALID_FILE]: `No se cargó el archivo. Por favor, intenta nuevamente.`,
@@ -16,10 +14,11 @@ const UI_ERROR_MESSAGES: uiErrorMessages = {
   [FILES_API_ERRORS.GENERIC_ERROR]: `Ocurrió un error. Por favor, intenta nuevamente.`,
   [FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED]: `No se proporcionaron correctamente las credenciales de SIEM debido a un error. No puedes finalizar expedientes.`,
   [FILES_API_ERRORS.UNAUTHORIZED]: `Necesitas iniciar sesión para finalizar los expedientes.`,
+  [FILES_API_ERRORS.TOKEN_MISSING_ACCESS_DENIED]: `Necesitas iniciar sesión para finalizar los expedientes.`,
   [FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM]: `No se pudo iniciar sesión en SIEM. Por favor revisa tus credenciales de usuario y vuelve a intentarlo.`,
 } as const;
 
-const UI_MODAL_MESSAGES = {
+export const UI_MODAL_MESSAGES = {
   ERROR_MODAL: {
     FILES_ERROR: {
       dialogTitle: "Ocurrió un error al intentar enviar los expedientes",
@@ -36,7 +35,7 @@ const UI_MODAL_MESSAGES = {
   },
 } as const;
 
-const UI_TOAST_MESSAGES = {
+export const UI_TOAST_MESSAGES = {
   LOGIN_SUCCESS: {
     title: "Sesión iniciada",
     description: "¡Bienvenido! Ahora puedes finalizar expedientes",
@@ -53,9 +52,17 @@ const UI_TOAST_MESSAGES = {
     title: "Error al cerrar sesión",
     description: "No se pudo cerrar sesión. Por favor, intenta nuevamente.",
   },
+  CREDENTIALS_UPDATED_SUCCESS: {
+    title: "Credenciales actualizadas",
+    description: "Tus credenciales se han actualizado correctamente",
+  },
   NO_FILES_TO_END: {
     title: "No hay expedientes seleccionados",
     description: "Selecciona expedientes para poder finalizarlos",
+  },
+  FILE_UPLOADED: {
+    title: "¡Archivo cargado correctamente!",
+    description: (filesLength: number) => `${filesLength} expedientes cargados`,
   },
   GENERIC_ERROR: {
     title: "Error",
@@ -64,9 +71,7 @@ const UI_TOAST_MESSAGES = {
   },
 } as const;
 
-const CARD_TEXTS = {
+export const CARD_TEXTS = {
   title: "Santa Fe Hábitat - Depto. Admin. y Despacho",
   body: `Carga un archivo .csv que contenga una columna "Número" con el número completo de expediente SIEM. Podrás visualizar su estado actual y finalizar su tramitación.`,
 } as const;
-
-export { UI_TOAST_MESSAGES, UI_ERROR_MESSAGES, UI_MODAL_MESSAGES, CARD_TEXTS };

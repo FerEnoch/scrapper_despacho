@@ -42,7 +42,7 @@ export class AuthController implements IAuthController {
 
       /**
        * If token is generated
-       * (i.e. user is forced to log in because he was already registered)
+       * (i.e. user is forced to login because he was already registered)
        * set it as a cookie
        */
       if (token) {

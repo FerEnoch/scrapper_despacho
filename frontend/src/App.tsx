@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Form,
   FormControl,
@@ -16,11 +15,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { DataTable } from "@/components/table/DataTable";
-import { TableSkeleton } from "@/components/table/TableSkeleton";
-import { SpeedDial } from "@/components/speedDial/SpeedDial";
+import { TableSkeleton } from "@/components/dataTable/TableSkeleton";
 import { Input } from "@/components/ui/input";
-import { Columns } from "@/components/table/Columns";
 import { uploadFileFormSchema } from "@/schemas/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -31,20 +27,38 @@ import {
   AUTH_API_ERRORS,
   AUTH_API_MESSAGES,
   FILES_API_ERRORS,
+  FILES_API_MESSAGES,
 } from "@/types/enums";
-import { useEffect, useState } from "react";
+import { lazy, useState } from "react";
 import {
   CARD_TEXTS,
   UI_ERROR_MESSAGES,
   UI_TOAST_MESSAGES,
 } from "@/i18n/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
-import { Modals } from "./components/modals/Modals";
 import { Toaster } from "@/components/ui/toaster";
-import { CircleUser, LogOutIcon } from "lucide-react";
-import { authApi } from "./api/authApi";
-import { useToast } from "./lib/hooks/use-toast";
-import { parseCookie } from "./lib/utils";
+import { useToast } from "./utils/hooks/use-toast";
+import { Columns } from "@/components/dataTable/Columns";
+import { DataTable } from "@/components/dataTable";
+import { useActiveUser } from "./utils/hooks/use-active-user";
+
+const SpeedDial = lazy(() =>
+  import("@/components/speedDial/SpeedDial").then((module) => ({
+    default: module.SpeedDial,
+  }))
+);
+
+const Account = lazy(() =>
+  import("@/components/account/Account").then((module) => ({
+    default: module.Account,
+  }))
+);
+
+const Modals = lazy(() =>
+  import("./components/modals/Modals").then((module) => ({
+    default: module.Modals,
+  }))
+);
 
 export default function App() {
   const [filesData, setFilesData] = useState<FileStats[]>([]);
@@ -56,12 +70,9 @@ export default function App() {
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
   const [modalMsg, setModalMsg] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
-  const [activeUser, setActiveUser] = useState<{
-    userId: string;
-    username: string;
-    password: string;
-  } | null>(null);
 
+  const { activeUser, handleActiveUser, logoutAndClearCookie } =
+    useActiveUser();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof uploadFileFormSchema>>({
@@ -71,30 +82,16 @@ export default function App() {
     },
   });
 
-  useEffect(() => {
-    const accessTokenCookieName = "accessToken";
-    const cookies = document.cookie;
-    const cookieKVString = cookies
-      .split(";")
-      .find((cookie) => cookie.includes(accessTokenCookieName));
-
-    if (!cookieKVString) return;
-
-    const {
-      value: { userId, user, pass },
-    } = parseCookie(cookieKVString);
-    setActiveUser({ userId, username: user, password: pass });
-  }, []);
-
   const onFilterData = (filteredFiles: FileStats[]) => {
     setFilteredFiles(filteredFiles);
   };
 
   const handleLogin = async (userData: UserSession) => {
-    setActiveUser({
-      userId: userData.userId,
-      username: userData.user,
-      password: userData.pass,
+    const { userId, user, pass } = userData;
+    handleActiveUser({
+      userId: userId,
+      username: user,
+      password: pass,
     });
   };
 
@@ -136,12 +133,12 @@ export default function App() {
   }: ApiResponse<UserSession>) => {
     switch (message) {
       case AUTH_API_MESSAGES.USER_LOGGED_OUT:
+        logoutAndClearCookie();
         toast({
           title: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.title,
           description: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.description,
           variant: "default",
         });
-        setActiveUser(null);
         break;
       case AUTH_API_ERRORS.LOGOUT_FAILED:
         toast({
@@ -171,7 +168,19 @@ export default function App() {
     data,
   }: ApiResponse<FileStats | RawFile>) => {
     switch (message) {
+      case FILES_API_MESSAGES.FILE_UPLOADED:
+        setFilesData(data as FileStats[]);
+        setIsSearchingFiles(false);
+        toast({
+          title: UI_TOAST_MESSAGES.FILE_UPLOADED.title,
+          description: UI_TOAST_MESSAGES.FILE_UPLOADED.description(
+            data?.length || 0
+          ),
+          variant: "default",
+        });
+        break;
       case FILES_API_ERRORS.UNAUTHORIZED:
+      case FILES_API_ERRORS.TOKEN_MISSING_ACCESS_DENIED:
         setIsSearchingFiles(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
         setOpenAuthModal(true);
@@ -182,8 +191,8 @@ export default function App() {
       case FILES_API_ERRORS.NO_FILE_TO_UPLOAD:
       case FILES_API_ERRORS.NOT_FOUND:
       case FILES_API_ERRORS.GENERIC_ERROR:
-      case FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED:
       case FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED:
+      case FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED:
       case FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM:
         setIsSearchingFiles(false);
         setModalMsg(UI_ERROR_MESSAGES[message]);
@@ -211,7 +220,9 @@ export default function App() {
     }
   };
 
-  const onSubmit = async (data: z.infer<typeof uploadFileFormSchema>) => {
+  const onSubmitFileForm = async (
+    data: z.infer<typeof uploadFileFormSchema>
+  ) => {
     setIsSearchingFiles(true);
     setFilesApiError(false);
     setErrorFiles([]);
@@ -245,9 +256,13 @@ export default function App() {
     setFilesData(newState);
   };
 
-  const handleLogout = async () => {
-    const apiResponse = await authApi.logout();
+  const handleLogout = (apiResponse: ApiResponse<UserSession>) => {
     handleAuthResponseMessages(apiResponse);
+  };
+
+  const handleChangeCredentials = (apiResponse: ApiResponse<UserSession>) => {
+    // handleAuthResponseMessages(apiResponse);
+    console.log("🚀 ~ handleChangeCredentials ~ apiResponse:", apiResponse);
   };
 
   return (
@@ -261,29 +276,12 @@ export default function App() {
       "
       >
         <CardHeader className="relative">
-          {activeUser && activeUser.username.length > 0 && (
-            <div className="absolute right-8 top-8 space-y-4 flex flex-col justify-center items-center">
-              <CircleUser
-                className="
-                h-10 w-10 rounded-full
-                bg-primary text-white
-                shadow-md
-                "
-              />
-              <div className="flex justify-center items-center">
-                <Badge className="py-2 px-4" variant="outline">
-                  {activeUser.username}
-                </Badge>
-                <LogOutIcon
-                  className="
-                h-6 w-6 ms-2
-                text-red-300
-                hover:text-red-700 cursor-pointer
-                "
-                  onClick={handleLogout}
-                />
-              </div>
-            </div>
+          {activeUser.username.length > 0 && (
+            <Account
+              activeUser={activeUser}
+              handleLogout={handleLogout}
+              handleChangeCredentials={handleChangeCredentials}
+            />
           )}
           <CardTitle className="text-3xl mb-6">{CARD_TEXTS.title}</CardTitle>
           <CardDescription className="my-8">
@@ -301,7 +299,7 @@ export default function App() {
           <Form {...form}>
             <form
               encType="multipart/form-data"
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit(onSubmitFileForm)}
               className="space-y-8"
             >
               <FormField

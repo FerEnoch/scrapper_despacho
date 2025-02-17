@@ -65,6 +65,39 @@ export const authApi = {
     }
   },
 
+  changeCredentials: async (
+    userId: string,
+    data: z.infer<typeof loginFormSchema>
+  ) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/${userId}`, {
+        method: "PATH",
+        credentials: "include",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const responseData = (await response.json()) as ApiResponse<UserSession>;
+
+      if (response.ok) {
+        return responseData;
+      }
+
+      return {
+        message: responseData.message ?? "",
+        data: responseData?.data ?? [],
+      };
+    } catch (error) {
+      console.log("🚀 ~ changeCredentials ~ error:", error);
+      return {
+        message: AUTH_API_ERRORS.GENERIC_ERROR,
+        data: [],
+      };
+    }
+  },
+
   logout: async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/logout`, {

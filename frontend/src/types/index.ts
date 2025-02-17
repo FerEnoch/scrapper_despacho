@@ -39,3 +39,14 @@ export type UserSession = {
   user: string;
   pass: string;
 };
+
+export type ActiveUser = {
+  userId: string;
+  username: string;
+  password: string;
+};
+
+export type NewUserCredentials = {
+  newUser: string;
+  newPass: string;
+};

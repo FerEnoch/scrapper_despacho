@@ -1,3 +1,5 @@
+import { Puff } from "react-loader-spinner";
+import { Input } from "../ui/input";
 import { ColumnDef, flexRender } from "@tanstack/react-table";
 import {
   Table,
@@ -9,14 +11,12 @@ import {
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { useState } from "react";
-import { Input } from "../ui/input";
 import { filesApi } from "@/api/filesApi";
 import { ApiResponse, FileStats } from "@/types";
 import { TableSkeleton } from "./TableSkeleton";
-import { Puff } from "react-loader-spinner";
-import { useTable } from "@/lib/hooks/use-table";
-import { toast } from "@/lib/hooks/use-toast";
 import { UI_TOAST_MESSAGES } from "@/i18n/constants";
+import { useTable } from "@/utils/hooks/use-table";
+import { toast } from "@/utils/hooks/use-toast";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -209,7 +209,7 @@ export function DataTable<TData, TValue>({
               disabled={!table.getCanPreviousPage()}
               className="text-gray-500"
             >
-              Anterior
+              {"Anterior"}
             </Button>
             <Button
               variant="outline"
@@ -218,7 +218,7 @@ export function DataTable<TData, TValue>({
               disabled={!table.getCanNextPage()}
               className="text-gray-500"
             >
-              Siguiente
+              {"Siguiente"}
             </Button>
           </div>
         </div>

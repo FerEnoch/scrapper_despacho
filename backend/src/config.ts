@@ -34,7 +34,7 @@ const REMOTE_DEV_ENV =
 
 const SCRAPPER_TIMEOUT =
   NODE_ENV === "test"
-    ? 3 * 1000
+    ? 5 * 1000 
     : parseInt(STANDARD_SCRAPPER_TIMEOUT_PROD_IN_SS) * 1000;
 
 export {
