@@ -56,12 +56,16 @@ describe("API-INTEGRATION > auth-router", () => {
    * @method POST
    * @description Logout a user
    */
-  test("should register/login and logout a user", async () => {
-    const registerResponse = await testAgent
+  test("should register, login and logout a user", async () => {
+    await testAgent
       .post("/api/v1/auth/register")
       .send({ user: "John Doe", pass: "password" });
 
-    const loginCookies = registerResponse.headers[
+    const loginResponse = await testAgent
+      .post("/api/v1/auth/login")
+      .send({ user: "John Doe", pass: "password" });
+
+    const loginCookies = loginResponse.headers[
       "set-cookie"
     ] as unknown as string[];
 
