@@ -5,10 +5,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-import { loginFormSchema } from "@/schemas/forms";
+import { loginFormSchema, FormDataSubmit } from "@/schemas/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -20,27 +19,25 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { useState } from "react";
-import { authApi } from "@/api/authApi";
-import { ApiResponse, UserSession } from "@/types";
 import { Puff } from "react-loader-spinner";
 
-interface LoginFormProps {
+interface AuthFormProps {
   actionButton: string;
-  toggleAlertDialog: () => void;
-  handleLoginCredentials: (apiResponseData: ApiResponse<UserSession>) => void;
-  isError: boolean;
+  authError: boolean;
+  toggleAuthModal: (flag?: string) => void;
+  handleSubmit: (data: FormDataSubmit) => Promise<void>;
 }
 
-export function LoginForm({
+export function AuthForm({
   actionButton,
-  toggleAlertDialog,
-  handleLoginCredentials,
-  isError,
-}: LoginFormProps) {
+  toggleAuthModal,
+  handleSubmit,
+  authError: isError,
+}: AuthFormProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof loginFormSchema>>({
+  const form = useForm<FormDataSubmit>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
       user: "",
@@ -52,10 +49,9 @@ export function LoginForm({
     setIsPasswordVisible((isVisible) => !isVisible);
   };
 
-  const onSubmit = async (data: z.infer<typeof loginFormSchema>) => {
+  const onSubmit = async (data: FormDataSubmit) => {
     setIsLoading(true);
-    const apiResponse = await authApi.register(data);
-    handleLoginCredentials(apiResponse);
+    await handleSubmit(data);
     setIsLoading(false);
   };
 
@@ -140,16 +136,21 @@ export function LoginForm({
         <AlertDialogFooter className="mt-4">
           <AlertDialogAction
             className="bg-transparent hover:text-red-400 shadow-none"
-            onClick={() => toggleAlertDialog()}
+            onClick={() => toggleAuthModal()}
           >
             {"Cancelar"}
           </AlertDialogAction>
-          <AlertDialogAction className="bg-transparent shadow-none">
-            <Button type="submit" disabled={isLoading}>
+          <AlertDialogAction
+            className="bg-transparent shadow-none"
+            type="submit"
+            disabled={isLoading}
+            asChild
+          >
+            <Button variant="outline" className="bg-primary">
               {actionButton}
               {isLoading && (
                 <Puff
-                  visible={true}
+                  visible
                   height="100"
                   width="100"
                   color="#000"

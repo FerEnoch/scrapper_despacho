@@ -11,7 +11,7 @@ export const useActiveUser = () => {
     password: cookieUserInfo?.password || "",
   });
 
-  const checkAccessToken = () => {
+  const checkAccessToken = useCallback(() => {
     const accessTokenCookieName = "accessToken";
     const cookies = document.cookie;
     const cookieKVString = cookies
@@ -19,12 +19,11 @@ export const useActiveUser = () => {
       .find((cookie) => cookie.includes(accessTokenCookieName));
 
     return cookieKVString;
-  };
+  }, []);
 
   const clearAccessToken = useCallback(() => {
     const cookieKVString = checkAccessToken();
 
-    console.log("🚀 ~ clearAccessToken ~ cookieKVString:", cookieKVString);
     if (!cookieKVString) return setCookieUserInfo(null);
 
     const [accessTokenCookieName] = cookieKVString.split("=");
@@ -34,13 +33,23 @@ export const useActiveUser = () => {
       REMOTE_DEV_ENV ? ".devtunnels.ms" : "localhost"
     }; path=/`;
 
-    console.log("🚀 ~ clearAccessToken ~ REMOTE_DEV_ENV:", REMOTE_DEV_ENV);
-    console.log("🚀 ~ clearAccessToken ~ updatedCookie:", updatedCookie);
     document.cookie = updatedCookie;
-
-    console.log("🚀 ~ clearAccessToken ~ document.cookie:", document.cookie);
     setCookieUserInfo(null);
+  }, [checkAccessToken]);
+
+  const handleActiveUser = useCallback((userData: ActiveUser) => {
+    setActiveUser(userData);
   }, []);
+
+  const logoutAndClearCookie = useCallback(() => {
+    clearAccessToken();
+    setCookieUserInfo(null);
+    setActiveUser({
+      userId: "",
+      username: "",
+      password: "",
+    });
+  }, [clearAccessToken]);
 
   useEffect(() => {
     const cookieKVString = checkAccessToken();
@@ -50,26 +59,12 @@ export const useActiveUser = () => {
       value: { userId, user, pass },
     } = parseCookie(cookieKVString);
     setCookieUserInfo({ userId, username: user, password: pass });
-  }, []);
+  }, [checkAccessToken]);
 
   useEffect(() => {
     if (!cookieUserInfo) return;
     setActiveUser(cookieUserInfo);
   }, [cookieUserInfo]);
-
-  const handleActiveUser = (userData: ActiveUser) => {
-    setActiveUser(userData);
-  };
-
-  const logoutAndClearCookie = () => {
-    clearAccessToken();
-    setCookieUserInfo(null);
-    setActiveUser({
-      userId: "",
-      username: "",
-      password: "",
-    });
-  };
 
   return { activeUser, handleActiveUser, logoutAndClearCookie };
 };

@@ -39,7 +39,6 @@ export function SpeedDial({ handleDownloadData }: SpeedDialProps) {
           >
             <svg
               className="w-4 h-4 mx-auto mb-1"
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="currentColor"
               viewBox="0 0 20 20"
@@ -64,7 +63,6 @@ export function SpeedDial({ handleDownloadData }: SpeedDialProps) {
         >
           <svg
             className="w-6 h-6 text-gray-800 dark:text-white"
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 10 14"
@@ -88,7 +86,6 @@ export function SpeedDial({ handleDownloadData }: SpeedDialProps) {
         >
           <svg
             className="w-5 h-5 transition-transform group-hover:rotate-45"
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 18 18"

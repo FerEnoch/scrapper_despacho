@@ -1,31 +1,38 @@
 import { UI_MODAL_MESSAGES } from "@/i18n/constants";
 import { FilesErrorModal } from "./FilesErrorModal";
 import { AuthModalError } from "./AuthModalError";
-import { RawFile, UserSession } from "@/types";
+import { RawFile } from "@/types";
 import { AuthModal } from "./AuthModal";
+import { FormDataSubmit } from "@/schemas/forms";
 
 interface ModalsProps {
   modalMsg: string;
-  isError: boolean;
+  authModalTitle: string;
+  authModalActionButton: string;
+  filesError: boolean;
   errorFiles: RawFile[];
   openAuthModal: boolean;
-  openLoginModal: boolean;
+  authError: boolean;
+  isOpenAuthErrorModal: boolean;
+  toggleAuthErrorModal: () => void;
   toggleErrorModal: () => void;
-  toggleAuthModal: () => void;
-  toggleLoginModal: () => void;
-  handleLogin: (userData: UserSession) => Promise<void>;
+  toggleAuthModal: (flag?: string) => void;
+  handleSubmit: (userData: FormDataSubmit) => Promise<void>;
 }
 
 export function Modals({
   modalMsg,
-  isError,
+  authModalTitle,
+  authModalActionButton,
+  filesError,
   errorFiles,
   openAuthModal,
-  openLoginModal,
+  authError,
+  isOpenAuthErrorModal,
+  toggleAuthErrorModal,
   toggleErrorModal,
   toggleAuthModal,
-  toggleLoginModal,
-  handleLogin,
+  handleSubmit,
 }: ModalsProps) {
   return (
     <>
@@ -34,23 +41,24 @@ export function Modals({
         actionButton={UI_MODAL_MESSAGES.ERROR_MODAL.FILES_ERROR.actionButton}
         dialogDescription={modalMsg}
         errorFiles={errorFiles}
-        isOpen={isError}
+        isOpen={filesError}
         toggleAlertDialog={toggleErrorModal}
       />
       <AuthModalError
         dialogTitle={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.dialogTitle}
         actionButton={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.actionButton}
         dialogDescription={modalMsg}
-        isOpen={openAuthModal}
-        toggleAlertDialog={toggleAuthModal}
-        toggleLoginModal={toggleLoginModal}
+        isOpen={isOpenAuthErrorModal}
+        toggleAlertDialog={toggleAuthErrorModal}
+        toggleAuthModal={toggleAuthModal}
       />
       <AuthModal
-        dialogTitle={UI_MODAL_MESSAGES.LOGIN.dialogTitle}
-        actionButton={UI_MODAL_MESSAGES.LOGIN.actionButton}
-        isOpen={openLoginModal}
-        toggleAlertDialog={toggleLoginModal}
-        handleSubmit={handleLogin}
+        dialogTitle={authModalTitle}
+        actionButton={authModalActionButton}
+        isOpen={openAuthModal}
+        toggleAuthModal={toggleAuthModal}
+        authError={authError}
+        handleSubmit={handleSubmit}
       />
     </>
   );

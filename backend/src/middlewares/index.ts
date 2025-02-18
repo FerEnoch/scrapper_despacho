@@ -26,6 +26,7 @@ export function useMiddlewares(app: Application): Application {
         "http://localhost:5173",
       ],
       credentials: true,
+      methods: "GET,HEAD,PATCH,POST",
     })
   );
   app.use(urlencoded({ extended: true }));

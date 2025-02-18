@@ -14,3 +14,5 @@ export const loginFormSchema = z.object({
   user: z.string({ message: "Utiliza tu usuario SIEM" }),
   pass: z.string({ message: "Utiliza tu contraseña SIEM" }),
 });
+
+export type FormDataSubmit = z.infer<typeof loginFormSchema>;

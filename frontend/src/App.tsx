@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { TableSkeleton } from "@/components/dataTable/TableSkeleton";
 import { Input } from "@/components/ui/input";
-import { uploadFileFormSchema } from "@/schemas/forms";
+import { FormDataSubmit, uploadFileFormSchema } from "@/schemas/forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -29,10 +29,11 @@ import {
   FILES_API_ERRORS,
   FILES_API_MESSAGES,
 } from "@/types/enums";
-import { lazy, useState } from "react";
+import { lazy, useCallback, useState } from "react";
 import {
   CARD_TEXTS,
   UI_ERROR_MESSAGES,
+  UI_MODAL_MESSAGES,
   UI_TOAST_MESSAGES,
 } from "@/i18n/constants";
 import { MagnifyingGlass } from "react-loader-spinner";
@@ -41,6 +42,7 @@ import { useToast } from "./utils/hooks/use-toast";
 import { Columns } from "@/components/dataTable/Columns";
 import { DataTable } from "@/components/dataTable";
 import { useActiveUser } from "./utils/hooks/use-active-user";
+import { authApi } from "./api/authApi";
 
 const SpeedDial = lazy(() =>
   import("@/components/speedDial/SpeedDial").then((module) => ({
@@ -61,20 +63,31 @@ const Modals = lazy(() =>
 );
 
 export default function App() {
+  /** data - data loading state */
   const [filesData, setFilesData] = useState<FileStats[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<FileStats[]>([]);
   const [isSerchingFiles, setIsSearchingFiles] = useState<boolean>(false);
-  const [isFilesApiError, setFilesApiError] = useState<boolean>(false);
-  const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
-  const [openLoginModal, setOpenLoginModal] = useState<boolean>(false);
   const [errorFiles, setErrorFiles] = useState<RawFile[]>([]);
-  const [modalMsg, setModalMsg] = useState<string>("");
+  /** handle file downloading name */
   const [fileName, setFileName] = useState<string>("");
-
+  /** errors */
+  const [isFilesApiError, setIsFilesApiError] = useState<boolean>(false);
+  const [isAuthApiError, setIsAuthApiError] = useState<boolean>(false);
+  /** modal handlers */
+  const [modalMsg, setModalMsg] = useState<string>("");
+  const [authModalTitle, setAuthModalTitle] = useState<string>("");
+  const [authModalActionButton, setAuthModalActionButton] =
+    useState<string>("");
+  const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
+  const [isOpenAuthErrorModal, setIsOpenAuthErrorModal] =
+    useState<boolean>(false);
+  const [submitHandler, setSubmitHandler] = useState<
+    (data: FormDataSubmit) => Promise<void>
+  >(() => Promise.resolve());
+  /** custom hooks */
+  const { toast } = useToast();
   const { activeUser, handleActiveUser, logoutAndClearCookie } =
     useActiveUser();
-  const { toast } = useToast();
-
   const form = useForm<z.infer<typeof uploadFileFormSchema>>({
     resolver: zodResolver(uploadFileFormSchema),
     defaultValues: {
@@ -82,20 +95,11 @@ export default function App() {
     },
   });
 
-  const onFilterData = (filteredFiles: FileStats[]) => {
+  const onFilterData = useCallback((filteredFiles: FileStats[]) => {
     setFilteredFiles(filteredFiles);
-  };
+  }, []);
 
-  const handleLogin = async (userData: UserSession) => {
-    const { userId, user, pass } = userData;
-    handleActiveUser({
-      userId: userId,
-      username: user,
-      password: pass,
-    });
-  };
-
-  const handleDownloadData = async () => {
+  const handleDownloadData = useCallback(async () => {
     try {
       const userFileName = window.prompt(
         "Introduce un nombre para el archivo .csv",
@@ -109,161 +113,250 @@ export default function App() {
         return;
       }
     }
+  }, [fileName, filteredFiles]);
+
+  const toggleFilesApiErrorModal = useCallback(() => {
+    setIsFilesApiError((error) => !error);
+  }, []);
+
+  const toggleAuthErrorModal = () => {
+    setIsOpenAuthErrorModal((auth) => !auth);
   };
 
-  const onDataChange = (data: FileStats[], message: string) => {
-    handleFilesResponseMessages({ message, data });
-    setFilesData(data);
-  };
+  const handleFilesResponseMessages = useCallback(
+    ({ message, data }: ApiResponse<FileStats | RawFile>) => {
+      switch (message) {
+        case FILES_API_MESSAGES.FILE_UPLOADED:
+          setFilesData(data as FileStats[]);
+          setIsSearchingFiles(false);
+          toast({
+            title: UI_TOAST_MESSAGES.FILE_UPLOADED.title,
+            description: UI_TOAST_MESSAGES.FILE_UPLOADED.description(
+              data?.length || 0
+            ),
+            variant: "default",
+          });
+          break;
+        case FILES_API_ERRORS.UNAUTHORIZED:
+        case FILES_API_ERRORS.TOKEN_MISSING_ACCESS_DENIED:
+          setIsSearchingFiles(false);
+          setModalMsg(UI_ERROR_MESSAGES[message]);
+          toggleAuthErrorModal();
+          return;
 
-  const toggleErrorModal = () => {
-    setFilesApiError((error) => !error);
-  };
+        case FILES_API_ERRORS.SERVER_ERROR:
+        case FILES_API_ERRORS.INVALID_FILE:
+        case FILES_API_ERRORS.NO_FILE_TO_UPLOAD:
+        case FILES_API_ERRORS.NOT_FOUND:
+        case FILES_API_ERRORS.GENERIC_ERROR:
+        case FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED:
+        case FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED:
+        case FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM:
+          setIsSearchingFiles(false);
+          setModalMsg(UI_ERROR_MESSAGES[message]);
+          setIsFilesApiError(true);
+          setFilesData([]);
+          return;
 
-  const toggleLoginModal = () => {
-    setOpenLoginModal((login) => !login);
-  };
+        case FILES_API_ERRORS.INVALID_DATA:
+          setIsSearchingFiles(false);
+          setModalMsg(UI_ERROR_MESSAGES[message]);
+          setIsFilesApiError(true);
+          setErrorFiles(data as RawFile[]);
+          setFilesData([]);
+          return;
 
-  const toggleAuthModal = () => {
-    setOpenAuthModal((auth) => !auth);
-  };
+        case FILES_API_ERRORS.NO_FILES_TO_END:
+          setModalMsg(UI_ERROR_MESSAGES[message]);
+          setIsFilesApiError(true);
+          return;
 
-  const handleAuthResponseMessages = ({
-    message /*data -> unused parameter */,
-  }: ApiResponse<UserSession>) => {
-    switch (message) {
-      case AUTH_API_MESSAGES.USER_LOGGED_OUT:
-        logoutAndClearCookie();
-        toast({
-          title: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.title,
-          description: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.description,
-          variant: "default",
-        });
-        break;
-      case AUTH_API_ERRORS.LOGOUT_FAILED:
-        toast({
-          title: UI_TOAST_MESSAGES.LOGOUT_ERROR.title,
-          description: UI_TOAST_MESSAGES.LOGOUT_ERROR.description,
-          variant: "destructive",
-        });
-        break;
-      case AUTH_API_ERRORS.SERVER_ERROR:
-        toast({
-          title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
-          description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
-          variant: "destructive",
-        });
-        break;
-      default:
-        toast({
-          title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
-          description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
-          variant: "destructive",
-        });
-    }
-  };
+        default:
+          setFilesData(data as FileStats[]);
+          setIsSearchingFiles(false);
+          return data;
+      }
+    },
+    [toast]
+  );
 
-  const handleFilesResponseMessages = ({
-    message,
-    data,
-  }: ApiResponse<FileStats | RawFile>) => {
-    switch (message) {
-      case FILES_API_MESSAGES.FILE_UPLOADED:
-        setFilesData(data as FileStats[]);
-        setIsSearchingFiles(false);
-        toast({
-          title: UI_TOAST_MESSAGES.FILE_UPLOADED.title,
-          description: UI_TOAST_MESSAGES.FILE_UPLOADED.description(
-            data?.length || 0
-          ),
-          variant: "default",
-        });
-        break;
-      case FILES_API_ERRORS.UNAUTHORIZED:
-      case FILES_API_ERRORS.TOKEN_MISSING_ACCESS_DENIED:
-        setIsSearchingFiles(false);
-        setModalMsg(UI_ERROR_MESSAGES[message]);
-        setOpenAuthModal(true);
-        return;
+  const onDataChange = useCallback(
+    (data: FileStats[], message: string) => {
+      handleFilesResponseMessages({ message, data });
+      setFilesData(data);
+    },
+    [handleFilesResponseMessages]
+  );
 
-      case FILES_API_ERRORS.SERVER_ERROR:
-      case FILES_API_ERRORS.INVALID_FILE:
-      case FILES_API_ERRORS.NO_FILE_TO_UPLOAD:
-      case FILES_API_ERRORS.NOT_FOUND:
-      case FILES_API_ERRORS.GENERIC_ERROR:
-      case FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED:
-      case FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED:
-      case FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM:
-        setIsSearchingFiles(false);
-        setModalMsg(UI_ERROR_MESSAGES[message]);
-        setFilesApiError(true);
-        setFilesData([]);
-        return;
+  const onSubmitFileForm = useCallback(
+    async (data: z.infer<typeof uploadFileFormSchema>) => {
+      setIsSearchingFiles(true);
+      setIsFilesApiError(false);
+      setErrorFiles([]);
 
-      case FILES_API_ERRORS.INVALID_DATA:
-        setIsSearchingFiles(false);
-        setModalMsg(UI_ERROR_MESSAGES[message]);
-        setFilesApiError(true);
-        setErrorFiles(data as RawFile[]);
-        setFilesData([]);
-        return;
+      const formData = new FormData();
+      formData.append("file", data.file);
+      const [fileRawName] = data.file.name.split(".csv");
+      const defaultFileName = `${fileRawName}.download`;
+      setFileName(defaultFileName);
 
-      case FILES_API_ERRORS.NO_FILES_TO_END:
-        setModalMsg(UI_ERROR_MESSAGES[message]);
-        setFilesApiError(true);
-        return;
+      const response = (await filesApi.uploadFile(formData)) as ApiResponse<
+        FileStats | RawFile
+      >;
+      handleFilesResponseMessages(response);
+      formData.delete("file");
+    },
+    [handleFilesResponseMessages]
+  );
 
-      default:
-        setFilesData(data as FileStats[]);
-        setIsSearchingFiles(false);
-        return data;
-    }
-  };
+  const onEndFilesClick = useCallback(
+    (apiResponseData: ApiResponse<FileStats>) => {
+      console.log("🚀 ~ onEndFilesClick ~ apiResponseData:", apiResponseData);
+      const data = handleFilesResponseMessages(apiResponseData);
 
-  const onSubmitFileForm = async (
-    data: z.infer<typeof uploadFileFormSchema>
-  ) => {
-    setIsSearchingFiles(true);
-    setFilesApiError(false);
-    setErrorFiles([]);
+      const newState = filesData.map((currentFile) => {
+        if (!data) return currentFile;
+        const updatedFile = data.find((file) => file.num === currentFile.num);
+        return updatedFile ? updatedFile : currentFile;
+      }) as FileStats[];
 
-    const formData = new FormData();
-    formData.append("file", data.file);
+      setFilesData(newState);
+    },
+    [filesData, handleFilesResponseMessages]
+  );
 
-    const [fileRawName] = data.file.name.split(".csv");
+  const handleAuthResponseMessages = useCallback(
+    ({ message, data }: ApiResponse<UserSession>) => {
+      const userData: UserSession | null = data?.[0] ?? null;
+      switch (message) {
+        case AUTH_API_MESSAGES.USER_CREDENTIALS_UPDATED:
+          toggleAuthModal();
+          toast({
+            title: UI_TOAST_MESSAGES.CREDENTIALS_UPDATED_SUCCESS.title,
+            description:
+              UI_TOAST_MESSAGES.CREDENTIALS_UPDATED_SUCCESS.description,
+            variant: "success",
+          });
+          return userData;
+        case AUTH_API_MESSAGES.USER_LOGGED_IN:
+        case AUTH_API_MESSAGES.USER_REGISTERED:
+          toggleAuthModal();
+          toast({
+            title: UI_TOAST_MESSAGES.LOGIN_SUCCESS.title,
+            description: UI_TOAST_MESSAGES.LOGIN_SUCCESS.description,
+            variant: "success",
+          });
+          return userData;
+        case AUTH_API_ERRORS.INVALID_CREDENTIALS:
+          setIsAuthApiError(true);
+          return null;
+        case AUTH_API_ERRORS.GENERIC_ERROR:
+          toggleAuthModal();
+          toast({
+            title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
+            description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
+            variant: "destructive",
+          });
+          return null;
+        case AUTH_API_MESSAGES.USER_LOGGED_OUT:
+          logoutAndClearCookie();
+          toast({
+            title: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.title,
+            description: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.description,
+            variant: "default",
+          });
+          break;
+        case AUTH_API_ERRORS.LOGOUT_FAILED:
+          toast({
+            title: UI_TOAST_MESSAGES.LOGOUT_ERROR.title,
+            description: UI_TOAST_MESSAGES.LOGOUT_ERROR.description,
+            variant: "destructive",
+          });
+          break;
+        case AUTH_API_ERRORS.RESOURCE_NOT_FOUND:
+          setIsAuthApiError(true);
+          return null;
+        case AUTH_API_ERRORS.SERVER_ERROR:
+          toggleAuthModal();
+          toast({
+            title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
+            description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
+            variant: "destructive",
+          });
+          break;
+        default:
+          toggleAuthModal();
+          toast({
+            title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
+            description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
+            variant: "destructive",
+          });
+          return null;
+      }
+    },
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    []
+  );
 
-    const defaultFileName = `${fileRawName}.download`;
+  const handleLogin = useCallback(
+    async (data: FormDataSubmit) => {
+      const apiResponse = await authApi.register(data);
+      const userData = handleAuthResponseMessages(apiResponse);
+      if (!userData) return;
+      const { userId, user, pass } = userData;
+      handleActiveUser({
+        userId: userId,
+        username: user,
+        password: pass,
+      });
+    },
+    [handleActiveUser, handleAuthResponseMessages]
+  );
 
-    setFileName(defaultFileName);
-
-    const response = (await filesApi.uploadFile(formData)) as ApiResponse<
-      FileStats | RawFile
-    >;
-
-    handleFilesResponseMessages(response);
-    formData.delete("file");
-  };
-
-  const onEndFilesClick = (apiResponseData: ApiResponse<FileStats>) => {
-    const data = handleFilesResponseMessages(apiResponseData);
-
-    const newState = filesData.map((currentFile) => {
-      if (!data) return currentFile;
-      const updatedFile = data.find((file) => file.num === currentFile.num);
-      return updatedFile ? updatedFile : currentFile;
-    }) as FileStats[];
-
-    setFilesData(newState);
-  };
-
-  const handleLogout = (apiResponse: ApiResponse<UserSession>) => {
+  const handleLogout = useCallback(async () => {
+    const apiResponse = await authApi.logout();
     handleAuthResponseMessages(apiResponse);
-  };
+  }, [handleAuthResponseMessages]);
 
-  const handleChangeCredentials = (apiResponse: ApiResponse<UserSession>) => {
-    // handleAuthResponseMessages(apiResponse);
-    console.log("🚀 ~ handleChangeCredentials ~ apiResponse:", apiResponse);
-  };
+  const handleUpdateCredentials = useCallback(
+    async (data: FormDataSubmit) => {
+      // Rename just for clarity
+      const { user: newUser, pass: newPass } = data;
+      const apiResponse = await authApi.updateCredentials(activeUser.userId, {
+        user: newUser,
+        pass: newPass,
+      });
+      const userData = handleAuthResponseMessages(apiResponse);
+      if (!userData) return;
+
+      const { userId, user, pass } = userData;
+      handleActiveUser({
+        userId,
+        username: user,
+        password: pass,
+      });
+    },
+    [activeUser, handleAuthResponseMessages, handleActiveUser]
+  );
+
+  const toggleAuthModal = useCallback(
+    (flag?: string) => {
+      if (flag === "UPDATE_CREDENTIALS") {
+        setSubmitHandler(() => handleUpdateCredentials);
+        setAuthModalTitle(UI_MODAL_MESSAGES.UPDATE_CREDENTIALS.dialogTitle);
+        setAuthModalActionButton(
+          UI_MODAL_MESSAGES.UPDATE_CREDENTIALS.actionButton
+        );
+      } else if (flag === "LOGIN") {
+        setSubmitHandler(() => handleLogin);
+        setAuthModalTitle(UI_MODAL_MESSAGES.LOGIN.dialogTitle);
+        setAuthModalActionButton(UI_MODAL_MESSAGES.LOGIN.actionButton);
+      }
+      setIsAuthApiError(false);
+      setOpenAuthModal((auth) => !auth);
+    },
+    [handleLogin, handleUpdateCredentials]
+  );
 
   return (
     <>
@@ -279,8 +372,8 @@ export default function App() {
           {activeUser.username.length > 0 && (
             <Account
               activeUser={activeUser}
+              toggleAuthModal={toggleAuthModal}
               handleLogout={handleLogout}
-              handleChangeCredentials={handleChangeCredentials}
             />
           )}
           <CardTitle className="text-3xl mb-6">{CARD_TEXTS.title}</CardTitle>
@@ -315,7 +408,7 @@ export default function App() {
                         id="file"
                         placeholder="expedientes.csv"
                         onChange={(e) => {
-                          setFilesApiError(false);
+                          setIsFilesApiError(false);
                           field.onChange(e.target.files?.[0]);
                         }}
                         onBlur={field.onBlur}
@@ -355,14 +448,17 @@ export default function App() {
       </Card>
       <Modals
         modalMsg={modalMsg}
-        isError={isFilesApiError}
+        authModalTitle={authModalTitle}
+        authModalActionButton={authModalActionButton}
+        filesError={isFilesApiError}
+        authError={isAuthApiError}
         errorFiles={errorFiles}
-        toggleErrorModal={toggleErrorModal}
         openAuthModal={openAuthModal}
-        openLoginModal={openLoginModal}
+        isOpenAuthErrorModal={isOpenAuthErrorModal}
+        toggleAuthErrorModal={toggleAuthErrorModal}
+        toggleErrorModal={toggleFilesApiErrorModal}
         toggleAuthModal={toggleAuthModal}
-        toggleLoginModal={toggleLoginModal}
-        handleLogin={handleLogin}
+        handleSubmit={submitHandler}
       />
       <Toaster />
       {isSerchingFiles && <TableSkeleton />}

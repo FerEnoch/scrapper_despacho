@@ -13,7 +13,7 @@ interface AuthModalErrorProps {
   actionButton: string;
   isOpen: boolean;
   toggleAlertDialog: () => void;
-  toggleLoginModal: () => void;
+  toggleAuthModal: (flag?: string) => void;
 }
 export function AuthModalError({
   dialogTitle,
@@ -21,7 +21,7 @@ export function AuthModalError({
   actionButton,
   isOpen,
   toggleAlertDialog,
-  toggleLoginModal,
+  toggleAuthModal,
 }: AuthModalErrorProps) {
   return (
     <ModalDialog isOpen={isOpen}>
@@ -51,7 +51,7 @@ export function AuthModalError({
         <AlertDialogAction
           onClick={() => {
             toggleAlertDialog();
-            toggleLoginModal();
+            toggleAuthModal("LOGIN");
           }}
         >
           {actionButton}

@@ -1,11 +1,4 @@
-import { authApi } from "@/api/authApi";
-import { Badge } from "@/components/ui/badge";
-import {
-  ActiveUser,
-  ApiResponse,
-  NewUserCredentials,
-  UserSession,
-} from "@/types";
+import { ActiveUser } from "@/types";
 import { CircleUser } from "lucide-react";
 import {
   DropdownMenu,
@@ -15,92 +8,73 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { lazy, useState } from "react";
-
-const AuthModal = lazy(() =>
-  import("../modals/AuthModal").then((module) => ({
-    default: module.AuthModal,
-  }))
-);
+import { Button } from "../ui/button";
+import { useControlDropdown } from "@/utils/hooks/use-control-dropdown";
 
 interface AccountInterface {
   activeUser: ActiveUser;
-  handleLogout: (apiResponse: ApiResponse<UserSession>) => void;
-  handleChangeCredentials: (apiResponse: ApiResponse<UserSession>) => void;
+  toggleAuthModal: (flag?: string) => void;
+  handleLogout: () => Promise<void>;
 }
 
 export function Account({
   activeUser,
+  toggleAuthModal,
   handleLogout,
-  handleChangeCredentials,
 }: AccountInterface) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const logOut = async () => {
-    const apiResponse = await authApi.logout();
-    handleLogout(apiResponse);
-  };
-
-  const toggleAlertDialog = () => {
-    setIsOpen((open) => !open);
-  };
-
-  const changeCredentials = async (
-    userData: UserSession | NewUserCredentials = {
-      newUser: "",
-      newPass: "",
-    }
-  ) => {
-    if (!("newUser" in userData && "newPass" in userData)) return;
-
-    const { newUser, newPass } = userData;
-    const apiResponse = await authApi.changeCredentials(activeUser.userId, {
-      user: newUser,
-      pass: newPass,
-    });
-    handleChangeCredentials(apiResponse);
-  };
+  const { isOpen, toggleDropdown } = useControlDropdown();
 
   return (
-    <div className="absolute right-8 top-8 space-y-4 flex flex-col justify-center items-center">
-      <AuthModal
-        dialogTitle="Cambiar credenciales SIEM"
-        actionButton="Actualizar"
-        isOpen={isOpen}
-        toggleAlertDialog={toggleAlertDialog}
-        handleSubmit={changeCredentials}
-      />
-      <CircleUser
-        className="
-          h-10 w-10 rounded-full
-          bg-primary text-white
-          shadow-md
-          "
-      />
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Badge className="py-2 px-4" variant="outline">
-            {activeUser.username}
-          </Badge>
+    <div className="absolute right-8 top-8">
+      <DropdownMenu open={isOpen}>
+        <DropdownMenuTrigger asChild>
+          <div
+            className="flex flex-col justify-center items-center space-y-4"
+            role="button"
+          >
+            <CircleUser
+              onClick={toggleDropdown}
+              className="
+                h-10 w-10 rounded-full
+                bg-primary text-white
+                shadow-md
+            "
+            />
+            <Button
+              variant="outline"
+              className="w-full px-6"
+              onClick={toggleDropdown}
+            >
+              {activeUser.username}
+            </Button>
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuLabel>Mi cuenta</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
-            {"Usuario SIEM:"} {activeUser.username}
+            {"Usuario SIEM:"}
+            <strong>{activeUser.username}</strong>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            {"Contraseña SIEM:"} {activeUser.password}
+            {"Contraseña SIEM:"}
+            <strong>{activeUser.password}</strong>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="hover:cursor-pointer"
-            onClick={toggleAlertDialog}
+            className="hover:cursor-pointer focus:ring-0 focus:outline-none hover:outline-none hover:ring-0 w-full justify-start"
+            onClick={() => {
+              toggleDropdown();
+              toggleAuthModal("UPDATE_CREDENTIALS");
+            }}
           >
             {"Actualizar credenciales SIEM"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="hover:cursor-pointer" onClick={logOut}>
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="hover:cursor-pointer focus:ring-0 focus:outline-none hover:outline-none hover:ring-0 w-full justify-start"
+          >
             {"Cerrar sesión"}
           </DropdownMenuItem>
         </DropdownMenuContent>

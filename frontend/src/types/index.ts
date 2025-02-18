@@ -45,8 +45,3 @@ export type ActiveUser = {
   username: string;
   password: string;
 };
-
-export type NewUserCredentials = {
-  newUser: string;
-  newPass: string;
-};

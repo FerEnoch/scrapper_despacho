@@ -33,6 +33,10 @@ export const UI_MODAL_MESSAGES = {
     dialogTitle: "Usa tus credenciales de SIEM",
     actionButton: "Iniciar sesión",
   },
+  UPDATE_CREDENTIALS: {
+    dialogTitle: "Actualiza tus credenciales de SIEM",
+    actionButton: "Actualizar",
+  },
 } as const;
 
 export const UI_TOAST_MESSAGES = {

@@ -17,6 +17,7 @@ export const authApi = {
       });
 
       const responseData = (await response.json()) as ApiResponse<UserSession>;
+      console.log("🚀 ~ responseData:", responseData);
 
       if (response.ok) {
         return responseData;
@@ -47,6 +48,7 @@ export const authApi = {
       });
 
       const responseData = (await response.json()) as ApiResponse<UserSession>;
+      console.log("🚀 ~ responseData:", responseData);
 
       if (response.ok) {
         return responseData;
@@ -65,13 +67,13 @@ export const authApi = {
     }
   },
 
-  changeCredentials: async (
+  updateCredentials: async (
     userId: string,
     data: z.infer<typeof loginFormSchema>
   ) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/${userId}`, {
-        method: "PATH",
+      const response = await fetch(`${API_BASE_URL}/auth/user/${userId}`, {
+        method: "PATCH",
         credentials: "include",
         headers: {
           "content-type": "application/json",
@@ -80,6 +82,7 @@ export const authApi = {
       });
 
       const responseData = (await response.json()) as ApiResponse<UserSession>;
+      console.log("🚀 ~ responseData:", responseData);
 
       if (response.ok) {
         return responseData;
@@ -106,6 +109,7 @@ export const authApi = {
       });
 
       const responseData = (await response.json()) as ApiResponse<UserSession>;
+      console.log("🚀 ~ responseData:", responseData);
 
       if (response.ok) {
         return responseData;
