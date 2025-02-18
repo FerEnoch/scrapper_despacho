@@ -4,8 +4,9 @@ import fileUpload from "express-fileupload";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { NODE_ENV } from "../config";
+import { NODE_ENV, CORS_ORIGINS } from "../config";
 
+console.log("🚀 ~ useMiddlewares ~ [...CORS_ORIGINS]:", [...CORS_ORIGINS]);
 export function useMiddlewares(app: Application): Application {
   app.use(helmet());
   //   app.disable("x-powered-by"); // -> helmet takes care of this
@@ -20,11 +21,7 @@ export function useMiddlewares(app: Application): Application {
   app.use(cookieParser());
   app.use(
     cors({
-      origin: [
-        "https://h9nn1667-5173.brs.devtunnels.ms",
-        "https://h9nn1667-4173.brs.devtunnels.ms",
-        "http://localhost:5173",
-      ],
+      origin: [...CORS_ORIGINS],
       credentials: true,
       methods: "GET,HEAD,PATCH,POST",
     })

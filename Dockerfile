@@ -19,6 +19,8 @@ RUN npm install
 # Expose ports
 EXPOSE 3000
 
+VOLUME [ "/home/app/backend/db" ]
+
 # Build and start the app
 RUN npm run build:back
 

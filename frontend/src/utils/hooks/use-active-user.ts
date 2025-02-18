@@ -1,7 +1,7 @@
 import { ActiveUser } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 import { parseCookie } from "..";
-import { REMOTE_DEV_ENV } from "@/config";
+import { COOKIE_DOMAIN } from "@/config";
 
 export const useActiveUser = () => {
   const [cookieUserInfo, setCookieUserInfo] = useState<ActiveUser | null>(null);
@@ -29,9 +29,7 @@ export const useActiveUser = () => {
     const [accessTokenCookieName] = cookieKVString.split("=");
     const expiryDate = new Date(0).toUTCString();
 
-    const updatedCookie = `${accessTokenCookieName}=; expires=${expiryDate}; domain=${
-      REMOTE_DEV_ENV ? ".devtunnels.ms" : "localhost"
-    }; path=/`;
+    const updatedCookie = `${accessTokenCookieName}=; expires=${expiryDate}; domain=${COOKIE_DOMAIN}; path=/`;
 
     document.cookie = updatedCookie;
     setCookieUserInfo(null);

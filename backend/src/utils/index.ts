@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import converter from "convert-csv-to-json";
 import { Response } from "express";
-import { NODE_ENV, REMOTE_DEV_ENV } from "../config";
+import { NODE_ENV, COOKIE_DOMAIN } from "../config";
 
 export async function getFilesRawDataFromFile({
   folder,
@@ -29,10 +29,7 @@ export function setAccessTokenCookie(res: Response, accessToken: string) {
     secure: NODE_ENV === "production",
     httpOnly: false,
     sameSite: "lax",
-    /**
-     * ".devtunnels.ms" would be production domain too
-     */
-    domain: REMOTE_DEV_ENV ? ".devtunnels.ms" : "localhost",
+    domain: COOKIE_DOMAIN,
     // maxAge: 24 * 60 * 60 * 1000,
   });
 }

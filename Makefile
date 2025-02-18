@@ -1,11 +1,11 @@
 dev:
 	echo " 😞 ~ Dev enviroment not available"
 
-back-prod:
-	echo "\n\033[1;34m==============================\033[0m" && \
+start-prod:
+	echo "\n\033[1;34m====================================\033[0m" && \
     echo "\033[1;34m| \033[0m\033[1;32mStarting prod\033[0m \033[1;34m|\033[0m" && \
-    echo "\033[1;34m| \033[0m\033[1;32mFor real prod env don't forget to persist db in docker volume.\033[0m \033[1;34m|\033[0m" && \
-    echo "\033[1;34m==============================\033[0m\n" && \
+    echo "\033[1;34m| \033[0m\033[1;32mExposing only backend port - 3000\033[0m \033[1;34m|\033[0m" && \
+    echo "\033[1;34m====================================\033[0m\n" && \
 	NODE_ENV=production docker build -t scrapper-api . && \
 	docker run -d --rm --ipc=host \
 	--name scrapper-api \
