@@ -12,7 +12,7 @@ try {
 
 const {
   NODE_ENV = "development",
-  REMOTE_FLAG = "1",
+  REMOTE_FLAG = "0",
   LAST_PROD_VERSION = "1",
   PROD_PORT,
   DEV_PORT,
@@ -26,6 +26,9 @@ const {
   DEV_DOMAIN_LOCAL = "",
   DEV_PROD_DOMAIN_REMOTE_FRONTEND = "",
   PROD_DOMAIN_FRONTEND = "",
+  COOKIE_DOMAIN_DEV_LOCAL = "localhost",
+  COOKIE_DOMAIN_DEV_REMOTE = ".devtunnels.ms",
+  COOKIE_DOMAIN_PROD = "",
 } = process.env;
 
 const CURRENT_PROD_VERSION = Number(LAST_PROD_VERSION);
@@ -38,9 +41,9 @@ const API_PORT = NODE_ENV === "development" ? DEV_PORT : PROD_PORT;
 const COOKIE_DOMAIN =
   NODE_ENV === "development"
     ? Number(REMOTE_FLAG)
-      ? ".devtunnels.ms"
-      : "localhost"
-    : PROD_DOMAIN_FRONTEND;
+      ? COOKIE_DOMAIN_DEV_REMOTE
+      : COOKIE_DOMAIN_DEV_LOCAL
+    : COOKIE_DOMAIN_PROD;
 
 const SCRAPPER_TIMEOUT =
   NODE_ENV === "test"
