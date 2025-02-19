@@ -27,8 +27,4 @@ const COOKIE_DOMAIN =
       : "localhost"
     : VITE_PROD_HOSTING_URL;
 
-console.log("🚀 ~ NODE_ENV:", NODE_ENV);
-console.log("🚀 ~ API_BASE_URL:", API_BASE_URL);
-console.log("🚀 ~ COOKIE_DOMAIN:", COOKIE_DOMAIN);
-
 export { API_BASE_URL, SIEM_FILE_STATS_URL, COOKIE_DOMAIN };
