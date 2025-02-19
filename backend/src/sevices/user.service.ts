@@ -5,7 +5,8 @@ import { AuthModel } from "../models/auth.model";
 import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import { modelTypes } from "../types";
 import { IUserService } from "./types";
-import { TokenExpiredError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+const { TokenExpiredError } = jwt;
 
 export class UserService implements IUserService {
   databaseModel: modelTypes["IDatabaseModel"];

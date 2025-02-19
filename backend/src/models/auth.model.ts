@@ -1,4 +1,4 @@
-import jwt, { JwtPayload, Secret, TokenExpiredError } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import {
   JWT_ACCESS_EXPIRES_IN,
   JWT_REFRESH_EXPIRES_IN,
@@ -10,6 +10,7 @@ import { ERRORS } from "../errors/types";
 import { IAuthModel, UserAuthData } from "./types";
 import ms from "ms";
 import chalk from "chalk";
+const { TokenExpiredError } = jwt;
 
 export class AuthModel implements IAuthModel {
   private readonly JWT_SECRET: Secret;
