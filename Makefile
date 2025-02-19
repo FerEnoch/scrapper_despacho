@@ -1,13 +1,13 @@
 dev:
 	echo " 😞 ~ Dev enviroment not available"
 
-start-prod:
+start-prod: ## Starts the prod environment NOT detached mode
 	echo "\n\033[1;34m====================================\033[0m" && \
     echo "\033[1;34m| \033[0m\033[1;32mStarting prod\033[0m \033[1;34m|\033[0m" && \
     echo "\033[1;34m| \033[0m\033[1;32mExposing only backend port - 3000\033[0m \033[1;34m|\033[0m" && \
     echo "\033[1;34m====================================\033[0m\n" && \
 	NODE_ENV=production docker build -t scrapper-api . && \
-	docker run -d --rm --ipc=host \
+	docker run --rm --ipc=host \
 	--name scrapper-api \
 	--security-opt seccomp=seccomp_profile.json \
 	-p 3000:3000 \

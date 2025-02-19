@@ -11,7 +11,7 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "NODE_ENV=production node dist/server.js",
     "build": "NODE_ENV=production tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "nodemon",
     "back:test": "NODE_ENV=test vitest",

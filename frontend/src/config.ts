@@ -4,8 +4,9 @@ const {
   VITE_REMOTE_FLAG = 0,
   VITE_PROD_API_URL = "",
   VITE_PROD_HOSTING_URL = "",
-  NODE_ENV = "development",
 } = import.meta.env;
+
+const NODE_ENV = import.meta.env.PROD ? "production" : "development";
 
 const SIEM_BASE_URL = "https://siem.santafeciudad.gov.ar";
 const FILE_STATS_PATH = "/expediente_ver.php?id=";
@@ -25,5 +26,9 @@ const COOKIE_DOMAIN =
       ? ".devtunnels.ms"
       : "localhost"
     : VITE_PROD_HOSTING_URL;
+
+console.log("🚀 ~ NODE_ENV:", NODE_ENV);
+console.log("🚀 ~ API_BASE_URL:", API_BASE_URL);
+console.log("🚀 ~ COOKIE_DOMAIN:", COOKIE_DOMAIN);
 
 export { API_BASE_URL, SIEM_FILE_STATS_URL, COOKIE_DOMAIN };

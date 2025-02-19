@@ -31,9 +31,9 @@ const {
 const CURRENT_PROD_VERSION = Number(LAST_PROD_VERSION);
 
 const BCRYPT_SALT_ROUNDS =
-  NODE_ENV === "production" ? BCYPT_SALT_PROD : BCYPT_SALT_DEV;
+  NODE_ENV === "development" ? BCYPT_SALT_DEV : BCYPT_SALT_PROD;
 
-const API_PORT = NODE_ENV === "production" ? PROD_PORT : DEV_PORT;
+const API_PORT = NODE_ENV === "development" ? DEV_PORT : PROD_PORT;
 
 const COOKIE_DOMAIN =
   NODE_ENV === "development"

@@ -6,7 +6,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { NODE_ENV, CORS_ORIGINS } from "../config";
 
-console.log("🚀 ~ useMiddlewares ~ [...CORS_ORIGINS]:", [...CORS_ORIGINS]);
 export function useMiddlewares(app: Application): Application {
   app.use(helmet());
   //   app.disable("x-powered-by"); // -> helmet takes care of this
