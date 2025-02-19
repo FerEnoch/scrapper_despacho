@@ -1,9 +1,11 @@
+import chalk from "chalk";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { AuthModel } from "../models/auth.model";
 import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import { modelTypes } from "../types";
 import { IUserService } from "./types";
+import { TokenExpiredError } from "jsonwebtoken";
 
 export class UserService implements IUserService {
   databaseModel: modelTypes["IDatabaseModel"];
@@ -117,9 +119,9 @@ export class UserService implements IUserService {
     try {
       this.authModel.verifyJwt({ token: refreshToken });
     } catch (error: any) {
-      // Revalidate refresh token if invalid:
-      // If the refresh token is invalid, generate a new refresh token.
-      if (error.message === ERRORS.INVALID_TOKEN) {
+      console.log(chalk.red(error.message));
+      if (error instanceof TokenExpiredError) {
+        // If the refresh token is invalid, generate a new refresh token.
         const { refreshToken: freshRefreshToken } =
           this.authModel.generateRefreshToken(userId);
         await this.databaseModel.saveRefreshToken({

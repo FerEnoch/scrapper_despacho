@@ -1,4 +1,4 @@
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret, TokenExpiredError } from "jsonwebtoken";
 import {
   JWT_ACCESS_EXPIRES_IN,
   JWT_REFRESH_EXPIRES_IN,
@@ -9,6 +9,7 @@ import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { IAuthModel, UserAuthData } from "./types";
 import ms from "ms";
+import chalk from "chalk";
 
 export class AuthModel implements IAuthModel {
   private readonly JWT_SECRET: Secret;
@@ -32,6 +33,7 @@ export class AuthModel implements IAuthModel {
       });
       return { refreshToken: refresh };
     } catch (error: any) {
+      console.log(chalk.red(error.message));
       throw new ApiError({
         statusCode: 500,
         message: ERRORS.SERVER_ERROR,
@@ -49,6 +51,7 @@ export class AuthModel implements IAuthModel {
 
       return { accessToken: access };
     } catch (error: any) {
+      console.log(chalk.red(error.message));
       throw new ApiError({
         statusCode: 500,
         message: ERRORS.TOKEN_GENERATION_FAILED,
@@ -57,23 +60,16 @@ export class AuthModel implements IAuthModel {
   }
 
   verifyJwt({ token }: { token: string }) {
-    try {
-      const decoded = jwt.verify(token, this.JWT_SECRET);
+    const decoded = jwt.verify(token, this.JWT_SECRET);
 
-      if (!decoded) {
-        throw new ApiError({
-          statusCode: 400,
-          message: ERRORS.INVALID_TOKEN,
-        });
-      }
-
-      return decoded;
-    } catch (error: any) {
+    if (!decoded) {
       throw new ApiError({
-        statusCode: 500,
-        message: ERRORS.SERVER_ERROR,
+        statusCode: 400,
+        message: ERRORS.INVALID_TOKEN,
       });
     }
+
+    return decoded;
   }
 
   verifyJwtMiddleware(
@@ -87,6 +83,7 @@ export class AuthModel implements IAuthModel {
   ) {
     try {
       const accessToken: string = req.cookies.accessToken;
+      const { user, pass, userId } = req.body;
 
       if (!accessToken) {
         throw new ApiError({
@@ -95,28 +92,29 @@ export class AuthModel implements IAuthModel {
         });
       }
 
-      const decoded = jwt.verify(accessToken, this.JWT_SECRET);
-
-      if (!decoded) {
-        throw new ApiError({ statusCode: 401, message: ERRORS.INVALID_TOKEN });
+      let decoded;
+      try {
+        decoded = this.verifyJwt({ token: accessToken });
+      } catch (error: any) {
+        console.log(chalk.red(error.message));
+        if (error instanceof TokenExpiredError) {
+          const { accessToken } = this.generateAccessToken({
+            userId,
+            user,
+            pass,
+          });
+          decoded = this.verifyJwt({ token: accessToken });
+        }
       }
 
       req.auth = {
-        access: decoded,
+        access: decoded ?? {},
       };
 
       next();
     } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
+      console.log(chalk.red(error.message));
+      next(error);
     }
   }
 }

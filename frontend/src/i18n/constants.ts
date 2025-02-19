@@ -12,7 +12,7 @@ export const UI_ERROR_MESSAGES = {
   [FILES_API_ERRORS.NO_FILES_ENDED]: `No se encontraron expediente en curso para finalizar.`,
   [FILES_API_ERRORS.NO_FILE_STATS_RETRIEVED]: `No se encontraron datos de expedientes.`,
   [FILES_API_ERRORS.GENERIC_ERROR]: `Ocurrió un error. Por favor, intenta nuevamente.`,
-  [FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED]: `No se proporcionaron correctamente las credenciales de SIEM debido a un error. No puedes finalizar expedientes.`,
+  [FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED]: `Tu sesión ha expirado. Por favor vuelve a iniciar sesión`,
   [FILES_API_ERRORS.UNAUTHORIZED]: `Necesitas iniciar sesión para finalizar los expedientes.`,
   [FILES_API_ERRORS.TOKEN_MISSING_ACCESS_DENIED]: `Necesitas iniciar sesión para finalizar los expedientes.`,
   [FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM]: `No se pudo iniciar sesión en SIEM. Por favor revisa tus credenciales de usuario y vuelve a intentarlo.`,

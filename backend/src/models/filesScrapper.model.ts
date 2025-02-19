@@ -15,6 +15,7 @@ import {
 } from "../models/lib/filesScrapper/constants";
 import { ApiError } from "../errors/api-error";
 import { SCRAPPER_TIMEOUT } from "../config";
+import chalk from "chalk";
 
 export class FilesScrapperV1 implements IFileScrapperV1 {
   SIEM_BASE_URL = "";
@@ -107,6 +108,12 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
   async collectData({ file }: { file: FileId }): Promise<FileStats | null> {
     if (!this.context) {
       await this.createBrowserContext();
+      console.log(
+        chalk.cyanBright(
+          " ~ FilesScrapper ~ error:",
+          "context not created - try again"
+        )
+      );
       throw new ApiError({
         statusCode: 500,
         message: ERRORS.SERVER_ERROR,
@@ -166,6 +173,12 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
   }): Promise<{ message: string; detail: string }> {
     if (!this.context) {
       await this.createBrowserContext();
+      console.log(
+        chalk.cyanBright(
+          " ~ FilesScrapper ~ error:",
+          "context not created - try again"
+        )
+      );
       return { message: "", detail: "" };
     }
 
@@ -220,6 +233,12 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
   }): Promise<void | null> {
     if (!this.context) {
       await this.createBrowserContext();
+      console.log(
+        chalk.cyanBright(
+          " ~ FilesScrapper ~ error:",
+          "context not created - try again"
+        )
+      );
       throw new ApiError({
         statusCode: 500,
         message: ERRORS.SERVER_ERROR,

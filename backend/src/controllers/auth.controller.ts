@@ -6,8 +6,6 @@ import { UserService } from "../sevices/user.service";
 import { modelTypes } from "../types";
 import { MESSAGES } from "./constants";
 import { JwtPayload } from "jsonwebtoken";
-import { ApiError } from "../errors/api-error";
-import { ERRORS } from "../errors/types";
 import { setAccessTokenCookie } from "../utils";
 import { UserAuthData } from "../models/types";
 
@@ -59,16 +57,7 @@ export class AuthController implements IAuthController {
         data: [{ userId, user: authUser }],
       });
     } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
+      next(error);
     }
   }
 
@@ -96,16 +85,7 @@ export class AuthController implements IAuthController {
         data: [{ userId, user: authUser, pass }],
       });
     } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
+      next(error);
     }
   }
 
@@ -131,16 +111,7 @@ export class AuthController implements IAuthController {
         data: [{ userId, user, pass }],
       });
     } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
+      next(error);
     }
   }
 
@@ -167,16 +138,7 @@ export class AuthController implements IAuthController {
         data: [{ userId, user: newUser, pass: newPass }],
       });
     } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
+      next(error);
     }
   }
 

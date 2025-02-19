@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ERRORS } from "../errors/types";
 import { ApiError } from "../errors/api-error";
+import chalk from "chalk";
 
 function handle404Error(_req: Request, res: Response, _next: NextFunction) {
   res.status(404).json({ message: ERRORS.NOT_FOUND });
@@ -13,7 +14,6 @@ function handleGlobalError(
   _next: NextFunction
 ) {
   if (err instanceof ApiError) {
-    console.error("Encountered an unexpected error:", err.message);
     res.status(err.statusCode).json({
       message: err.message,
       data: err.data || null,
@@ -21,7 +21,10 @@ function handleGlobalError(
     return;
   }
 
-  console.error("Encountered an API unhandled error:", err);
+  console.error(
+    chalk.red.bold(" :::: Encountered an API unhandled error:"),
+    err
+  );
   res.status(500).json({ message: ERRORS.SERVER_ERROR });
 }
 

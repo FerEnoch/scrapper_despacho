@@ -11,6 +11,7 @@ import { UploadedFile } from "express-fileupload";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { JwtPayload } from "jsonwebtoken";
+import chalk from "chalk";
 
 export class FilesController implements IFilesController {
   service: IFilesService;
@@ -54,16 +55,13 @@ export class FilesController implements IFilesController {
         .status(200)
         .json({ message: MESSAGES.FILES_STATS_RETRIEVED, data: scrappedData });
     } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
+      console.log(
+        chalk.red(
+          "~ FilesController ~ getFilesStats ~ error.message:",
+          error.message
+        )
+      );
+      next(error);
     }
   }
 
@@ -97,16 +95,13 @@ export class FilesController implements IFilesController {
         data: scrappedData,
       });
     } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
+      console.log(
+        chalk.red(
+          "~ FilesController ~ uploadFile ~ error.message:",
+          error.message
+        )
+      );
+      next(error);
     }
   }
 
@@ -137,6 +132,7 @@ export class FilesController implements IFilesController {
         user: string;
         pass: string;
       };
+
       await this.service.populateUserCredentials({ user, pass });
 
       const endedFiles = await this.service.endFiles({ files });
@@ -150,16 +146,13 @@ export class FilesController implements IFilesController {
 
       res.status(200).json({ message: MESSAGES.FILES_ENDED, data: endedFiles });
     } catch (error: any) {
-      if (error instanceof ApiError) {
-        next(error);
-      } else {
-        next(
-          new ApiError({
-            statusCode: 500,
-            message: ERRORS.SERVER_ERROR,
-          })
-        );
-      }
+      console.log(
+        chalk.red(
+          " ~ FilesController ~ endFiles ~ error.message:",
+          error.message
+        )
+      );
+      next(error);
     }
   }
 }

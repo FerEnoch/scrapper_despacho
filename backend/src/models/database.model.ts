@@ -8,6 +8,7 @@ import { ERRORS } from "../errors/types";
 import { BCRYPT_SALT_ROUNDS, NODE_ENV } from "../config";
 import path from "node:path";
 import { cwd } from "node:process";
+import chalk from "chalk";
 
 export class DatabaseModel implements IDatabaseModel {
   database: Database.Database;
@@ -56,7 +57,9 @@ export class DatabaseModel implements IDatabaseModel {
 
     if (NODE_ENV !== "test") {
       console.log(
-        "🚀 ~ DatabaseModel ~ createTables ~ Tables created successfully"
+        chalk.whiteBright.bgGreen.bold(
+          " 🚀 ~ DatabaseModel ~ createTables ~ Tables created successfully "
+        )
       );
     }
   }
@@ -112,9 +115,10 @@ export class DatabaseModel implements IDatabaseModel {
         });
       }
     } catch (error: any) {
-      console.log("🚀 ~ saveRefreshToken ~ error:", error);
+      console.log(chalk.red(" ~ saveRefreshToken ~ error:", error.message));
+      if (error instanceof ApiError) throw error;
       throw new ApiError({
-        statusCode: 500,
+        statusCode: error.statusCode ?? 500,
         message:
           error?.message ?? error?.code ?? ERRORS.REFRESH_TOKEN_SAVE_FAILED,
         data: [{ userId }],
@@ -146,9 +150,10 @@ export class DatabaseModel implements IDatabaseModel {
 
       return { userId: id };
     } catch (error: any) {
-      console.log("🚀 ~ login ~ error:", error);
+      console.log(chalk.red(" ~ login ~ error:", error.message));
+      if (error instanceof ApiError) throw error;
       throw new ApiError({
-        statusCode: 500,
+        statusCode: error.statusCode ?? 500,
         message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
         data: [{ user }],
       });
@@ -163,7 +168,7 @@ export class DatabaseModel implements IDatabaseModel {
 
       if (!isValidPass) {
         throw new ApiError({
-          statusCode: 500,
+          statusCode: 400,
           message: ERRORS.INVALID_CREDENTIALS,
           data: [{ user }],
         });
@@ -187,9 +192,10 @@ export class DatabaseModel implements IDatabaseModel {
 
       return { userId: stmtResult.id };
     } catch (error: any) {
-      console.log("🚀 ~ login ~ error:", error);
+      console.log(chalk.red(" ~ login ~ error:", error.message));
+      if (error instanceof ApiError) throw error;
       throw new ApiError({
-        statusCode: 500,
+        statusCode: error.statusCode ?? 500,
         message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
         data: [{ user }],
       });
@@ -216,9 +222,10 @@ export class DatabaseModel implements IDatabaseModel {
 
       return stmtResult;
     } catch (error: any) {
-      console.log("🚀 ~ getPassByUser ~ error:", error);
+      console.log(chalk.red(" ~ getPassByUser ~ error:", error.message));
+      if (error instanceof ApiError) throw error;
       throw new ApiError({
-        statusCode: 500,
+        statusCode: error.statusCode ?? 500,
         message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
         data: [{ user }],
       });
@@ -248,9 +255,12 @@ export class DatabaseModel implements IDatabaseModel {
 
       return { userId };
     } catch (error: any) {
-      console.log("🚀 ~ updateUserCredentials ~ error:", error);
+      console.log(
+        chalk.red(" ~ updateUserCredentials ~ error:", error.message)
+      );
+      if (error instanceof ApiError) throw error;
       throw new ApiError({
-        statusCode: 500,
+        statusCode: error.statusCode ?? 500,
         message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
         data: [{ userId, user, pass }],
       });
