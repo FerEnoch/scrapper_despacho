@@ -28,14 +28,13 @@ const SIEM_PAGE_DATA = {
   },
 };
 
-const FILE_NUMBER_COLUMN_VALID_NAME = "Número";
-
 const VALIDATION_REGEX = {
   FILE_NUMBER_COLUMN: /^(\w{2}-)?\d{3,4}-\d{7,9}-\d+( \(\w{1,3}\))?$/,
 };
 
 /**
- * This messages are used to inform the user about the error that occurred
+ * This messages are used to inform the user in the dashboard about the error that occurred
+ * when trying to collect data or end a file
  */
 const COLLECTION_ERRORS = {
   DATA_MISSING: "Sin datos",
@@ -45,9 +44,4 @@ const COLLECTION_ERRORS = {
     "Ocurrió un error al intentar finalizar el archivo",
 };
 
-export {
-  COLLECTION_ERRORS,
-  SIEM_PAGE_DATA,
-  FILE_NUMBER_COLUMN_VALID_NAME,
-  VALIDATION_REGEX,
-};
+export { COLLECTION_ERRORS, SIEM_PAGE_DATA, VALIDATION_REGEX };

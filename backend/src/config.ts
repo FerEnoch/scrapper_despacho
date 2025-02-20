@@ -31,6 +31,8 @@ const {
   COOKIE_DOMAIN_PROD = "",
 } = process.env;
 
+const FILE_NUMBER_COLUMN_VALID_NAME = "Número";
+
 const CURRENT_PROD_VERSION = Number(LAST_PROD_VERSION);
 
 const BCRYPT_SALT_ROUNDS =
@@ -59,6 +61,7 @@ const CORS_ORIGINS = [
 ];
 
 export {
+  FILE_NUMBER_COLUMN_VALID_NAME,
   CURRENT_PROD_VERSION,
   NODE_ENV,
   COOKIE_DOMAIN,

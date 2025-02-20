@@ -16,15 +16,49 @@ import {
   COLLECTION_ERRORS,
   SIEM_PAGE_DATA,
 } from "../models/lib/filesScrapper/constants";
+import { FILE_NUMBER_COLUMN_VALID_NAME } from "../config";
 
 export class FilesController implements IFilesController {
   service: IFilesService;
 
   constructor({ model }: { model: modelTypes }) {
     this.service = new FilesService({ model });
-    // this.getFilesStats = this.getFilesStats.bind(this);
+    this.getFilesStats = this.getFilesStats.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.endFiles = this.endFiles.bind(this);
+  }
+
+  async getFilesStats(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const rawFile: RawFile = { [FILE_NUMBER_COLUMN_VALID_NAME]: id };
+      const { ok, parsedData } = await parseRawFiles([rawFile]);
+
+      if (!ok) {
+        throw new ApiError({
+          statusCode: 400,
+          message: ERRORS.INVALID_DATA,
+          data: parsedData as RawFile[],
+        });
+      }
+
+      const scrappedData = await this.service.searchFilesStats(
+        parsedData as FileId[]
+      );
+
+      res
+        .status(200)
+        .json({ message: MESSAGES.FILES_STATS_RETRIEVED, data: scrappedData });
+    } catch (error: any) {
+      console.log(
+        chalk.red(
+          "~ FilesController ~ getFilesStats ~ error.message:",
+          error.message
+        )
+      );
+      next(error);
+    }
   }
 
   async uploadFile(req: Request, res: Response, next: NextFunction) {

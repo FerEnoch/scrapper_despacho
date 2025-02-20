@@ -3,6 +3,7 @@ import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import Database from "better-sqlite3";
 import { Request, Response, NextFunction } from "express";
 import { JwtPayload } from "jsonwebtoken";
+import { FILE_NUMBER_COLUMN_VALID_NAME } from "../config";
 
 export type IFileScrapperV1 = {
   END_FILE_TEXT: string;
@@ -113,7 +114,7 @@ export type UpdatedUserData = {
 };
 
 export type RawFile = {
-  Número: string;
+  [FILE_NUMBER_COLUMN_VALID_NAME]: string;
   [key: string]: string | undefined; // Other properties are optional
 };
 
