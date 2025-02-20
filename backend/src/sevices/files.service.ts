@@ -66,10 +66,6 @@ export class FilesService implements IFilesService {
           scrappedData.push(file);
         });
       } else {
-        console.log(
-          " 🚀 ~ file: files.service.searchFilesStats ~ batchResult.error.message",
-          batchResult.error.message
-        );
         // throw new ApiError({
         //   statusCode: 400,
         //   message: ERRORS.NO_FILE_STATS_RETRIEVED,

@@ -124,8 +124,24 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
     const { num } = file;
 
     try {
-      await page.goto(`${this.SIEM_SEE_FILE_URL}${num}`);
+      const response = await page.goto(`${this.SIEM_SEE_FILE_URL}${num}`);
       await page.waitForLoadState();
+      if (
+        !response ||
+        response?.status() === 404 ||
+        response?.status() === 500
+      ) {
+        console.log(
+          chalk.yellow(`Error going to ${this.SIEM_SEE_FILE_URL}${num}`)
+        );
+        return {
+          index: file.index,
+          num: file.completeNum || COLLECTION_ERRORS.NO_DATA_COLLECTED,
+          title: COLLECTION_ERRORS.NO_DATA_COLLECTED,
+          prevStatus: COLLECTION_ERRORS.NO_DATA_COLLECTED,
+          location: COLLECTION_ERRORS.NO_DATA_COLLECTED,
+        };
+      }
 
       let rawTitle: string = COLLECTION_ERRORS.DATA_MISSING,
         rawStatus: string = COLLECTION_ERRORS.DATA_MISSING,
@@ -192,6 +208,7 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
               COLLECTION_ERRORS.DATA_MISSING,
       };
     } catch (error: any) {
+      console.log("🚀 ~ FilesScrapperV1 ~ collectData ~ error:", error);
       console.log(
         chalk.cyanBright(" ~ FilesScrapperV1 ~ error:", error.message)
       );

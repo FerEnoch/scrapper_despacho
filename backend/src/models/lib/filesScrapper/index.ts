@@ -11,49 +11,51 @@ function removeKVQuotes(file: RawFile) {
   }, {} as RawFile);
 }
 
-const validateRawDataBatch = (files: RawFile[], withLetters: boolean) => {
-  const validationRegex = withLetters
-    ? VALIDATION_REGEX.FILE_NUMBER_COLUMN
-    : VALIDATION_REGEX.FILE_NUMBER_COLUMN_NO_LETTERS;
+const validateRawDataBatch = (files: RawFile[]) => {
+  const validationRegex = VALIDATION_REGEX.FILE_NUMBER_COLUMN;
 
-  return files.every((file) => {
+  const hasCorrectColumn = files.filter(
+    (file) => FILE_NUMBER_COLUMN_VALID_NAME in file && file["Número"].length > 0
+  );
+
+  return hasCorrectColumn.every((file) => {
     const newFile = removeKVQuotes(file);
     const fileNum = newFile[FILE_NUMBER_COLUMN_VALID_NAME].trim();
     // Check if 'Número' property exists and matches the regex
-    return (
-      FILE_NUMBER_COLUMN_VALID_NAME in newFile && validationRegex.test(fileNum)
-    );
+    return validationRegex.test(fileNum);
   });
 };
 
-const getInvalidFiles = (files: RawFile[], withLetters: boolean) =>
-  files.filter((file) => !validateRawDataBatch([file], withLetters));
+const getInvalidFiles = (files: RawFile[]) =>
+  files.filter((file) => !validateRawDataBatch([file]));
 
 const rawFileParser = (files: RawFile[]): FileId[] => {
-  return files.map((file, index) => {
-    const newRawFile = removeKVQuotes(file);
-    const { Número: completeNum = "" } = newRawFile;
-    const [org = "", rep = "", num = "", digv = ""] = completeNum.split("-");
+  return files
+    .map((file, index) => {
+      const newRawFile = removeKVQuotes(file);
+      const { Número: completeNum = "" } = newRawFile;
+      const [org = "", rep = "", num = "", digv = ""] = completeNum.split("-");
 
-    return {
-      index,
-      completeNum: completeNum,
-      org,
-      rep,
-      num,
-      digv: digv.split("")[0],
-    };
-  });
+      if (!org || !rep || !num || !digv) return null as unknown as FileId;
+
+      return {
+        index,
+        completeNum: completeNum,
+        org,
+        rep,
+        num,
+        digv: digv.split("")[0],
+      };
+    })
+    .filter(Boolean);
 };
 
 export async function parseRawFiles(
-  files: RawFile[],
-  { withLetters = true }: { withLetters: boolean }
+  files: RawFile[]
 ): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
-
-  const batchIsValid = validateRawDataBatch(files, withLetters);
+  const batchIsValid = validateRawDataBatch(files);
   if (!batchIsValid) {
-    const invalidFiles = getInvalidFiles(files, withLetters);
+    const invalidFiles = getInvalidFiles(files);
     console.log("🚀 ~ invalidFiles:", invalidFiles);
     return Promise.resolve({
       ok: batchIsValid,

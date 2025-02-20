@@ -12,6 +12,10 @@ import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { JwtPayload } from "jsonwebtoken";
 import chalk from "chalk";
+import {
+  COLLECTION_ERRORS,
+  SIEM_PAGE_DATA,
+} from "../models/lib/filesScrapper/constants";
 
 export class FilesController implements IFilesController {
   service: IFilesService;
@@ -29,10 +33,7 @@ export class FilesController implements IFilesController {
       const data = file.data.toString("utf-8");
       const jsonData = (await convertData(data)) as RawFile[];
 
-      const { ok, parsedData } = await parseRawFiles(jsonData, {
-        withLetters: false, // admit files without letters to be lax in data entry
-      });
-
+      const { ok, parsedData } = await parseRawFiles(jsonData);
       if (!ok) {
         throw new ApiError({
           statusCode: 400,
@@ -67,7 +68,9 @@ export class FilesController implements IFilesController {
       const files = req.body as FileStats[];
       const filesToEnd = files?.filter(
         (file) =>
-          file.prevStatus !== "FINALIZADO" && file.prevStatus !== "Sin datos"
+          file.prevStatus !== SIEM_PAGE_DATA.ENDED_FILE_STATUS_TEXT &&
+          file.prevStatus !== COLLECTION_ERRORS.NO_DATA_COLLECTED &&
+          file.prevStatus !== COLLECTION_ERRORS.DATA_MISSING
       );
 
       if (filesToEnd?.length === 0) {
