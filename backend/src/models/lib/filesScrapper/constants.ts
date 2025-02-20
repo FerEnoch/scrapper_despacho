@@ -31,8 +31,8 @@ const SIEM_PAGE_DATA = {
 const FILE_NUMBER_COLUMN_VALID_NAME = "Número";
 
 const VALIDATION_REGEX = {
-  FILE_NUMBER_COLUMN: /^\w{2}-\d{4}-\d{7,9}-\d+ \(\w{1,2}\)$/,
-  FILE_NUMBER_COLUMN_NO_LETTERS: /^\w{2}-\d{4}-\d{7,9}-\d+$/,
+  FILE_NUMBER_COLUMN: /^(\w{2}-)?\d{3,4}-\d{7,9}-\d+( \(\w{1,3}\))?$/,
+  FILE_NUMBER_COLUMN_NO_LETTERS: /^(\w{2}-)?\d{3,4}-\d{7,9}-\d+$/,
 };
 
 /**

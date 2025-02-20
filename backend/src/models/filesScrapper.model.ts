@@ -6,6 +6,7 @@ import {
   BrowserContext,
   Browser,
   errors as PwErrors,
+  Locator,
 } from "playwright";
 import { FileId, FileStats, IFileScrapperV1, locationType } from "./types";
 import { ERRORS } from "../errors/types";
@@ -110,7 +111,7 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
       await this.createBrowserContext();
       console.log(
         chalk.cyanBright(
-          " ~ FilesScrapper ~ error:",
+          " ~ FilesScrapperV1 ~ error:",
           "context not created - try again"
         )
       );
@@ -126,42 +127,80 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
       await page.goto(`${this.SIEM_SEE_FILE_URL}${num}`);
       await page.waitForLoadState();
 
-      let titleRow = await page.locator(this.SIEM_LOCATE_FILE_TITLE.element, {
-        hasText: this.SIEM_LOCATE_FILE_TITLE.text,
-      });
-      let statusRow = await page.locator(this.SIEM_LOCATE_FILE_STATUS.element, {
-        hasText: this.SIEM_LOCATE_FILE_STATUS.text,
-      });
-      let locationRow = await page.locator(
-        this.SIEM_LOCATE_FILE_LOCATION.element,
-        {
-          hasText: this.SIEM_LOCATE_FILE_LOCATION.text,
-        }
-      );
+      let rawTitle: string = COLLECTION_ERRORS.DATA_MISSING,
+        rawStatus: string = COLLECTION_ERRORS.DATA_MISSING,
+        rawLocation: string = COLLECTION_ERRORS.DATA_MISSING,
+        titleRow: Locator | null = null,
+        statusRow: Locator | null = null,
+        locationRow: Locator | null = null;
 
-      const rawTitle = await titleRow?.textContent();
-      const rawStatus = await statusRow?.textContent();
-      const rawLocation = await locationRow?.textContent();
+      try {
+        titleRow = await page.locator(this.SIEM_LOCATE_FILE_TITLE.element, {
+          hasText: this.SIEM_LOCATE_FILE_TITLE.text,
+        });
+        rawTitle =
+          (await titleRow?.textContent()) || COLLECTION_ERRORS.DATA_MISSING;
+      } catch (error: any) {
+        if (error instanceof PwErrors.TimeoutError) {
+          rawTitle = COLLECTION_ERRORS.DATA_MISSING;
+        }
+      }
+
+      try {
+        statusRow = await page.locator(this.SIEM_LOCATE_FILE_STATUS.element, {
+          hasText: this.SIEM_LOCATE_FILE_STATUS.text,
+        });
+        rawStatus =
+          (await statusRow?.textContent()) || COLLECTION_ERRORS.DATA_MISSING;
+      } catch (error: any) {
+        if (error instanceof PwErrors.TimeoutError) {
+          rawStatus = COLLECTION_ERRORS.DATA_MISSING;
+        }
+      }
+
+      try {
+        locationRow = await page.locator(
+          this.SIEM_LOCATE_FILE_LOCATION.element,
+          {
+            hasText: this.SIEM_LOCATE_FILE_LOCATION.text,
+          }
+        );
+        rawLocation =
+          (await locationRow?.textContent()) || COLLECTION_ERRORS.DATA_MISSING;
+      } catch (error: any) {
+        if (error instanceof PwErrors.TimeoutError) {
+          rawLocation = COLLECTION_ERRORS.DATA_MISSING;
+        }
+      }
 
       return {
         index: file.index,
         num: file.completeNum || COLLECTION_ERRORS.DATA_MISSING,
-        title: rawTitle?.slice(12).trim() || COLLECTION_ERRORS.DATA_MISSING,
+        title:
+          rawTitle === COLLECTION_ERRORS.DATA_MISSING
+            ? COLLECTION_ERRORS.DATA_MISSING
+            : rawTitle.slice(12).trim() || COLLECTION_ERRORS.DATA_MISSING,
         prevStatus:
-          rawStatus?.slice(18).replace("\n", "").replace("\t", "").trim() ||
-          COLLECTION_ERRORS.DATA_MISSING,
+          rawStatus === COLLECTION_ERRORS.DATA_MISSING
+            ? COLLECTION_ERRORS.DATA_MISSING
+            : rawStatus.slice(18).replace("\n", "").replace("\t", "").trim() ||
+              COLLECTION_ERRORS.DATA_MISSING,
         location:
-          rawLocation?.slice(15).replace("\n", "").trim() ||
-          COLLECTION_ERRORS.DATA_MISSING,
+          rawLocation === COLLECTION_ERRORS.DATA_MISSING
+            ? COLLECTION_ERRORS.DATA_MISSING
+            : rawLocation.slice(15).replace("\n", "").trim() ||
+              COLLECTION_ERRORS.DATA_MISSING,
       };
-    } catch (error) {
-      console.log("🚀 ~ FilesScrapper ~ error:", error);
+    } catch (error: any) {
+      console.log(
+        chalk.cyanBright(" ~ FilesScrapperV1 ~ error:", error.message)
+      );
       return {
         index: file.index,
         num: file.completeNum || COLLECTION_ERRORS.NO_DATA_COLLECTED,
-        title: "",
-        prevStatus: "",
-        location: "",
+        title: COLLECTION_ERRORS.NO_DATA_COLLECTED,
+        prevStatus: COLLECTION_ERRORS.NO_DATA_COLLECTED,
+        location: COLLECTION_ERRORS.NO_DATA_COLLECTED,
       };
     }
   }
@@ -175,7 +214,7 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
       await this.createBrowserContext();
       console.log(
         chalk.cyanBright(
-          " ~ FilesScrapper ~ error:",
+          " ~ FilesScrapperV1 ~ error:",
           "context not created - try again"
         )
       );
@@ -210,11 +249,8 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
         (await page.locator("h3").textContent()) ??
         COLLECTION_ERRORS.DATA_MISSING;
 
-      // page.close();
-
       return { message, detail };
-    } catch (error) {
-      console.log("🚀 ~ test ~ error:", error);
+    } catch (error: any) {
       return {
         message: COLLECTION_ERRORS.COULD_NOT_END_FILE_MESSAGE,
         detail: COLLECTION_ERRORS.COULD_NOT_END_FILE_DETAIL,
@@ -235,7 +271,7 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
       await this.createBrowserContext();
       console.log(
         chalk.cyanBright(
-          " ~ FilesScrapper ~ error:",
+          " ~ FilesScrapperV1 ~ error:",
           "context not created - try again"
         )
       );
@@ -259,8 +295,10 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
       await responsePromise;
 
       await this.checkSiemLogin({ page, user });
-    } catch (error) {
-      console.log("🚀 ~ FilesScrapper ~ error:", error);
+    } catch (error: any) {
+      console.log(
+        chalk.cyanBright(" ~ FilesScrapperV1 ~ error:", error.message)
+      );
       if (error instanceof ApiError) {
         throw error;
       }

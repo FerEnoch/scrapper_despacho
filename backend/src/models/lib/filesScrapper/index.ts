@@ -2,7 +2,7 @@ import { FILE_NUMBER_COLUMN_VALID_NAME, VALIDATION_REGEX } from "./constants";
 import { FileId, FileStats, RawFile } from "../../types";
 
 function removeKVQuotes(file: RawFile) {
-  const removeQuotesByRegex = (str: string) => str.replace(/['"]+/g, "");
+  const removeQuotesByRegex = (str: string) => str.trim().replace(/['"]+/g, "");
   return Object.entries(file).reduce((acc, [key, value = ""]) => {
     const newKey = removeQuotesByRegex(key);
     const newValue = removeQuotesByRegex(value);
@@ -18,10 +18,10 @@ const validateRawDataBatch = (files: RawFile[], withLetters: boolean) => {
 
   return files.every((file) => {
     const newFile = removeKVQuotes(file);
+    const fileNum = newFile[FILE_NUMBER_COLUMN_VALID_NAME].trim();
     // Check if 'Número' property exists and matches the regex
     return (
-      FILE_NUMBER_COLUMN_VALID_NAME in newFile &&
-      validationRegex.test(newFile[FILE_NUMBER_COLUMN_VALID_NAME].trim())
+      FILE_NUMBER_COLUMN_VALID_NAME in newFile && validationRegex.test(fileNum)
     );
   });
 };
@@ -50,15 +50,11 @@ export async function parseRawFiles(
   files: RawFile[],
   { withLetters = true }: { withLetters: boolean }
 ): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
-  /**
-   * TODO:
-   *  1. let pass letters absence error, but not number errors
-   *  2. accept code with 3 numbers (i.e. 963), and no letters
-   * */
 
   const batchIsValid = validateRawDataBatch(files, withLetters);
   if (!batchIsValid) {
     const invalidFiles = getInvalidFiles(files, withLetters);
+    console.log("🚀 ~ invalidFiles:", invalidFiles);
     return Promise.resolve({
       ok: batchIsValid,
       parsedData: rawFileParser(invalidFiles),
