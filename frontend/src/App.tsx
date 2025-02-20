@@ -84,6 +84,9 @@ export default function App() {
   const [submitHandler, setSubmitHandler] = useState<
     (data: FormDataSubmit) => Promise<void>
   >(() => Promise.resolve());
+  const [errorFilesActionHandler, setErrorFilesActionHandler] = useState<
+    (flag?: string) => void
+  >(() => {});
   /** custom hooks */
   const { toast } = useToast();
   const { activeUser, handleActiveUser, logoutAndClearCookie } =
@@ -153,18 +156,21 @@ export default function App() {
         case FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM:
           setIsSearchingFiles(false);
           setModalMsg(UI_ERROR_MESSAGES[message]);
+          setErrorFilesActionHandler(toggleFilesApiErrorModal);
           setIsFilesApiError(true);
           setFilesData([]);
           return;
         case FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED:
           setIsSearchingFiles(false);
           setModalMsg(UI_ERROR_MESSAGES[message]);
+          setErrorFilesActionHandler(toggleAuthModal);
           setIsFilesApiError(true);
           handleLogout();
           return;
         case FILES_API_ERRORS.INVALID_DATA:
           setIsSearchingFiles(false);
           setModalMsg(UI_ERROR_MESSAGES[message]);
+          setErrorFilesActionHandler(toggleFilesApiErrorModal);
           setIsFilesApiError(true);
           setErrorFiles(data as RawFile[]);
           setFilesData([]);
@@ -172,6 +178,7 @@ export default function App() {
 
         case FILES_API_ERRORS.NO_FILES_TO_END:
           setModalMsg(UI_ERROR_MESSAGES[message]);
+          setErrorFilesActionHandler(toggleFilesApiErrorModal);
           setIsFilesApiError(true);
           return;
 
@@ -461,7 +468,7 @@ export default function App() {
         openAuthModal={openAuthModal}
         isOpenAuthErrorModal={isOpenAuthErrorModal}
         toggleAuthErrorModal={toggleAuthErrorModal}
-        toggleErrorModal={toggleFilesApiErrorModal}
+        errorFilesActionHandler={errorFilesActionHandler}
         toggleAuthModal={toggleAuthModal}
         handleSubmit={submitHandler}
       />

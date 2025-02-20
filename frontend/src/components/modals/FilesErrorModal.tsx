@@ -16,7 +16,7 @@ interface FilesErrorModalProps {
   dialogDescription: string;
   actionButton: string;
   isOpen: boolean;
-  toggleAlertDialog: () => void;
+  errorFilesActionHandler: (flag?: string) => void;
 }
 
 export function FilesErrorModal({
@@ -25,7 +25,7 @@ export function FilesErrorModal({
   dialogDescription,
   actionButton,
   isOpen,
-  toggleAlertDialog,
+  errorFilesActionHandler,
 }: FilesErrorModalProps) {
   return (
     <ModalDialog isOpen={isOpen}>
@@ -80,7 +80,7 @@ export function FilesErrorModal({
       </AlertDialogHeader>
 
       <AlertDialogFooter className="mt-4">
-        <AlertDialogAction onClick={() => toggleAlertDialog()}>
+        <AlertDialogAction onClick={() => errorFilesActionHandler()}>
           {actionButton}
         </AlertDialogAction>
       </AlertDialogFooter>

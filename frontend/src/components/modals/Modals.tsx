@@ -15,7 +15,7 @@ interface ModalsProps {
   authError: boolean;
   isOpenAuthErrorModal: boolean;
   toggleAuthErrorModal: () => void;
-  toggleErrorModal: () => void;
+  errorFilesActionHandler: (flag?: string) => void
   toggleAuthModal: (flag?: string) => void;
   handleSubmit: (userData: FormDataSubmit) => Promise<void>;
 }
@@ -30,7 +30,7 @@ export function Modals({
   authError,
   isOpenAuthErrorModal,
   toggleAuthErrorModal,
-  toggleErrorModal,
+  errorFilesActionHandler,
   toggleAuthModal,
   handleSubmit,
 }: ModalsProps) {
@@ -42,7 +42,7 @@ export function Modals({
         dialogDescription={modalMsg}
         errorFiles={errorFiles}
         isOpen={filesError}
-        toggleAlertDialog={toggleErrorModal}
+        errorFilesActionHandler={errorFilesActionHandler}
       />
       <AuthModalError
         dialogTitle={UI_MODAL_MESSAGES.ERROR_MODAL.AUTH_ERROR.dialogTitle}
