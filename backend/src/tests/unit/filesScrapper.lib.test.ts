@@ -15,15 +15,13 @@ import { getJsonSampleDataFile } from "../json-imports.js";
 describe("LIB-FUNCTIONS > filesScrapper", () => {
   it("should return a list of files stats", async () => {
     const jsonDataFiles = await getJsonSampleDataFile("jsonDataFiles.json");
-    const { ok, parsedData } = await parseRawFiles(JSON.parse(jsonDataFiles), {
-      withLetters: true,
-    });
+    const { ok, parsedData } = await parseRawFiles(JSON.parse(jsonDataFiles));
     expect(ok).toEqual(true);
     expect(parsedData).toEqual(parsedFilesIds);
   });
 
   it("should not throw if empty list of files", async () => {
-    const { ok, parsedData } = await parseRawFiles([], { withLetters: true });
+    const { ok, parsedData } = await parseRawFiles([]);
     expect(ok).toEqual(true);
     expect(parsedData).toEqual([]);
   });
