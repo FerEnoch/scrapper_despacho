@@ -17,14 +17,17 @@ export function useMiddlewares(app: Application): Application {
     })
   );
 
-  app.use(cookieParser());
   app.use(
     cors({
       origin: [...CORS_ORIGINS],
       credentials: true,
-      methods: "GET,HEAD,PATCH,POST",
+      // methods: "GET,HEAD,PATCH,POST",
     })
   );
+  app.set("trust proxy", 1);
+
+  app.use(cookieParser());
+
   app.use(urlencoded({ extended: true }));
   app.use(json());
 

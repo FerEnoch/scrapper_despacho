@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import { ZodSchema } from "zod";
+import chalk from "chalk";
 
 export const validateAuthReq =
   (schema: ZodSchema) => (req: Request, _res: Response, next: NextFunction) => {
@@ -22,10 +23,11 @@ export const validateAuthReq =
 
       next();
     } catch (error: any) {
+      console.log(chalk.red(`${error.message}`));
       throw new ApiError({
         statusCode: 400,
-        message: error.errors?.[0].message ?? ERRORS.INVALID_CREDENTIALS,
-        data: error?.errors ?? [],
+        message: ERRORS.INVALID_CREDENTIALS,
+        data: [],
       });
     }
   };

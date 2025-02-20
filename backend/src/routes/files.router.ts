@@ -14,7 +14,7 @@ export async function initializeFilesRouter({
   const filesController = new FilesController({ model });
   const { verifyJwtMiddleware } = new AuthModel();
 
-  router.get("/stats/:id", filesController.getFilesStats);
+  // router.get("/stats/:id", filesController.getFilesStats);
   router.post("/", validateFileRequest, filesController.uploadFile);
   router.post("/end", verifyJwtMiddleware, filesController.endFiles);
   return router;

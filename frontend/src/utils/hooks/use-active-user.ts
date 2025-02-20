@@ -29,7 +29,7 @@ export const useActiveUser = () => {
     const [accessTokenCookieName] = cookieKVString.split("=");
     const expiryDate = new Date(0).toUTCString();
 
-    const updatedCookie = `${accessTokenCookieName}=; expires=${expiryDate}; domain=${COOKIE_DOMAIN}; path=/`;
+    const updatedCookie = `${accessTokenCookieName}=; expires=${expiryDate}; domain=${COOKIE_DOMAIN}; path=/; sameSite=none`;
 
     document.cookie = updatedCookie;
     setCookieUserInfo(null);

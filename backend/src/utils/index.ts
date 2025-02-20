@@ -28,8 +28,8 @@ export function setAccessTokenCookie(res: Response, accessToken: string) {
   res.cookie("accessToken", accessToken, {
     secure: NODE_ENV === "production",
     httpOnly: false,
-    sameSite: "lax",
     domain: COOKIE_DOMAIN,
-    // maxAge: 24 * 60 * 60 * 1000,
+    sameSite: NODE_ENV === "production" ? "none" : "strict",
+    maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
   });
 }

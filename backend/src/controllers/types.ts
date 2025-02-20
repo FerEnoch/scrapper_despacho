@@ -4,7 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 
 export interface IFilesController {
   service: IFilesService;
-  getFilesStats(req: Request, res: Response, next: NextFunction): Promise<void>;
+  // getFilesStats(req: Request, res: Response, next: NextFunction): Promise<void>;
   uploadFile(req: Request, res: Response, next: NextFunction): Promise<void>;
   endFiles(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
