@@ -9,19 +9,11 @@ export type IFileScrapperV1 = {
   createBrowserContext(): Promise<void>;
   interceptRoutes(route: Route): Promise<void>;
   closeBrowserContext(): Promise<void>;
-  siemLogin({
-    user,
-    pass,
-  }: {
-    user: string;
-    pass: string;
-  }): Promise<void | null>;
-
+  siemLogin({ user, pass }: Auth): Promise<void | null>;
   endFileByNum({ num }: { num: string }): Promise<{
     message: string;
     detail: string;
   }>;
-
   collectData({ file }: { file: FileId }): Promise<FileStats | null>;
   checkSiemLogin({ page }: { page: Page }): Promise<void>;
 };
@@ -64,15 +56,6 @@ export type IAuthModel = {
     accessToken: string;
   };
   verifyJwt({ token }: { token: string }): string | JwtPayload;
-  verifyJwtMiddleware(
-    req: Request & {
-      auth?: {
-        access: string | JwtPayload;
-      };
-    },
-    _res: Response,
-    next: NextFunction
-  ): void;
 };
 
 /****************************************************************** */

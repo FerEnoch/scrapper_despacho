@@ -1,17 +1,15 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
-import { modelTypes } from "../types";
 import { validateAuthReq } from "../middlewares/validateAuthReq";
 import { AuthSchema } from "../schemas/auth";
-import { AuthModel } from "../models/auth.model";
+import { IAuthController } from "../controllers/types";
 
-export async function initializeAuthRouter(
-  model: modelTypes["IDatabaseModel"]
-) {
-  const { login, updateUserCredentials, logout } = new AuthController(model);
-  const { verifyJwtMiddleware } = new AuthModel(model);
-
+export async function initializeAuthRouter(controller: IAuthController) {
   const router = Router();
+
+  const { login, updateUserCredentials, logout, verifyJwtMiddleware } =
+    controller;
+
   // router.post("/register", validateAuthReq(AuthSchema), register);
   router.post("/login", validateAuthReq(AuthSchema), login);
   router.patch("/user/:id", verifyJwtMiddleware, updateUserCredentials);

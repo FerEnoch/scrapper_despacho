@@ -6,17 +6,23 @@ import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import { modelTypes } from "../types";
 import { IUserService } from "./types";
 import jwt from "jsonwebtoken";
+import { UserAuthData } from "../models/types";
 const { TokenExpiredError } = jwt;
 
 export class UserService implements IUserService {
   private readonly authModel: modelTypes["IAuthModel"];
 
   constructor(private readonly databaseModel: modelTypes["IDatabaseModel"]) {
-    this.authModel = new AuthModel(databaseModel);
+    this.databaseModel = databaseModel;
+    this.authModel = new AuthModel(this.databaseModel);
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.updateUserCredentials = this.updateUserCredentials.bind(this);
     this.handleRefreshToken = this.handleRefreshToken.bind(this);
+    this.generateAccessToken = this.generateAccessToken.bind(this);
+    this.getRefreshTokenById = this.getRefreshTokenById.bind(this);
+    this.generateRefreshToken = this.generateRefreshToken.bind(this);
+    this.verifyJwt = this.verifyJwt.bind(this);
   }
 
   async register({ user, pass }: Auth) {
@@ -131,5 +137,30 @@ export class UserService implements IUserService {
         throw error;
       }
     }
+  }
+
+  async getRefreshTokenById({ userId }: { userId: string }) {
+    const refreshToken = await this.databaseModel.getRefreshTokenById({
+      userId,
+    });
+    return refreshToken;
+  }
+
+  generateAccessToken({ userId, user, pass }: UserAuthData) {
+    const { accessToken } = this.authModel.generateAccessToken({
+      userId,
+      user,
+      pass,
+    });
+    return { accessToken };
+  }
+
+  generateRefreshToken(userId: string) {
+    const { refreshToken } = this.authModel.generateRefreshToken(userId);
+    return { refreshToken };
+  }
+
+  verifyJwt({ token }: { token: string }) {
+    return this.authModel.verifyJwt({ token });
   }
 }

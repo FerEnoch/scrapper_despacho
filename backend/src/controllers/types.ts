@@ -16,4 +16,13 @@ export interface IAuthController {
     res: Response,
     next: NextFunction
   ): Promise<void>;
+  verifyJwtMiddleware(
+    req: Request & {
+      auth?: {
+        access: string | JwtPayload;
+      };
+    },
+    _res: Response,
+    next: NextFunction
+  ): void;
 }

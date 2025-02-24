@@ -1,6 +1,7 @@
-# Front - api w/web scrapper
+# File document web scrapper
 
-This project is a little job for public administration, and its intended to be a useful tool to view document files status located in public systems and registries via web scrapping.
+This project is a little job for public administration, and its intended to be a useful tool to view (only) public information about file documents located in public systems and registries via web scrapping.
+The user can login to the system using the (existing) system's credentials, upload a .csv file with the file document' numbers, and then view the file document' status, being able to do some small operations according to its current authorization in the system.
 
 ## Usage
 
@@ -9,7 +10,7 @@ Backend runs prod enviroment in docker (see Make file). To run the entire projec
 Run the backend:
 
 ```bash
-make back-prod
+make start-prod
 ```
 
 Run the frontend:
@@ -18,14 +19,14 @@ Run the frontend:
 npm run preview
 ```
 
-### Techs
+### Tech stack
 
-- Vite + React
-- Vite + Node
-- Express
-- TypeScript
-- Playwright
-- Docker
+- typescript
+- vite + react
+- vite + node
+- playwright
+- express / jwt / better-sqlite3
+- docker
 
 
 

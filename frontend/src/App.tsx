@@ -172,6 +172,15 @@ export default function App() {
           setIsFilesApiError(true);
           handleLogout();
           return;
+        case AUTH_API_ERRORS.REFRESH_TOKEN_NOT_FOUND:
+        case AUTH_API_ERRORS.TOKEN_EXPIRED:
+          toggleAuthModal("LOGIN");
+          toast({
+            title: UI_TOAST_MESSAGES.LOGIN_NEEDED.title,
+            description: UI_TOAST_MESSAGES.LOGIN_NEEDED.description,
+            variant: "destructive",
+          });
+          return;
         case FILES_API_ERRORS.INVALID_DATA:
           setIsSearchingFiles(false);
           setModalMsg(UI_ERROR_MESSAGES[message]);
@@ -351,6 +360,14 @@ export default function App() {
     async (data: FormDataSubmit) => {
       // Rename just for clarity
       const { user: newUser, pass: newPass } = data;
+      if (!activeUser) {
+        toast({
+          title: UI_TOAST_MESSAGES.LOGIN_NEEDED.title,
+          description: UI_TOAST_MESSAGES.LOGIN_NEEDED.description,
+          variant: "default",
+        });
+        return;
+      }
       const apiResponse = await authApi.updateCredentials(activeUser.userId, {
         user: newUser,
         pass: newPass,
@@ -365,7 +382,7 @@ export default function App() {
         password: pass,
       });
     },
-    [activeUser, handleAuthResponseMessages, handleActiveUser]
+    [activeUser, handleAuthResponseMessages, handleActiveUser, toast]
   );
 
   const toggleAuthModal = useCallback(
@@ -404,7 +421,7 @@ export default function App() {
       "
       >
         <CardHeader className="relative">
-          {activeUser.username.length > 0 && (
+          {activeUser && activeUser.username?.length > 0 && (
             <Account
               activeUser={activeUser}
               toggleAuthModal={toggleAuthModal}

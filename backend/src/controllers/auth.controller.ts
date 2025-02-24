@@ -10,6 +10,9 @@ import { setAccessTokenCookie } from "../utils";
 import { UserAuthData } from "../models/types";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
+import chalk from "chalk";
+import jwt from "jsonwebtoken";
+const { TokenExpiredError } = jwt;
 
 export class AuthController implements IAuthController {
   private service: IUserService;
@@ -19,6 +22,7 @@ export class AuthController implements IAuthController {
     // this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
+    this.verifyJwtMiddleware = this.verifyJwtMiddleware.bind(this);
     this.updateUserCredentials = this.updateUserCredentials.bind(this);
   }
 
@@ -135,6 +139,71 @@ export class AuthController implements IAuthController {
         data: [{ userId, user: newUser, pass: newPass }],
       });
     } catch (error: any) {
+      next(error);
+    }
+  }
+
+  async verifyJwtMiddleware(
+    req: Request & {
+      auth?: {
+        access: string | JwtPayload;
+      };
+    },
+    _res: Response,
+    next: NextFunction
+  ) {
+    let decoded;
+
+    try {
+      const accessToken: string = req.cookies.accessToken;
+      const { user, pass, userId } = req.body;
+
+      if (!accessToken) {
+        throw new ApiError({
+          statusCode: 401,
+          message: ERRORS.TOKEN_MISSING_ACCESS_DENIED,
+        });
+      }
+
+      try {
+        decoded = this.service.verifyJwt({ token: accessToken });
+      } catch (error: any) {
+        console.log(chalk.red(error.message));
+        if (error instanceof TokenExpiredError) {
+          // check refresh token
+          const { refreshToken } = await this.service.getRefreshTokenById({
+            userId,
+          });
+          try {
+            decoded = this.service.verifyJwt({ token: refreshToken });
+          } catch (error) {
+            if (error instanceof TokenExpiredError) {
+              console.log(chalk.red("Expired refresh token"));
+              throw new ApiError({
+                statusCode: 400,
+                message: ERRORS.TOKEN_EXPIRED,
+              });
+            }
+            throw error;
+          }
+
+          console.log(chalk.blue("Regenerating access token"));
+          const { accessToken } = this.service.generateAccessToken({
+            userId,
+            user,
+            pass,
+          });
+          decoded = accessToken;
+        }
+      }
+
+      req.auth = {
+        access: decoded ?? {},
+      };
+
+      next();
+    } catch (error: any) {
+      console.log(chalk.red(error.message));
       next(error);
     }
   }

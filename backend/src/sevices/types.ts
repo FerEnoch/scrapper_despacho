@@ -1,3 +1,4 @@
+import { JwtPayload } from "jsonwebtoken";
 import {
   UserAuthData,
   FileEndedStats,
@@ -23,6 +24,18 @@ export interface IUserService {
     pass,
   }: CompleteAuthWithId): Promise<{ token: string }>;
   handleRefreshToken({ userId }: { userId: string }): Promise<void>;
+  generateRefreshToken(userId: string): {
+    refreshToken: string;
+  };
+  getRefreshTokenById({
+    userId,
+  }: {
+    userId: string;
+  }): Promise<{ refreshToken: string }>;
+  generateAccessToken({ userId, user, pass }: UserAuthData): {
+    accessToken: string;
+  };
+  verifyJwt({ token }: { token: string }): string | JwtPayload;
 }
 
 export type BatchOpResultType<F> =

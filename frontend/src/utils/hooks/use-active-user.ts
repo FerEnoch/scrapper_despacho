@@ -1,48 +1,38 @@
 import { ActiveUser } from "@/types";
 import { useEffect, useState } from "react";
-import { parseCookie } from "..";
+import { useCheckAccessCookie } from "./use-check-access-cookie";
 // import { COOKIE_DOMAIN } from "@/config";
 
 export const useActiveUser = () => {
-  const [cookieUserInfo, setCookieUserInfo] = useState<ActiveUser | null>(null);
-  const [activeUser, setActiveUser] = useState<ActiveUser>({
-    userId: cookieUserInfo?.userId || "",
-    username: cookieUserInfo?.username || "",
-    password: cookieUserInfo?.password || "",
+  const { sessionUserInfo, clearAccessToken } = useCheckAccessCookie();
+  const [activeUser, setActiveUser] = useState<ActiveUser | null>(() => {
+    const userId = localStorage.getItem("userId");
+    const username = localStorage.getItem("username");
+    const password = localStorage.getItem("password");
+    if (!userId || !username || !password) return null;
+    return {
+      userId,
+      username,
+      password,
+    };
   });
 
-  const checkAccessToken = () => {
-    const accessTokenCookieName = "accessToken";
-    const cookies = document.cookie;
-    const cookieKVString = cookies
-      .split(";")
-      .find((cookie) => cookie.includes(accessTokenCookieName));
-
-    return cookieKVString;
-  };
-
-  const clearAccessToken = () => {
-    const cookieKVString = checkAccessToken();
-
-    if (!cookieKVString) return setCookieUserInfo(null);
-
-    const [accessTokenCookieName] = cookieKVString.split("=");
-    const expiryDate = new Date(0).toUTCString();
-
-    // const updatedCookie = `${accessTokenCookieName}=; expires=${expiryDate}; domain=${COOKIE_DOMAIN}; path=/; sameSite=none`;
-    const updatedCookie = `${accessTokenCookieName}=; expires=${expiryDate}; path=/`;
-
-    document.cookie = updatedCookie;
-    setCookieUserInfo(null);
-  };
-
   const handleActiveUser = (userData: ActiveUser) => {
-    setActiveUser(userData);
+    const { userId, username, password } = userData;
+
+    localStorage.setItem("username", username);
+    localStorage.setItem("password", password);
+    localStorage.setItem("userId", userId);
+
+    setActiveUser({
+      userId,
+      username,
+      password,
+    });
   };
 
   const logoutAndClearCookie = () => {
     clearAccessToken();
-    setCookieUserInfo(null);
     setActiveUser({
       userId: "",
       username: "",
@@ -51,19 +41,9 @@ export const useActiveUser = () => {
   };
 
   useEffect(() => {
-    const cookieKVString = checkAccessToken();
-    if (!cookieKVString) return setCookieUserInfo(null);
-
-    const {
-      value: { userId, user, pass },
-    } = parseCookie(cookieKVString);
-    setCookieUserInfo({ userId, username: user, password: pass });
-  }, []);
-
-  useEffect(() => {
-    if (!cookieUserInfo) return;
-    setActiveUser(cookieUserInfo);
-  }, [cookieUserInfo, setActiveUser]);
+    if (!sessionUserInfo?.username) return;
+    setActiveUser(sessionUserInfo);
+  }, [sessionUserInfo, setActiveUser]);
 
   return { activeUser, handleActiveUser, logoutAndClearCookie };
 };

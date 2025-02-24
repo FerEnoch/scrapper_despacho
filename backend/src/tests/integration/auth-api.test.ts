@@ -10,30 +10,30 @@ import { parseCookie } from "../helpers";
  *  - npm run back:test
  */
 describe("API-INTEGRATION > auth-router", () => {
-  /**
-   * @route /auth/register
-   * @method POST
-   * @description Register a new user and return access token
-   */
-  test("should register a new user", async () => {
-    const res = await testAgent
-      .post("/api/v1/auth/register")
-      .send({ user: "John Doe", pass: "password" });
+  // /**
+  //  * @route /auth/register
+  //  * @method POST
+  //  * @description Register a new user and return access token
+  //  */
+  // test("should register a new user", async () => {
+  //   const res = await testAgent
+  //     .post("/api/v1/auth/register")
+  //     .send({ user: "John Doe", pass: "password" });
 
-    expect(res.body.data[0].userId).toBeDefined();
-    expect(res.body.message).toBe(MESSAGES.USER_REGISTERED);
-    expect(res.status).toBe(201);
-  });
+  //   expect(res.body.data[0].userId).toBeDefined();
+  //   expect(res.body.message).toBe(MESSAGES.USER_REGISTERED);
+  //   expect(res.status).toBe(201);
+  // });
 
   /**
    * @route /auth/login
    * @method POST
    * @description Login a user
    */
-  test("should login a user after register", async () => {
-    await testAgent
-      .post("/api/v1/auth/register")
-      .send({ user: "John Doe", pass: "password" });
+  test("should login a new user (register if not exists)", async () => {
+    // await testAgent
+    //   .post("/api/v1/auth/register")
+    //   .send({ user: "John Doe", pass: "password" });
 
     const loginResponse = await testAgent
       .post("/api/v1/auth/login")
@@ -56,10 +56,10 @@ describe("API-INTEGRATION > auth-router", () => {
    * @method POST
    * @description Logout a user
    */
-  test("should register, login and logout a user", async () => {
-    await testAgent
-      .post("/api/v1/auth/register")
-      .send({ user: "John Doe", pass: "password" });
+  test("should register if not exists, login and logout a user", async () => {
+    // await testAgent
+    //   .post("/api/v1/auth/register")
+    //   .send({ user: "John Doe", pass: "password" });
 
     const loginResponse = await testAgent
       .post("/api/v1/auth/login")
@@ -99,7 +99,7 @@ describe("API-INTEGRATION > auth-router", () => {
    */
   test("should update user credentials", async () => {
     const registerResponse = await testAgent
-      .post("/api/v1/auth/register")
+      .post("/api/v1/auth/login")
       .send({ user: "John Doe", pass: "password" });
 
     const registerCookies = registerResponse.headers[

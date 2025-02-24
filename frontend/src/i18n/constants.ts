@@ -50,7 +50,7 @@ export const UI_TOAST_MESSAGES = {
   },
   LOGIN_NEEDED: {
     title: "Necesitas iniciar sesión",
-    description: "Inicia sesión nuevamente para poder finalizar expedientes",
+    description: "Inicia sesión nuevamente para poder continuar",
   },
   LOGOUT_SUCCESS: {
     title: "Sesión cerrada",
