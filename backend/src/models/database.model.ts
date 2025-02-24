@@ -11,8 +11,8 @@ import { cwd } from "node:process";
 import chalk from "chalk";
 
 export class DatabaseModel implements IDatabaseModel {
-  database: Database.Database;
-  BCRYPT_SALT_ROUNDS: number;
+  private readonly database: Database.Database;
+  private readonly BCRYPT_SALT_ROUNDS: number;
 
   constructor(private readonly dbName: string) {
     this.database = this.createDB(dbName);
@@ -25,8 +25,6 @@ export class DatabaseModel implements IDatabaseModel {
     this.login = this.login.bind(this);
     this.getPassByUser = this.getPassByUser.bind(this);
     this.updateUserCredentials = this.updateUserCredentials.bind(this);
-    // this.getUserById = this.getUserById.bind(this);
-    // this.logout = this.logout.bind(this);
   }
 
   createDB(name: string = "default.db") {
@@ -266,73 +264,4 @@ export class DatabaseModel implements IDatabaseModel {
       });
     }
   }
-
-  // async getUserById({ userId }: { userId: string }) {
-  //   try {
-  //     const getByIdStmt = this.database.prepare(
-  //       "SELECT id, user FROM users WHERE id = $id"
-  //     );
-
-  //     const checkInfo = getByIdStmt.get({
-  //       id: userId,
-  //     }) as unknown as { id: string; user: string } | null;
-
-  //     if (!checkInfo) {
-  //       throw new ApiError({
-  //         statusCode: 404,
-  //         message: ERRORS.USER_NOT_FOUND,
-  //       });
-  //     }
-
-  //     return {
-  //       userId: checkInfo.id,
-  //       username: checkInfo.user,
-  //     };
-  //   } catch (error: any) {
-  //     console.log("🚀 ~ getUserById ~ error:", error);
-  //     throw new ApiError({
-  //       statusCode: 500,
-  //       message: error?.message ?? error?.code ?? ERRORS.DB_TRANSACTION_FAILURE,
-  //       data: [{ userId }],
-  //     });
-  //   }
-  // }
-
-  /** NOT NEC TO DELETE USER FROM DATABAESE */
-  // async logout({ userId }: { userId: string }) {
-  //   try {
-  //     const deleteAuthStmt = this.database.prepare(
-  //       "DELETE FROM auth WHERE id = $id"
-  //     );
-  //     deleteAuthStmt.run({
-  //       id: userId,
-  //     });
-
-  //     const logoutStmt = this.database.prepare(
-  //       "DELETE FROM users WHERE id = $id"
-  //     );
-
-  //     const checkInfo = logoutStmt.run({
-  //       id: userId,
-  //     });
-
-  //     if (checkInfo.changes === 0) {
-  //       throw new ApiError({
-  //         statusCode: 404,
-  //         message: ERRORS.USER_NOT_FOUND,
-  //       });
-  //     }
-
-  //     return {
-  //       userId,
-  //     };
-  //   } catch (error: any) {
-  //     console.log("🚀 ~ logout ~ error:", error);
-  //     throw new ApiError({
-  //       statusCode: 500,
-  //       message: ERRORS.DB_TRANSACTION_FAILURE,
-  //       data: [{ userId }],
-  //     });
-  //   }
-  // }
 }

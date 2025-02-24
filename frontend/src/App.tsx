@@ -126,6 +126,11 @@ export default function App() {
     setIsOpenAuthErrorModal((auth) => !auth);
   };
 
+  const handleCloseErrorOpenLogin = () => () => {
+    toggleFilesApiErrorModal();
+    return toggleAuthModal("LOGIN");
+  };
+
   const handleFilesResponseMessages = useCallback(
     ({ message, data }: ApiResponse<FileStats | RawFile>) => {
       switch (message) {
@@ -156,21 +161,21 @@ export default function App() {
         case FILES_API_ERRORS.COULD_NOT_LOGIN_IN_SIEM:
           setIsSearchingFiles(false);
           setModalMsg(UI_ERROR_MESSAGES[message]);
-          setErrorFilesActionHandler(toggleFilesApiErrorModal);
+          setErrorFilesActionHandler(() => toggleFilesApiErrorModal);
           setIsFilesApiError(true);
           setFilesData([]);
           return;
         case FILES_API_ERRORS.CREDENTIALS_NOT_PROVIDED:
           setIsSearchingFiles(false);
           setModalMsg(UI_ERROR_MESSAGES[message]);
-          setErrorFilesActionHandler(toggleAuthModal);
+          setErrorFilesActionHandler(handleCloseErrorOpenLogin);
           setIsFilesApiError(true);
           handleLogout();
           return;
         case FILES_API_ERRORS.INVALID_DATA:
           setIsSearchingFiles(false);
           setModalMsg(UI_ERROR_MESSAGES[message]);
-          setErrorFilesActionHandler(toggleFilesApiErrorModal);
+          setErrorFilesActionHandler(() => toggleFilesApiErrorModal);
           setIsFilesApiError(true);
           setErrorFiles(data as RawFile[]);
           setFilesData([]);
@@ -178,7 +183,7 @@ export default function App() {
 
         case FILES_API_ERRORS.NO_FILES_TO_END:
           setModalMsg(UI_ERROR_MESSAGES[message]);
-          setErrorFilesActionHandler(toggleFilesApiErrorModal);
+          setErrorFilesActionHandler(() => toggleFilesApiErrorModal);
           setIsFilesApiError(true);
           return;
 
@@ -259,17 +264,6 @@ export default function App() {
             variant: "success",
           });
           return userData;
-        case AUTH_API_ERRORS.INVALID_CREDENTIALS:
-          setIsAuthApiError(true);
-          return null;
-        case AUTH_API_ERRORS.GENERIC_ERROR:
-          toggleAuthModal();
-          toast({
-            title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
-            description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
-            variant: "destructive",
-          });
-          return null;
         case AUTH_API_MESSAGES.USER_LOGGED_OUT:
           logoutAndClearCookie();
           toast({
@@ -278,15 +272,38 @@ export default function App() {
             variant: "default",
           });
           break;
-        case AUTH_API_ERRORS.LOGOUT_FAILED:
+        case AUTH_API_ERRORS.LOGOUT_FAILED: // handle REFRESH_TOKEN_NOT_FOUND in logout context (see authApi)
+          logoutAndClearCookie();
           toast({
             title: UI_TOAST_MESSAGES.LOGOUT_ERROR.title,
             description: UI_TOAST_MESSAGES.LOGOUT_ERROR.description,
-            variant: "destructive",
+            variant: "default",
           });
           break;
         case AUTH_API_ERRORS.RESOURCE_NOT_FOUND:
           setIsAuthApiError(true);
+          return null;
+        case AUTH_API_ERRORS.REFRESH_TOKEN_NOT_FOUND:
+        case AUTH_API_ERRORS.TOKEN_EXPIRED:
+          toggleAuthModal();
+          toggleAuthModal("LOGIN");
+          toast({
+            title: UI_TOAST_MESSAGES.LOGIN_NEEDED.title,
+            description: UI_TOAST_MESSAGES.LOGIN_NEEDED.description,
+            variant: "destructive",
+          });
+          return;
+        case AUTH_API_ERRORS.INVALID_CREDENTIALS:
+          setIsAuthApiError(true);
+          return null;
+
+        case AUTH_API_ERRORS.GENERIC_ERROR:
+          toggleAuthModal();
+          toast({
+            title: UI_TOAST_MESSAGES.GENERIC_ERROR.title,
+            description: UI_TOAST_MESSAGES.GENERIC_ERROR.description,
+            variant: "destructive",
+          });
           return null;
         case AUTH_API_ERRORS.SERVER_ERROR:
           toggleAuthModal();
@@ -312,7 +329,7 @@ export default function App() {
 
   const handleLogin = useCallback(
     async (data: FormDataSubmit) => {
-      const apiResponse = await authApi.register(data);
+      const apiResponse = await authApi.login(data);
       const userData = handleAuthResponseMessages(apiResponse);
       if (!userData) return;
       const { userId, user, pass } = userData;
@@ -364,10 +381,16 @@ export default function App() {
         setAuthModalTitle(UI_MODAL_MESSAGES.LOGIN.dialogTitle);
         setAuthModalActionButton(UI_MODAL_MESSAGES.LOGIN.actionButton);
       }
+      if (isFilesApiError) toggleFilesApiErrorModal();
       setIsAuthApiError(false);
       setOpenAuthModal((auth) => !auth);
     },
-    [handleLogin, handleUpdateCredentials]
+    [
+      handleLogin,
+      handleUpdateCredentials,
+      isFilesApiError,
+      toggleFilesApiErrorModal,
+    ]
   );
 
   return (

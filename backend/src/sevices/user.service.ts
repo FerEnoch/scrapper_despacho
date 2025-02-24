@@ -9,29 +9,25 @@ import jwt from "jsonwebtoken";
 const { TokenExpiredError } = jwt;
 
 export class UserService implements IUserService {
-  databaseModel: modelTypes["IDatabaseModel"];
-  authModel: modelTypes["IAuthModel"];
+  private readonly authModel: modelTypes["IAuthModel"];
 
-  constructor({ model }: { model: modelTypes["IDatabaseModel"] }) {
-    this.databaseModel = model;
-    this.authModel = new AuthModel();
+  constructor(private readonly databaseModel: modelTypes["IDatabaseModel"]) {
+    this.authModel = new AuthModel(databaseModel);
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
     this.updateUserCredentials = this.updateUserCredentials.bind(this);
     this.handleRefreshToken = this.handleRefreshToken.bind(this);
-    // this.getUserById = this.getUserById.bind(this);
-    // this.logout = this.logout.bind(this);
   }
 
   async register({ user, pass }: Auth) {
-    const userExists = await this.databaseModel.checkIfUserExists({ user });
+    // const userData = await this.databaseModel.checkIfUserExists({ user });
 
-    /**
-     * If user already exists, user is forced to log in because he was already registered
-     */
-    if (userExists) {
-      return this.login({ user, pass });
-    }
+    // /**
+    //  * If user already exists, user is forced to log in because he was already registered
+    //  */
+    // if (userData) {
+    //   return this.login({ user, pass });
+    // }
 
     const { userId } = await this.databaseModel.register({ user, pass });
 
@@ -49,18 +45,21 @@ export class UserService implements IUserService {
 
   async login({ user, pass }: Auth) {
     try {
-      // Check if user exists: Verify that the user exists in the database.
-      const userExists = await this.databaseModel.checkIfUserExists({ user });
+      // Check if user exists, if it doesn't exist, register
+      const userExists = await this.databaseModel.checkIfUserExists({
+        user,
+      });
+
       if (!userExists) {
-        throw new ApiError({
-          statusCode: 404,
-          message: ERRORS.USER_NOT_FOUND,
+        const { user: dbUser, userId: dbUserId } = await this.register({
+          user,
+          pass,
         });
+        await this.handleRefreshToken({ userId: dbUserId });
       }
+
       // Authenticate user: Verify the user's credentials (username and password).
       const { userId } = await this.databaseModel.login({ user, pass });
-
-      await this.handleRefreshToken({ userId });
 
       // Generate a new access token for the user.
       const { accessToken } = this.authModel.generateAccessToken({
@@ -72,7 +71,6 @@ export class UserService implements IUserService {
       // Return user, userId and access token.
       return {
         userId,
-        user,
         token: accessToken,
       };
     } catch (error: any) {
@@ -122,7 +120,7 @@ export class UserService implements IUserService {
     } catch (error: any) {
       console.log(chalk.red(error.message));
       if (error instanceof TokenExpiredError) {
-        // If the refresh token is invalid, generate a new refresh token.
+        console.log(chalk.blue("Regenerating refresh token"));
         const { refreshToken: freshRefreshToken } =
           this.authModel.generateRefreshToken(userId);
         await this.databaseModel.saveRefreshToken({
@@ -134,13 +132,4 @@ export class UserService implements IUserService {
       }
     }
   }
-
-  // async getUserById({ userId }: { userId: string }) {
-  //   return await this.databaseModel.getUserById({ userId });
-  // }
-
-  /** NOT NEC TO DELETE USER FROM DATABAESE */
-  // async logout({ userId }: { userId: string }) {
-  // return await this.databaseModel.logout({ userId });
-  // }
 }

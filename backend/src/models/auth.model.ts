@@ -10,6 +10,7 @@ import { ERRORS } from "../errors/types";
 import { IAuthModel, UserAuthData } from "./types";
 import ms from "ms";
 import chalk from "chalk";
+import { modelTypes } from "../types";
 const { TokenExpiredError } = jwt;
 
 export class AuthModel implements IAuthModel {
@@ -17,7 +18,7 @@ export class AuthModel implements IAuthModel {
   private readonly JWT_ACCESS_EXPIRES_IN: ms.StringValue;
   private readonly JWT_REFRESH_EXPIRES_IN: ms.StringValue;
 
-  constructor() {
+  constructor(private readonly databaseModel: modelTypes["IDatabaseModel"]) {
     this.JWT_SECRET = JWT_SECRET;
     this.JWT_ACCESS_EXPIRES_IN = JWT_ACCESS_EXPIRES_IN as ms.StringValue;
     this.JWT_REFRESH_EXPIRES_IN = JWT_REFRESH_EXPIRES_IN as ms.StringValue;
@@ -73,7 +74,7 @@ export class AuthModel implements IAuthModel {
     return decoded;
   }
 
-  verifyJwtMiddleware(
+  async verifyJwtMiddleware(
     req: Request & {
       auth?: {
         access: string | JwtPayload;
@@ -82,6 +83,8 @@ export class AuthModel implements IAuthModel {
     _res: Response,
     next: NextFunction
   ) {
+    let decoded;
+
     try {
       const accessToken: string = req.cookies.accessToken;
       const { user, pass, userId } = req.body;
@@ -93,18 +96,37 @@ export class AuthModel implements IAuthModel {
         });
       }
 
-      let decoded;
       try {
         decoded = this.verifyJwt({ token: accessToken });
       } catch (error: any) {
         console.log(chalk.red(error.message));
         if (error instanceof TokenExpiredError) {
+          // check refresh token
+          const { refreshToken } = await this.databaseModel.getRefreshTokenById(
+            {
+              userId,
+            }
+          );
+          try {
+            decoded = this.verifyJwt({ token: refreshToken });
+          } catch (error) {
+            if (error instanceof TokenExpiredError) {
+              console.log(chalk.red("Expired refresh token"));
+              throw new ApiError({
+                statusCode: 400,
+                message: ERRORS.TOKEN_EXPIRED,
+              });
+            }
+            throw error;
+          }
+
+          console.log(chalk.blue("Regenerating access token"));
           const { accessToken } = this.generateAccessToken({
             userId,
             user,
             pass,
           });
-          decoded = this.verifyJwt({ token: accessToken });
+          decoded = accessToken;
         }
       }
 

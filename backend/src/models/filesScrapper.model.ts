@@ -19,24 +19,24 @@ import { SCRAPPER_TIMEOUT } from "../config";
 import chalk from "chalk";
 
 export class FilesScrapperV1 implements IFileScrapperV1 {
-  SIEM_BASE_URL = "";
-  SIEM_LOGIN_PATH = "";
-  SIEM_LOGIN_URL = "";
-  SIEM_SEE_FILE_PATH = "";
-  SIEM_SEE_FILE_URL = "";
-  SIEM_SEARCH_FILE_PATH = "";
-  SIEM_SEARCH_FILE_URL = "";
-  SIEM_END_FILE_PATH = "";
-  SIEM_END_FILE_URL = "";
-  END_FILE_TEXT = "";
-  SIEM_LOCATE_FILE_TITLE: locationType;
-  SIEM_LOCATE_FILE_STATUS: locationType;
-  SIEM_LOCATE_FILE_LOCATION: locationType;
-  AUTH_DENIED_PAGE_MSG: locationType;
-  AUTH_GRANTED_PAGE_CHECK: locationType;
-  context: BrowserContext | null = null;
-  browser: Browser | null = null;
-  timeout = SCRAPPER_TIMEOUT;
+  private SIEM_BASE_URL = "";
+  private SIEM_LOGIN_PATH = "";
+  private SIEM_LOGIN_URL = "";
+  private SIEM_SEE_FILE_PATH = "";
+  private SIEM_SEE_FILE_URL = "";
+  private SIEM_SEARCH_FILE_PATH = "";
+  private SIEM_SEARCH_FILE_URL = "";
+  private SIEM_END_FILE_PATH = "";
+  private SIEM_END_FILE_URL = "";
+  private END_FILE_TEXT = "";
+  private SIEM_LOCATE_FILE_TITLE: locationType;
+  private SIEM_LOCATE_FILE_STATUS: locationType;
+  private SIEM_LOCATE_FILE_LOCATION: locationType;
+  private AUTH_DENIED_PAGE_MSG: locationType;
+  private AUTH_GRANTED_PAGE_CHECK: locationType;
+  private context: BrowserContext | null = null;
+  private browser: Browser | null = null;
+  private timeout = SCRAPPER_TIMEOUT;
 
   constructor() {
     const {

@@ -1,4 +1,5 @@
-import { FILE_NUMBER_COLUMN_VALID_NAME, VALIDATION_REGEX } from "./constants";
+import { VALIDATION_REGEX } from "./constants";
+import { FILE_NUMBER_COLUMN_VALID_NAME } from "../../../config";
 import { FileId, FileStats, RawFile } from "../../types";
 
 function removeKVQuotes(file: RawFile) {
@@ -15,9 +16,7 @@ const validateRawDataBatch = (files: RawFile[]) => {
   const validationRegex = VALIDATION_REGEX.FILE_NUMBER_COLUMN;
 
   const hasCorrectColumn = files.filter(
-    (file) =>
-      FILE_NUMBER_COLUMN_VALID_NAME in file &&
-      file[FILE_NUMBER_COLUMN_VALID_NAME].length > 0
+    (file) => FILE_NUMBER_COLUMN_VALID_NAME in file && file["Número"].length > 0
   );
 
   return hasCorrectColumn.every((file) => {
@@ -35,7 +34,7 @@ const rawFileParser = (files: RawFile[]): FileId[] => {
   return files
     .map((file, index) => {
       const newRawFile = removeKVQuotes(file);
-      const { [FILE_NUMBER_COLUMN_VALID_NAME]: completeNum = "" } = newRawFile;
+      const { Número: completeNum = "" } = newRawFile;
       const [org = "", rep = "", num = "", digv = ""] = completeNum.split("-");
 
       if (!org || !rep || !num || !digv) return null as unknown as FileId;

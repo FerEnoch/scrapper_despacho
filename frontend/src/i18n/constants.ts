@@ -48,13 +48,17 @@ export const UI_TOAST_MESSAGES = {
     title: "Error de autenticación",
     description: "No se pudo iniciar sesión. Por favor, intenta nuevamente.",
   },
+  LOGIN_NEEDED: {
+    title: "Necesitas iniciar sesión",
+    description: "Inicia sesión nuevamente para poder finalizar expedientes",
+  },
   LOGOUT_SUCCESS: {
     title: "Sesión cerrada",
     description: "¡Has cerrado sesión con éxito!",
   },
   LOGOUT_ERROR: {
-    title: "Error al cerrar sesión",
-    description: "No se pudo cerrar sesión. Por favor, intenta nuevamente.",
+    title: "El cierre de sesión no fue exitoso",
+    description: "Por favor, recarga la página para volver a iniciar sesión",
   },
   CREDENTIALS_UPDATED_SUCCESS: {
     title: "Credenciales actualizadas",

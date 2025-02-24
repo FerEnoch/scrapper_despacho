@@ -4,18 +4,17 @@ import { modelTypes } from "../types";
 import { AuthModel } from "../models/auth.model";
 import { validateFileRequest } from "../middlewares/validateFileReq";
 
-export async function initializeFilesRouter({
-  model,
-}: {
-  model: modelTypes["IFileScrapper"];
-}) {
+export async function initializeFilesRouter(
+  model: modelTypes["IFileScrapper"]
+) {
   const router = Router();
 
-  const filesController = new FilesController({ model });
-  const { verifyJwtMiddleware } = new AuthModel();
+  const { endFiles, getFilesStats, uploadFile } = new FilesController(model);
+  const { verifyJwtMiddleware } = new AuthModel(model);
 
-  router.get("/stats/:id", filesController.getFilesStats);
-  router.post("/", validateFileRequest, filesController.uploadFile);
-  router.post("/end", verifyJwtMiddleware, filesController.endFiles);
+  router.post("/", validateFileRequest, uploadFile);
+  router.post("/end", verifyJwtMiddleware, endFiles);
+  router.get("/stats/:id", getFilesStats);
+
   return router;
 }

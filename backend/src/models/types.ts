@@ -1,4 +1,4 @@
-import { Browser, BrowserContext, Page, Route } from "@playwright/test";
+import { Page, Route } from "@playwright/test";
 import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import Database from "better-sqlite3";
 import { Request, Response, NextFunction } from "express";
@@ -6,23 +6,6 @@ import { JwtPayload } from "jsonwebtoken";
 import { FILE_NUMBER_COLUMN_VALID_NAME } from "../config";
 
 export type IFileScrapperV1 = {
-  END_FILE_TEXT: string;
-  SIEM_BASE_URL: string;
-  SIEM_LOGIN_PATH: string;
-  SIEM_LOGIN_URL: string;
-  SIEM_SEE_FILE_PATH: string;
-  SIEM_SEARCH_FILE_PATH: string;
-  SIEM_SEARCH_FILE_URL: string;
-  SIEM_SEE_FILE_URL: string;
-  SIEM_END_FILE_PATH: string;
-  SIEM_END_FILE_URL: string;
-  SIEM_LOCATE_FILE_TITLE: locationType;
-  SIEM_LOCATE_FILE_STATUS: locationType;
-  SIEM_LOCATE_FILE_LOCATION: locationType;
-  AUTH_DENIED_PAGE_MSG: locationType;
-  AUTH_GRANTED_PAGE_CHECK: locationType;
-  context: BrowserContext | null;
-  browser: Browser | null;
   createBrowserContext(): Promise<void>;
   interceptRoutes(route: Route): Promise<void>;
   closeBrowserContext(): Promise<void>;
@@ -44,8 +27,6 @@ export type IFileScrapperV1 = {
 };
 
 export type IDatabaseModel = {
-  database: Database.Database;
-  BCRYPT_SALT_ROUNDS: number;
   createDB(name: string): Database.Database;
   createTables(db: Database.Database): void;
   checkIfUserExists({
@@ -73,8 +54,6 @@ export type IDatabaseModel = {
     user,
     pass,
   }: CompleteAuthWithId): Promise<{ userId: string }>;
-  // getUserById({ userId }: { userId: string }): Promise<authApiResponse>;
-  // logout({ userId }: { userId: string }): Promise<authApiResponse>;
 };
 
 export type IAuthModel = {
@@ -101,7 +80,7 @@ export type IAuthModel = {
 
 export type UserAuthData = {
   userId: string;
-  user: string;
+  user?: string;
   pass?: string;
   token?: string;
 };

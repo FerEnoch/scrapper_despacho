@@ -5,36 +5,36 @@ import { AUTH_API_ERRORS } from "@/types/enums";
 import { z } from "zod";
 
 export const authApi = {
-  register: async (data: z.infer<typeof loginFormSchema>) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+  // register: async (data: z.infer<typeof loginFormSchema>) => {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/auth/register`, {
+  //       method: "POST",
+  //       // credentials: "include",
+  //       headers: {
+  //         "content-type": "application/json",
+  //       },
+  //       body: JSON.stringify(data),
+  //     });
 
-      const responseData = (await response.json()) as ApiResponse<UserSession>;
-      console.log("🚀 ~ responseData:", responseData);
+  //     const responseData = (await response.json()) as ApiResponse<UserSession>;
+  //     console.log("🚀 ~ responseData:", responseData);
 
-      if (response.ok) {
-        return responseData;
-      }
+  //     if (response.ok) {
+  //       return responseData;
+  //     }
 
-      return {
-        message: responseData.message ?? "",
-        data: responseData?.data ?? [],
-      };
-    } catch (error) {
-      console.log("🚀 ~ register ~ error:", error);
-      return {
-        message: AUTH_API_ERRORS.GENERIC_ERROR,
-        data: [],
-      };
-    }
-  },
+  //     return {
+  //       message: responseData.message ?? "",
+  //       data: responseData?.data ?? [],
+  //     };
+  //   } catch (error) {
+  //     console.log("🚀 ~ register ~ error:", error);
+  //     return {
+  //       message: AUTH_API_ERRORS.GENERIC_ERROR,
+  //       data: [],
+  //     };
+  //   }
+  // },
 
   login: async (data: z.infer<typeof loginFormSchema>) => {
     try {

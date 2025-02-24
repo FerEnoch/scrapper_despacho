@@ -15,10 +15,10 @@ export async function v1Routes({
   const databaseName = "users.db";
   const databaseModel = new DatabaseModel(databaseName);
 
-  const authRouter = await initializeAuthRouter({ model: databaseModel });
+  const authRouter = await initializeAuthRouter(databaseModel);
 
   /** Initialize files routes model */
-  const filesRouter = await initializeFilesRouter({ model: filesModel });
+  const filesRouter = await initializeFilesRouter(filesModel);
 
   router.use("/auth", authRouter);
   router.use("/files", filesRouter);

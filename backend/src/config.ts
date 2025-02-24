@@ -46,7 +46,7 @@ const COOKIE_DOMAIN =
       ? COOKIE_DOMAIN_DEV_REMOTE
       : COOKIE_DOMAIN_DEV_LOCAL
     : COOKIE_DOMAIN_PROD;
-console.log("🚀 ~ COOKIE_DOMAIN:", COOKIE_DOMAIN);
+console.log("🚀 ~ COOKIE_DOMAIN:", COOKIE_DOMAIN); // not used
 
 const SCRAPPER_TIMEOUT =
   NODE_ENV === "test"

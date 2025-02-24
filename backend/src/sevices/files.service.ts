@@ -8,16 +8,17 @@ import {
 } from "../models/lib/filesScrapper/constants";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
+import { Auth } from "../schemas/auth";
 
 export class FilesService implements IFilesService {
-  model: modelTypes["IFileScrapper"];
-  MAX_BATCH_SIZE = 5;
-  ENDED_FILE_STATUS_TEXT = "";
-  SIEM_PASSWORD = "";
-  SIEM_USER = "";
+  private readonly MAX_BATCH_SIZE: number;
+  private readonly ENDED_FILE_STATUS_TEXT: string;
+  private SIEM_PASSWORD: string;
+  private SIEM_USER: string;
 
-  constructor({ model }: { model: modelTypes }) {
-    this.model = model;
+  constructor(
+    private readonly filesScrapperModel: modelTypes["IFileScrapper"]
+  ) {
     this.ENDED_FILE_STATUS_TEXT = SIEM_PAGE_DATA.ENDED_FILE_STATUS_TEXT;
     this.MAX_BATCH_SIZE = 10;
     this.SIEM_USER = "";
@@ -31,7 +32,7 @@ export class FilesService implements IFilesService {
   }
 
   async searchFilesStats(files: FileId[]) {
-    await this.model.createBrowserContext();
+    await this.filesScrapperModel.createBrowserContext();
 
     const scrappedData: Array<FileStats> = [];
 
@@ -48,7 +49,7 @@ export class FilesService implements IFilesService {
         return Promise.all(
           batch.map(async (file) => {
             try {
-              const fileStats = await this.model.collectData({
+              const fileStats = await this.filesScrapperModel.collectData({
                 file,
               });
               return { ...fileStats };
@@ -76,36 +77,11 @@ export class FilesService implements IFilesService {
 
     scrappedData.sort((a, b) => a.index - b.index);
 
-    await this.model.closeBrowserContext();
+    await this.filesScrapperModel.closeBrowserContext();
     return scrappedData;
-
-    /* old-method
-    let dataCollection: FileStats;
-    await Promise.all(
-      files.map(async (file) => {
-        dataCollection = await this.model.collectData({ file, page: null });
-        scrappedData.push(dataCollection);
-      })
-    );
-    */
-
-    /* Appear to be not needed 
-    // repeat first file to be sure to colect all the data
-    const firstFileData = await this.model.collectData({
-      file: files[0],
-      page: null,
-    });
-    scrappedData.splice(0, 1, firstFileData);
-    */
   }
 
-  async populateUserCredentials({
-    user,
-    pass,
-  }: {
-    user: string;
-    pass: string;
-  }) {
+  async populateUserCredentials({ user, pass }: Auth) {
     this.SIEM_USER = user;
     this.SIEM_PASSWORD = pass;
     if (!this.SIEM_USER || !this.SIEM_PASSWORD) {
@@ -114,13 +90,13 @@ export class FilesService implements IFilesService {
         message: ERRORS.CREDENTIALS_NOT_PROVIDED,
       });
     }
-    await this.model.createBrowserContext();
+    await this.filesScrapperModel.createBrowserContext();
     await this.siemLogin();
-    await this.model.closeBrowserContext();
+    await this.filesScrapperModel.closeBrowserContext();
   }
 
   async endFiles({ files }: { files: FileStats[] }) {
-    await this.model.createBrowserContext();
+    await this.filesScrapperModel.createBrowserContext();
 
     const filesEndedResult: Array<FileEndedStats> = [];
 
@@ -152,7 +128,7 @@ export class FilesService implements IFilesService {
 
               const [{ num }] = parseFileStats([file]);
 
-              // const fileNewData: FileStats = await this.model.collectData({
+              // const fileNewData: FileStats = await this.filesScrapperModel.collectData({
               //   file: {
               //     ...file,
               //     num, // only middle long number
@@ -194,7 +170,7 @@ export class FilesService implements IFilesService {
         // });
       }
     });
-    await this.model.closeBrowserContext();
+    await this.filesScrapperModel.closeBrowserContext();
     filesEndedResult.sort((a, b) => a.index - b.index);
     return filesEndedResult;
   }
@@ -202,7 +178,7 @@ export class FilesService implements IFilesService {
   async endFileByNum(
     num: string
   ): Promise<{ message: string; detail: string }> {
-    const { message, detail } = await this.model.endFileByNum({
+    const { message, detail } = await this.filesScrapperModel.endFileByNum({
       num,
     });
     return { message, detail };
@@ -215,7 +191,7 @@ export class FilesService implements IFilesService {
         message: ERRORS.CREDENTIALS_NOT_PROVIDED,
       });
     }
-    await this.model.siemLogin({
+    await this.filesScrapperModel.siemLogin({
       user: this.SIEM_USER,
       pass: this.SIEM_PASSWORD,
     });

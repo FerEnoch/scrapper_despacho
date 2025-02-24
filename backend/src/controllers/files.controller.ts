@@ -1,7 +1,7 @@
+import { IFilesService } from "../sevices/types";
 import { convertData } from "../utils";
 import { NextFunction, Request, Response } from "express";
 import { IFilesController } from "./types";
-import { IFilesService } from "../sevices/types";
 import { MESSAGES } from "./constants";
 import { FilesService } from "../sevices/files.service";
 import { modelTypes } from "../types";
@@ -19,10 +19,12 @@ import {
 import { FILE_NUMBER_COLUMN_VALID_NAME } from "../config";
 
 export class FilesController implements IFilesController {
-  service: IFilesService;
+  private readonly service: IFilesService;
 
-  constructor({ model }: { model: modelTypes }) {
-    this.service = new FilesService({ model });
+  constructor(
+    private readonly filesScrapperModel: modelTypes["IFileScrapper"]
+  ) {
+    this.service = new FilesService(filesScrapperModel);
     this.getFilesStats = this.getFilesStats.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.endFiles = this.endFiles.bind(this);
