@@ -5,7 +5,8 @@ The user can login to the system using the (existing) system's credentials, uplo
 
 ## Usage
 
-Backend runs prod enviroment in docker (see Make file). To run the entire project, you can use the following command:
+Backend runs prod enviroment in docker (see Make file). 
+To run the entire project, you can use the following command:
 
 Run the backend:
 
