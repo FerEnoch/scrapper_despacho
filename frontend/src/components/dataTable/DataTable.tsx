@@ -17,6 +17,8 @@ import { TableSkeleton } from "./TableSkeleton";
 import { UI_TOAST_MESSAGES } from "@/i18n/constants";
 import { useTable } from "@/utils/hooks/use-table";
 import { toast } from "@/utils/hooks/use-toast";
+import { AUTH_API_ERRORS } from "@/types/enums";
+import { useUserSession } from "@/utils/hooks/use-user-session";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,7 +36,7 @@ export function DataTable<TData, TValue>({
   onFilterData,
 }: DataTableProps<TData, TValue>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const { handleActiveUser, handleRevalidateAccessToken } = useUserSession();
   const { table, setIsEndingFiles, isEndingFiles } = useTable({
     data,
     columns,
@@ -56,8 +58,20 @@ export function DataTable<TData, TValue>({
     }
     setIsLoading(true);
     setIsEndingFiles(true);
-    const response = await filesApi.endFiles(selectedValues as FileStats[]);
-    onEndFilesClick(response);
+
+    let revalidateApiResponse;
+    const apiResponse = await filesApi.endFiles(selectedValues as FileStats[]);
+    const { message } = apiResponse;
+
+    if (message === AUTH_API_ERRORS.ACCESS_TOKEN_EXPIRED) {
+      const revalidateResponseData = await handleRevalidateAccessToken();
+      handleActiveUser(revalidateResponseData);
+      revalidateApiResponse = await filesApi.endFiles(
+        selectedValues as FileStats[]
+      );
+    }
+
+    onEndFilesClick(revalidateApiResponse ?? apiResponse);
 
     setIsLoading(false);
     setIsEndingFiles(false);

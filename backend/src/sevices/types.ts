@@ -16,14 +16,18 @@ export interface IFilesService {
 }
 
 export interface IUserService {
-  register({ user, pass }: Auth): Promise<UserAuthData>;
+  setRefreshToken({ userId }: { userId: string }): Promise<{
+    refreshToken: string;
+  }>;
+  registerUser({ user, pass }: Auth): Promise<UserAuthData>;
   login({ user, pass }: Auth): Promise<UserAuthData>;
+  getUserById({ userId }: { userId: string }): Promise<{ user: string }>;
   updateUserCredentials({
     userId,
     user,
     pass,
-  }: CompleteAuthWithId): Promise<{ token: string }>;
-  handleRefreshToken({ userId }: { userId: string }): Promise<void>;
+  }: CompleteAuthWithId): Promise<{ accessToken: string }>;
+  // handleRefreshToken({ userId }: { userId: string }): Promise<void>;
   generateRefreshToken(userId: string): {
     refreshToken: string;
   };

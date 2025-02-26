@@ -1,3 +1,4 @@
+import { useUserSession } from "@/utils/hooks/use-user-session";
 import { ColumnDef } from "@tanstack/react-table";
 import { FileStats } from "../../types";
 import { Button } from "../ui/button";
@@ -8,6 +9,7 @@ import { filesApi } from "@/api/filesApi";
 import { getMessageColor, getStatusColor } from "@/utils";
 import { useState } from "react";
 import { Puff } from "react-loader-spinner";
+import { AUTH_API_ERRORS } from "@/types/enums";
 
 // TO DO -> make a component  / inc. useMemo() ?
 export const Columns: ColumnDef<FileStats>[] = [
@@ -174,6 +176,8 @@ export const Columns: ColumnDef<FileStats>[] = [
     id: "actions",
     cell: ({ row, table }) => {
       /* eslint-disable react-hooks/rules-of-hooks */
+      const { handleActiveUser, handleRevalidateAccessToken } =
+        useUserSession();
       const [isSearchingStats, setIsSearchingStats] = useState<boolean>(false);
       const [isEndingFile, setIsEndingFile] = useState<boolean>(false);
 
@@ -198,12 +202,23 @@ export const Columns: ColumnDef<FileStats>[] = [
           location: selectedLocation,
         };
 
+        let revalidateApiResponse;
+
         const apiResponse = await filesApi.endFiles([
           selectedValues,
         ] as FileStats[]);
+        const { message } = apiResponse;
+
+        if (message === AUTH_API_ERRORS.ACCESS_TOKEN_EXPIRED) {
+          const revalidateResponseData = await handleRevalidateAccessToken();
+          handleActiveUser(revalidateResponseData);
+          revalidateApiResponse = await filesApi.endFiles([
+            selectedValues,
+          ] as FileStats[]);
+        }
 
         setIsEndingFile(false);
-        table.options.meta?.updateData(apiResponse);
+        table.options.meta?.updateData(revalidateApiResponse ?? apiResponse);
       };
 
       const handleSearchFileClick = async () => {

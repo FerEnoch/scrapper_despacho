@@ -38,8 +38,9 @@ export type IDatabaseModel = {
   }: {
     userId: string;
   }): Promise<{ refreshToken: string }>;
-  register({ user, pass }: Auth): Promise<{ userId: string }>;
+  registerUser({ user, pass }: Auth): Promise<{ userId: string }>;
   login({ user, pass }: Auth): Promise<{ userId: string }>;
+  getUserById({ userId }: { userId: string }): Promise<Auth>;
   getPassByUser({ user }: { user: string }): Promise<{ pass: string }>;
   updateUserCredentials({
     userId,
@@ -65,14 +66,16 @@ export type UserAuthData = {
   userId: string;
   user?: string;
   pass?: string;
-  token?: string;
+  accessToken?: string;
+  refreshToken?: string;
 };
 
 export type UpdatedUserData = {
   updatedUser: string;
   updatedPass: string;
   userId?: string;
-  token?: string;
+  accessToken?: string;
+  refreshToken?: string;
 };
 
 export type RawFile = {

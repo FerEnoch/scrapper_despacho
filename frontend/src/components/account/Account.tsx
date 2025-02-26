@@ -1,4 +1,3 @@
-import { ActiveUser } from "@/types";
 import { CircleUser } from "lucide-react";
 import {
   DropdownMenu,
@@ -10,19 +9,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { useControlDropdown } from "@/utils/hooks/use-control-dropdown";
+import { useUserSession } from "@/utils/hooks/use-user-session";
 
 interface AccountInterface {
-  activeUser: ActiveUser;
   toggleAuthModal: (flag?: string) => void;
   handleLogout: () => Promise<void>;
 }
 
-export function Account({
-  activeUser,
-  toggleAuthModal,
-  handleLogout,
-}: AccountInterface) {
+export function Account({ toggleAuthModal, handleLogout }: AccountInterface) {
+  const { activeUser } = useUserSession();
+
   const { isOpen, toggleDropdown } = useControlDropdown();
+
+  if (!activeUser) return <></>;
 
   return (
     <div className="absolute right-8 top-8">

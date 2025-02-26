@@ -6,7 +6,7 @@ import { UserService } from "../sevices/user.service";
 import { modelTypes } from "../types";
 import { MESSAGES } from "./constants";
 import { JwtPayload } from "jsonwebtoken";
-import { setAccessTokenCookie } from "../utils";
+import { setTokenCookie } from "../utils";
 import { UserAuthData } from "../models/types";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
@@ -15,53 +15,96 @@ import jwt from "jsonwebtoken";
 const { TokenExpiredError } = jwt;
 
 export class AuthController implements IAuthController {
-  private service: IUserService;
+  private userService: IUserService;
 
   constructor(private readonly databaseModel: modelTypes["IDatabaseModel"]) {
-    this.service = new UserService(databaseModel);
-    // this.register = this.register.bind(this);
+    this.userService = new UserService(databaseModel);
+    this.revalidateAccessToken = this.revalidateAccessToken.bind(this);
+    this.getUserById = this.getUserById.bind(this);
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.verifyJwtMiddleware = this.verifyJwtMiddleware.bind(this);
     this.updateUserCredentials = this.updateUserCredentials.bind(this);
   }
 
-  // async register(
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ): Promise<void> {
-  //   try {
-  // const { user, pass } = req.body as Auth;
-  // const {
-  //   userId,
-  //   user: authUser,
-  //   token,
-  // } = await this.service.register({
-  //   user,
-  //   pass,
-  // });
-  // /**
-  //  * If token is generated
-  //  * (i.e. user is forced to login because he was already registered)
-  //  * set it as a cookie
-  //  */
-  // if (token) {
-  //   setAccessTokenCookie(res, token);
-  //   res.status(201).json({
-  //     message: MESSAGES.USER_LOGGED_IN,
-  //     data: [{ userId, user: authUser, pass }],
-  //   });
-  //   return;
-  // }
-  // res.status(201).json({
-  //   message: MESSAGES.USER_REGISTERED,
-  //   data: [{ userId, user: authUser }],
-  // });
-  // } catch (error: any) {
-  // next(error);
-  // }
-  // }
+  async revalidateAccessToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { userId, user, pass } = req.body;
+
+      const { accessToken } = await this.userService.generateAccessToken({
+        userId,
+        user,
+        pass,
+      });
+
+      setTokenCookie(res, {
+        tokenKey: "accessToken",
+        tokenValue: accessToken,
+        maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days cookie expiration time
+      });
+
+      res.status(200).json({
+        message: MESSAGES.USER_SESSION_ACTIVE,
+        data: [{ userId, user, pass }],
+      });
+    } catch (error: any) {
+      next(error);
+    }
+  }
+
+  async getUserById(
+    req: Request & {
+      auth?: { access: string | JwtPayload };
+    },
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params as { id: string };
+      const { access } = req.auth as {
+        access: {
+          user: string;
+          pass: string;
+        };
+      };
+
+      const { pass } = access;
+
+      const { user } = await this.userService.getUserById({
+        userId: id,
+      });
+
+      try {
+        const { refreshToken } = await this.userService.getRefreshTokenById({
+          userId: id,
+        });
+        await this.userService.verifyJwt({ token: refreshToken });
+      } catch (error: any) {
+        console.log(chalk.red(error.message));
+        if (error instanceof TokenExpiredError) {
+          console.log(chalk.blue("Expired REFRESH token - login again"));
+          res.clearCookie("accessToken");
+          throw new ApiError({
+            statusCode: 401,
+            message: ERRORS.REFRESH_TOKEN_EXPIRED,
+          });
+        } else {
+          throw error;
+        }
+      }
+
+      res.status(200).json({
+        message: MESSAGES.USER_SESSION_ACTIVE,
+        data: [{ userId: id, user, pass }],
+      });
+    } catch (error: any) {
+      next(error);
+    }
+  }
 
   async login(
     req: Request & { auth?: { access: string | JwtPayload } },
@@ -71,19 +114,23 @@ export class AuthController implements IAuthController {
     try {
       const { user, pass } = req.body as Auth;
 
-      const { userId, token } = await this.service.login({
+      const { userId, accessToken } = await this.userService.login({
         user,
         pass,
       });
 
-      if (!token) {
+      if (!accessToken) {
         throw new ApiError({
           statusCode: 401,
           message: ERRORS.TOKEN_GENERATION_FAILED,
         });
       }
 
-      setAccessTokenCookie(res, token);
+      setTokenCookie(res, {
+        tokenKey: "accessToken",
+        tokenValue: accessToken,
+        maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days cookie expiration time
+      });
       res.status(201).json({
         message: MESSAGES.USER_LOGGED_IN,
         data: [{ userId, user, pass }],
@@ -99,17 +146,19 @@ export class AuthController implements IAuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { userId, user, pass } = req.auth?.access as {
-        userId: string;
-        user: string;
-        pass: string;
+      const { access } = req.auth as {
+        access: {
+          userId: string;
+        };
       };
+
+      const { userId } = access;
 
       res.clearCookie("accessToken");
 
       res.status(200).json({
         message: MESSAGES.USER_LOGGED_OUT,
-        data: [{ userId, user, pass }],
+        data: [{ userId }],
       });
     } catch (error: any) {
       next(error);
@@ -122,17 +171,22 @@ export class AuthController implements IAuthController {
     next: NextFunction
   ) {
     try {
-      let { userId /*user, pass*/ } = req.auth?.access as UserAuthData;
+      let { userId } = req.auth?.access as UserAuthData;
 
       const { user: newUser, pass: newPass } = req.body as Auth;
 
-      const { token } = await this.service.updateUserCredentials({
+      const { accessToken } = await this.userService.updateUserCredentials({
         userId,
         user: newUser,
         pass: newPass,
       });
 
-      if (token) setAccessTokenCookie(res, token);
+      if (accessToken)
+        setTokenCookie(res, {
+          tokenKey: "accessToken",
+          tokenValue: accessToken,
+          maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days cookie expiration time
+        });
 
       res.status(200).json({
         message: MESSAGES.USER_CREDENTIALS_UPDATED,
@@ -149,14 +203,12 @@ export class AuthController implements IAuthController {
         access: string | JwtPayload;
       };
     },
-    _res: Response,
+    res: Response,
     next: NextFunction
   ) {
     let decoded;
-
     try {
       const accessToken: string = req.cookies.accessToken;
-      const { user, pass, userId } = req.body;
 
       if (!accessToken) {
         throw new ApiError({
@@ -166,34 +218,20 @@ export class AuthController implements IAuthController {
       }
 
       try {
-        decoded = this.service.verifyJwt({ token: accessToken });
+        decoded = this.userService.verifyJwt({ token: accessToken });
       } catch (error: any) {
-        console.log(chalk.red(error.message));
+        console.log(chalk.red("accessToken token error: " + error.message));
         if (error instanceof TokenExpiredError) {
-          // check refresh token
-          const { refreshToken } = await this.service.getRefreshTokenById({
-            userId,
+          console.log(
+            chalk.red("Expired accessToken token - needs to regenerate")
+          );
+          res.clearCookie("accessToken");
+          throw new ApiError({
+            statusCode: 401,
+            message: ERRORS.ACCESS_TOKEN_EXPIRED,
           });
-          try {
-            decoded = this.service.verifyJwt({ token: refreshToken });
-          } catch (error) {
-            if (error instanceof TokenExpiredError) {
-              console.log(chalk.red("Expired refresh token"));
-              throw new ApiError({
-                statusCode: 400,
-                message: ERRORS.TOKEN_EXPIRED,
-              });
-            }
-            throw error;
-          }
-
-          console.log(chalk.blue("Regenerating access token"));
-          const { accessToken } = this.service.generateAccessToken({
-            userId,
-            user,
-            pass,
-          });
-          decoded = accessToken;
+        } else {
+          throw error;
         }
       }
 
@@ -203,7 +241,6 @@ export class AuthController implements IAuthController {
 
       next();
     } catch (error: any) {
-      console.log(chalk.red(error.message));
       next(error);
     }
   }

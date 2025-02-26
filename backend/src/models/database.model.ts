@@ -21,8 +21,9 @@ export class DatabaseModel implements IDatabaseModel {
     this.getRefreshTokenById = this.getRefreshTokenById.bind(this);
     this.checkIfUserExists = this.checkIfUserExists.bind(this);
     this.saveRefreshToken = this.saveRefreshToken.bind(this);
-    this.register = this.register.bind(this);
+    this.registerUser = this.registerUser.bind(this);
     this.login = this.login.bind(this);
+    this.getUserById = this.getUserById.bind(this);
     this.getPassByUser = this.getPassByUser.bind(this);
     this.updateUserCredentials = this.updateUserCredentials.bind(this);
   }
@@ -46,12 +47,12 @@ export class DatabaseModel implements IDatabaseModel {
       "CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, user TEXT, pass TEXT)"
     );
 
-    const createAutnTokensTable = db.prepare(
+    const createAuthTokensTable = db.prepare(
       "CREATE TABLE IF NOT EXISTS auth (id TEXT PRIMARY KEY REFERENCES users(id), refreshToken TEXT)"
     );
 
     createUsersTable.run();
-    createAutnTokensTable.run();
+    createAuthTokensTable.run();
 
     if (NODE_ENV !== "test") {
       console.log(
@@ -124,7 +125,7 @@ export class DatabaseModel implements IDatabaseModel {
     }
   }
 
-  async register({ user, pass }: Auth) {
+  async registerUser({ user, pass }: Auth) {
     try {
       const hashedPass = await bcrypt.hash(pass, this.BCRYPT_SALT_ROUNDS);
       const id = randomUUID();
@@ -228,6 +229,30 @@ export class DatabaseModel implements IDatabaseModel {
         data: [{ user }],
       });
     }
+  }
+
+  async getUserById({ userId }: { userId: string }) {
+    const stmt = this.database.prepare(
+      "SELECT * FROM users WHERE id = $userId"
+    );
+    const stmtResult = stmt.get({
+      userId,
+    }) as unknown as { user: string; pass: string } | null;
+
+    const { user, pass } = stmtResult || {};
+
+    if (!user || !pass) {
+      throw new ApiError({
+        statusCode: 404,
+        message: ERRORS.NOT_FOUND,
+        data: [{ userId }],
+      });
+    }
+
+    return {
+      user,
+      pass,
+    };
   }
 
   async updateUserCredentials({ userId, user, pass }: CompleteAuthWithId) {

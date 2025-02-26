@@ -10,31 +10,12 @@ import { parseCookie } from "../helpers";
  *  - npm run back:test
  */
 describe("API-INTEGRATION > auth-router", () => {
-  // /**
-  //  * @route /auth/register
-  //  * @method POST
-  //  * @description Register a new user and return access token
-  //  */
-  // test("should register a new user", async () => {
-  //   const res = await testAgent
-  //     .post("/api/v1/auth/register")
-  //     .send({ user: "John Doe", pass: "password" });
-
-  //   expect(res.body.data[0].userId).toBeDefined();
-  //   expect(res.body.message).toBe(MESSAGES.USER_REGISTERED);
-  //   expect(res.status).toBe(201);
-  // });
-
   /**
    * @route /auth/login
    * @method POST
    * @description Login a user
    */
   test("should login a new user (register if not exists)", async () => {
-    // await testAgent
-    //   .post("/api/v1/auth/register")
-    //   .send({ user: "John Doe", pass: "password" });
-
     const loginResponse = await testAgent
       .post("/api/v1/auth/login")
       .send({ user: "John Doe", pass: "password" });
@@ -42,13 +23,80 @@ describe("API-INTEGRATION > auth-router", () => {
     expect(loginResponse.headers["set-cookie"]).toBeDefined();
     expect("cookie", "accessToken");
 
-    const cookie = loginResponse.headers["set-cookie"][0]
-      .split(";")[0]
-      .split("=")[1];
-    expect(cookie).toBeDefined();
+    const [{ userId: registeredUserId }] = loginResponse.body.data;
+
+    const loginResponseCookies = loginResponse.headers[
+      "set-cookie"
+    ] as unknown as string[];
+
+    const loginCookieValue = loginResponseCookies.find((cookie) =>
+      cookie.startsWith("accessToken=")
+    );
+
+    const {
+      value: { userId, user, pass },
+    } = parseCookie(loginCookieValue || "");
+
+    expect(userId).toBe(registeredUserId);
+    expect(user).toBe("John Doe");
+    expect(pass).toBe("password");
 
     expect(loginResponse.body.message).toBe(MESSAGES.USER_LOGGED_IN);
     expect(loginResponse.status).toBe(201);
+  });
+
+  /**
+   * @route /auth/user/:id
+   * @method GET
+   * @description Get user by id
+   */
+  test("should get user by id", async () => {
+    const loginResponse = await testAgent
+      .post("/api/v1/auth/login")
+      .send({ user: "John Doe", pass: "password" });
+
+    expect(loginResponse.headers["set-cookie"]).toBeDefined();
+    expect("cookie", "accessToken");
+
+    const [{ userId: registeredUserId }] = loginResponse.body.data;
+
+    const loginResponseCookies = loginResponse.headers[
+      "set-cookie"
+    ] as unknown as string[];
+
+    const loginCookieValue = loginResponseCookies
+      ?.find((cookie) => cookie.startsWith("accessToken="))
+      ?.split(";")[0]
+      .split("=")[1];
+
+    const userByIdResponse = await testAgent
+      .get(`/api/v1/auth/user/${registeredUserId}`)
+      .set("Cookie", `accessToken=${loginCookieValue}`);
+
+    expect(userByIdResponse.body.message).toBe(MESSAGES.USER_SESSION_ACTIVE);
+    expect(userByIdResponse.status).toBe(200);
+
+    const userByIdResponseCookies = loginResponse.headers[
+      "set-cookie"
+    ] as unknown as string[];
+
+    const userByIdCookieValue = userByIdResponseCookies.find((cookie) =>
+      cookie.startsWith("accessToken=")
+    );
+
+    const {
+      value: { userId, user, pass },
+    } = parseCookie(userByIdCookieValue || "");
+
+    expect(userId).toBe(registeredUserId);
+    expect(user).toBe("John Doe");
+    expect(pass).toBe("password");
+
+    const [{ userId: responseUserId, user: responseUser, pass: responsePass }] =
+      loginResponse.body.data;
+    expect(responseUserId).toBe(userId);
+    expect(responseUser).toBe(user);
+    expect(responsePass).toBe(pass);
   });
 
   /**
@@ -57,10 +105,6 @@ describe("API-INTEGRATION > auth-router", () => {
    * @description Logout a user
    */
   test("should register if not exists, login and logout a user", async () => {
-    // await testAgent
-    //   .post("/api/v1/auth/register")
-    //   .send({ user: "John Doe", pass: "password" });
-
     const loginResponse = await testAgent
       .post("/api/v1/auth/login")
       .send({ user: "John Doe", pass: "password" });

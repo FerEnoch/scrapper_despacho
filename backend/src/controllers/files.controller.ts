@@ -101,7 +101,15 @@ export class FilesController implements IFilesController {
     next: NextFunction
   ) {
     try {
+      const { access } = req.auth as {
+        access: {
+          user: string;
+          pass: string;
+        };
+      };
+      const { user, pass } = access;
       const files = req.body as FileStats[];
+
       const filesToEnd = files?.filter(
         (file) =>
           file.prevStatus !== SIEM_PAGE_DATA.ENDED_FILE_STATUS_TEXT &&
@@ -115,11 +123,6 @@ export class FilesController implements IFilesController {
           message: ERRORS.NO_FILES_TO_END,
         });
       }
-
-      const { user, pass } = req.auth?.access as {
-        user: string;
-        pass: string;
-      };
 
       await this.service.populateUserCredentials({ user, pass });
 

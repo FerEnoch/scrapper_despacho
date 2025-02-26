@@ -26,9 +26,6 @@ const {
   DEV_DOMAIN_LOCAL = "",
   DEV_PROD_DOMAIN_REMOTE_FRONTEND = "",
   PROD_DOMAIN_FRONTEND = "",
-  COOKIE_DOMAIN_DEV_LOCAL = "localhost",
-  COOKIE_DOMAIN_DEV_REMOTE = ".devtunnels.ms",
-  COOKIE_DOMAIN_PROD = "",
 } = process.env;
 
 const FILE_NUMBER_COLUMN_VALID_NAME = "Número";
@@ -39,14 +36,6 @@ const BCRYPT_SALT_ROUNDS =
   NODE_ENV === "development" ? BCYPT_SALT_DEV : BCYPT_SALT_PROD;
 
 const API_PORT = NODE_ENV === "development" ? DEV_PORT : PROD_PORT;
-
-const COOKIE_DOMAIN =
-  NODE_ENV === "development"
-    ? Number(REMOTE_FLAG)
-      ? COOKIE_DOMAIN_DEV_REMOTE
-      : COOKIE_DOMAIN_DEV_LOCAL
-    : COOKIE_DOMAIN_PROD;
-console.log("🚀 ~ COOKIE_DOMAIN:", COOKIE_DOMAIN); // not used
 
 const SCRAPPER_TIMEOUT =
   NODE_ENV === "test"
@@ -64,7 +53,6 @@ export {
   FILE_NUMBER_COLUMN_VALID_NAME,
   CURRENT_PROD_VERSION,
   NODE_ENV,
-  COOKIE_DOMAIN,
   SCRAPPER_TIMEOUT,
   API_PORT,
   JWT_SECRET,

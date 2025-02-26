@@ -22,7 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { filesApi } from "@/api/filesApi";
-import { FileStats, ApiResponse, RawFile, UserSession } from "@/types";
+import { FileStats, ApiResponse, RawFile, UserSessionData } from "@/types";
 import {
   AUTH_API_ERRORS,
   AUTH_API_MESSAGES,
@@ -40,8 +40,8 @@ import { MagnifyingGlass } from "react-loader-spinner";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "./utils/hooks/use-toast";
 import { Columns } from "@/components/dataTable/Columns";
-import { DataTable } from "@/components/dataTable";
-import { useActiveUser } from "./utils/hooks/use-active-user";
+import { DataTable } from "@/components/dataTable/DataTable";
+import { useUserSession } from "./utils/hooks/use-user-session";
 import { authApi } from "./api/authApi";
 
 const SpeedDial = lazy(() =>
@@ -89,8 +89,8 @@ export default function App() {
   >(() => {});
   /** custom hooks */
   const { toast } = useToast();
-  const { activeUser, handleActiveUser, logoutAndClearCookie } =
-    useActiveUser();
+  const { activeUser, handleActiveUser, handleRevalidateAccessToken } =
+    useUserSession();
   const form = useForm<z.infer<typeof uploadFileFormSchema>>({
     resolver: zodResolver(uploadFileFormSchema),
     defaultValues: {
@@ -132,7 +132,7 @@ export default function App() {
   };
 
   const handleFilesResponseMessages = useCallback(
-    ({ message, data }: ApiResponse<FileStats | RawFile>) => {
+    async ({ message, data }: ApiResponse<FileStats | RawFile>) => {
       switch (message) {
         case FILES_API_MESSAGES.FILE_UPLOADED:
           setFilesData(data as FileStats[]);
@@ -173,7 +173,7 @@ export default function App() {
           handleLogout();
           return;
         case AUTH_API_ERRORS.REFRESH_TOKEN_NOT_FOUND:
-        case AUTH_API_ERRORS.TOKEN_EXPIRED:
+        case AUTH_API_ERRORS.REFRESH_TOKEN_EXPIRED:
           toggleAuthModal("LOGIN");
           toast({
             title: UI_TOAST_MESSAGES.LOGIN_NEEDED.title,
@@ -236,9 +236,9 @@ export default function App() {
   );
 
   const onEndFilesClick = useCallback(
-    (apiResponseData: ApiResponse<FileStats>) => {
+    async (apiResponseData: ApiResponse<FileStats>) => {
       console.log("🚀 ~ onEndFilesClick ~ apiResponseData:", apiResponseData);
-      const data = handleFilesResponseMessages(apiResponseData);
+      const data = await handleFilesResponseMessages(apiResponseData);
 
       const newState = filesData.map((currentFile) => {
         if (!data) return currentFile;
@@ -252,8 +252,8 @@ export default function App() {
   );
 
   const handleAuthResponseMessages = useCallback(
-    ({ message, data }: ApiResponse<UserSession>) => {
-      const userData: UserSession | null = data?.[0] ?? null;
+    ({ message, data }: ApiResponse<UserSessionData>) => {
+      const userData: UserSessionData | null = data?.[0] ?? null;
       switch (message) {
         case AUTH_API_MESSAGES.USER_CREDENTIALS_UPDATED:
           toggleAuthModal();
@@ -274,7 +274,7 @@ export default function App() {
           });
           return userData;
         case AUTH_API_MESSAGES.USER_LOGGED_OUT:
-          logoutAndClearCookie();
+          handleActiveUser(null);
           toast({
             title: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.title,
             description: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.description,
@@ -282,10 +282,16 @@ export default function App() {
           });
           break;
         case AUTH_API_ERRORS.LOGOUT_FAILED: // handle REFRESH_TOKEN_NOT_FOUND in logout context (see authApi)
-          logoutAndClearCookie();
+          handleActiveUser(null);
+          // toast({
+          //   title: UI_TOAST_MESSAGES.LOGOUT_ERROR.title,
+          //   description: UI_TOAST_MESSAGES.LOGOUT_ERROR.description,
+          //   variant: "default",
+          // });
+          /* Always successful logout */
           toast({
-            title: UI_TOAST_MESSAGES.LOGOUT_ERROR.title,
-            description: UI_TOAST_MESSAGES.LOGOUT_ERROR.description,
+            title: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.title,
+            description: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.description,
             variant: "default",
           });
           break;
@@ -293,7 +299,7 @@ export default function App() {
           setIsAuthApiError(true);
           return null;
         case AUTH_API_ERRORS.REFRESH_TOKEN_NOT_FOUND:
-        case AUTH_API_ERRORS.TOKEN_EXPIRED:
+        case AUTH_API_ERRORS.REFRESH_TOKEN_EXPIRED:
           toggleAuthModal();
           toggleAuthModal("LOGIN");
           toast({
@@ -337,9 +343,22 @@ export default function App() {
   );
 
   const handleLogin = useCallback(
-    async (data: FormDataSubmit) => {
-      const apiResponse = await authApi.login(data);
-      const userData = handleAuthResponseMessages(apiResponse);
+    async (dataFormSubmit: FormDataSubmit) => {
+      let revalidateApiResponse;
+
+      const apiResponse = await authApi.login(dataFormSubmit);
+      const { message } = apiResponse;
+
+      if (message === AUTH_API_ERRORS.ACCESS_TOKEN_EXPIRED) {
+        const revalidateResponseData = await handleRevalidateAccessToken();
+        handleActiveUser(revalidateResponseData);
+        revalidateApiResponse = await authApi.login(dataFormSubmit);
+      }
+
+      const userData = handleAuthResponseMessages(
+        revalidateApiResponse ?? apiResponse
+      );
+
       if (!userData) return;
       const { userId, user, pass } = userData;
       handleActiveUser({
@@ -348,18 +367,19 @@ export default function App() {
         password: pass,
       });
     },
-    [handleActiveUser, handleAuthResponseMessages]
+    [handleActiveUser, handleAuthResponseMessages, handleRevalidateAccessToken]
   );
 
   const handleLogout = useCallback(async () => {
     const apiResponse = await authApi.logout();
+
     handleAuthResponseMessages(apiResponse);
   }, [handleAuthResponseMessages]);
 
   const handleUpdateCredentials = useCallback(
-    async (data: FormDataSubmit) => {
+    async (dataFormSubmit: FormDataSubmit) => {
       // Rename just for clarity
-      const { user: newUser, pass: newPass } = data;
+      const { user: newUser, pass: newPass } = dataFormSubmit;
       if (!activeUser) {
         toast({
           title: UI_TOAST_MESSAGES.LOGIN_NEEDED.title,
@@ -372,7 +392,26 @@ export default function App() {
         user: newUser,
         pass: newPass,
       });
-      const userData = handleAuthResponseMessages(apiResponse);
+
+      const { message } = apiResponse;
+
+      let revalidateApiResponse;
+      if (message === AUTH_API_ERRORS.ACCESS_TOKEN_EXPIRED) {
+        const revalidateResponseData = await handleRevalidateAccessToken();
+        handleActiveUser(revalidateResponseData);
+        revalidateApiResponse = await authApi.updateCredentials(
+          activeUser.userId,
+          {
+            user: newUser,
+            pass: newPass,
+          }
+        );
+      }
+
+      const userData = handleAuthResponseMessages(
+        revalidateApiResponse ?? apiResponse
+      );
+
       if (!userData) return;
 
       const { userId, user, pass } = userData;
@@ -382,7 +421,13 @@ export default function App() {
         password: pass,
       });
     },
-    [activeUser, handleAuthResponseMessages, handleActiveUser, toast]
+    [
+      activeUser,
+      handleAuthResponseMessages,
+      handleActiveUser,
+      toast,
+      handleRevalidateAccessToken,
+    ]
   );
 
   const toggleAuthModal = useCallback(
@@ -423,7 +468,6 @@ export default function App() {
         <CardHeader className="relative">
           {activeUser && activeUser.username?.length > 0 && (
             <Account
-              activeUser={activeUser}
               toggleAuthModal={toggleAuthModal}
               handleLogout={handleLogout}
             />

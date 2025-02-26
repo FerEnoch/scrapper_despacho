@@ -34,13 +34,13 @@ export type ApiResponse<T> = {
   data?: T[];
 };
 
-export type UserSession = {
+export type UserSessionData = {
   userId: string;
   user: string;
   pass: string;
 };
 
-export type ActiveUser = {
+export type ActiveUserInfo = {
   userId: string;
   username: string;
   password: string;

@@ -7,12 +7,29 @@ export async function convertData(rawData: string) {
   return json;
 }
 
-export function setAccessTokenCookie(res: Response, accessToken: string) {
-  res.cookie("accessToken", accessToken, {
+export function setTokenCookie(
+  res: Response,
+  {
+    tokenKey,
+    tokenValue,
+    maxAge,
+  }: {
+    tokenKey: string;
+    tokenValue: string;
+    maxAge?: number;
+  }
+) {
+  const cookieMaxAge = maxAge ?? 7 * 24 * 60 * 60 * 1000; // 7 days
+
+  res.cookie(tokenKey, tokenValue, {
+    maxAge: cookieMaxAge,
     secure: NODE_ENV === "production",
-    httpOnly: false,
-    // domain: COOKIE_DOMAIN,
-    // sameSite: "lax" by default,
-    maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+    httpOnly: true,
+    /**
+     * Cookie sameSite prop should be set to "none" in production mode due to how
+     * the backend is served, which happen to send the cookie to the frontend
+     * throw a tunnel vpn.
+     */
+    sameSite: NODE_ENV === "production" ? "none" : "strict",
   });
 }

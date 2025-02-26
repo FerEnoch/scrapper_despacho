@@ -1,40 +1,75 @@
 import { API_BASE_URL } from "@/config";
 import { loginFormSchema } from "@/schemas/forms";
-import { ApiResponse, UserSession } from "@/types";
+import { ActiveUserInfo, ApiResponse, UserSessionData } from "@/types";
 import { AUTH_API_ERRORS } from "@/types/enums";
 import { z } from "zod";
 
 export const authApi = {
-  // register: async (data: z.infer<typeof loginFormSchema>) => {
-  //   try {
-  //     const response = await fetch(`${API_BASE_URL}/auth/register`, {
-  //       method: "POST",
-  //       // credentials: "include",
-  //       headers: {
-  //         "content-type": "application/json",
-  //       },
-  //       body: JSON.stringify(data),
-  //     });
+  revalidateAccessToken: async (userSession: ActiveUserInfo) => {
+    try {
+      const { userId, username, password } = userSession;
 
-  //     const responseData = (await response.json()) as ApiResponse<UserSession>;
-  //     console.log("🚀 ~ responseData:", responseData);
+      const response = await fetch(`${API_BASE_URL}/auth/revalidate-token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          user: username,
+          pass: password,
+        }),
+      });
 
-  //     if (response.ok) {
-  //       return responseData;
-  //     }
+      const responseData =
+        (await response.json()) as ApiResponse<UserSessionData>;
+      console.log("🚀 ~ responseData:", responseData);
 
-  //     return {
-  //       message: responseData.message ?? "",
-  //       data: responseData?.data ?? [],
-  //     };
-  //   } catch (error) {
-  //     console.log("🚀 ~ register ~ error:", error);
-  //     return {
-  //       message: AUTH_API_ERRORS.GENERIC_ERROR,
-  //       data: [],
-  //     };
-  //   }
-  // },
+      if (response.ok) {
+        return responseData;
+      }
+
+      return {
+        message: responseData.message ?? "",
+        data: responseData?.data ?? [],
+      };
+    } catch (error) {
+      console.log("🚀 ~ revalidateAccessToken ~ error:", error);
+      return {
+        message: AUTH_API_ERRORS.GENERIC_ERROR,
+        data: [],
+      };
+    }
+  },
+
+  getUserById: async ({ userId }: { userId: string }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/user/${userId}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const responseData =
+        (await response.json()) as ApiResponse<UserSessionData>;
+      console.log("🚀 ~ responseData:", responseData);
+
+      if (response.ok) {
+        return responseData;
+      }
+
+      return {
+        message: responseData.message ?? "",
+        data: responseData?.data ?? [],
+      };
+    } catch (error) {
+      console.log("🚀 ~ getUserById ~ error:", error);
+      return {
+        message: AUTH_API_ERRORS.GENERIC_ERROR,
+        data: [],
+      };
+    }
+  },
 
   login: async (data: z.infer<typeof loginFormSchema>) => {
     try {
@@ -47,7 +82,8 @@ export const authApi = {
         body: JSON.stringify(data),
       });
 
-      const responseData = (await response.json()) as ApiResponse<UserSession>;
+      const responseData =
+        (await response.json()) as ApiResponse<UserSessionData>;
       console.log("🚀 ~ responseData:", responseData);
 
       if (response.ok) {
@@ -81,7 +117,8 @@ export const authApi = {
         body: JSON.stringify(data),
       });
 
-      const responseData = (await response.json()) as ApiResponse<UserSession>;
+      const responseData =
+        (await response.json()) as ApiResponse<UserSessionData>;
       console.log("🚀 ~ responseData:", responseData);
 
       if (response.ok) {
@@ -108,7 +145,8 @@ export const authApi = {
         credentials: "include",
       });
 
-      const responseData = (await response.json()) as ApiResponse<UserSession>;
+      const responseData =
+        (await response.json()) as ApiResponse<UserSessionData>;
       console.log("🚀 ~ responseData:", responseData);
 
       if (response.ok) {
