@@ -56,10 +56,10 @@ export const UI_TOAST_MESSAGES = {
     title: "Sesión cerrada",
     description: "¡Has cerrado sesión con éxito!",
   },
-  LOGOUT_ERROR: {
-    title: "El cierre de sesión no fue exitoso",
-    description: "Por favor, recarga la página para volver a iniciar sesión",
-  },
+  // LOGOUT_ERROR: {
+  //   title: "El cierre de sesión no fue exitoso",
+  //   description: "Por favor, recarga la página para volver a iniciar sesión",
+  // },
   CREDENTIALS_UPDATED_SUCCESS: {
     title: "Credenciales actualizadas",
     description: "Tus credenciales se han actualizado correctamente",

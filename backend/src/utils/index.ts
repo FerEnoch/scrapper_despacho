@@ -22,13 +22,13 @@ export function setTokenCookie(
   const cookieMaxAge = maxAge ?? 7 * 24 * 60 * 60 * 1000; // 7 days
 
   res.cookie(tokenKey, tokenValue, {
-    maxAge: cookieMaxAge,
     secure: NODE_ENV === "production",
     httpOnly: true,
     /**
      * Cookie sameSite prop should be set to "none" in production mode due to how
      * the backend is served, which happen to send the cookie to the frontend
      * throw a tunnel vpn.
+     * Needed: allow frontend production domain 3rd party cookies.
      */
     sameSite: NODE_ENV === "production" ? "none" : "strict",
   });

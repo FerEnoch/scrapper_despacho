@@ -10,6 +10,7 @@ import {
 import { Button } from "../ui/button";
 import { useControlDropdown } from "@/utils/hooks/use-control-dropdown";
 import { useUserSession } from "@/utils/hooks/use-user-session";
+import { useState } from "react";
 
 interface AccountInterface {
   toggleAuthModal: (flag?: string) => void;
@@ -17,8 +18,8 @@ interface AccountInterface {
 }
 
 export function Account({ toggleAuthModal, handleLogout }: AccountInterface) {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const { activeUser } = useUserSession();
-
   const { isOpen, toggleDropdown } = useControlDropdown();
 
   if (!activeUser) return <></>;
@@ -48,20 +49,34 @@ export function Account({ toggleAuthModal, handleLogout }: AccountInterface) {
             </Button>
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className="w-[20rem]">
           <DropdownMenuLabel>Mi cuenta</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            {"Usuario SIEM:"}
-            <strong>{activeUser.username}</strong>
+          <DropdownMenuItem className="h-10">
+            <div className="flex items-center justify-between w-full pe-2">
+              <p className="shrink-0">{"Usuario SIEM:"}</p>
+              <strong className="flex-1 ps-4">{activeUser.username}</strong>
+            </div>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            {"Contraseña SIEM:"}
-            <strong>{activeUser.password}</strong>
+          <DropdownMenuItem className="h-10">
+            <div className="flex items-center justify-between w-full pe-2">
+              <p className="shrink-0">{"Contraseña SIEM:"}</p>
+              <strong
+                className="flex-1 ps-4"
+                onMouseLeave={() => setIsPasswordVisible(false)}
+                onMouseEnter={() => setIsPasswordVisible(true)}
+              >
+                {isPasswordVisible ? (
+                  activeUser.password
+                ) : (
+                  <span className="relative top-1">{"**********"}</span>
+                )}
+              </strong>
+            </div>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="hover:cursor-pointer focus:ring-0 focus:outline-none hover:outline-none hover:ring-0 w-full justify-start"
+            className="h-10 hover:cursor-pointer focus:ring-0 focus:outline-none hover:outline-none hover:ring-0 w-full justify-start"
             onClick={() => {
               toggleDropdown();
               toggleAuthModal("UPDATE_CREDENTIALS");
@@ -72,7 +87,7 @@ export function Account({ toggleAuthModal, handleLogout }: AccountInterface) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={handleLogout}
-            className="hover:cursor-pointer focus:ring-0 focus:outline-none hover:outline-none hover:ring-0 w-full justify-start"
+            className="h-10 hover:cursor-pointer focus:ring-0 focus:outline-none hover:outline-none hover:ring-0 w-full justify-start"
           >
             {"Cerrar sesión"}
           </DropdownMenuItem>

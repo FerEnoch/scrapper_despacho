@@ -147,12 +147,16 @@ export const authApi = {
 
       const responseData =
         (await response.json()) as ApiResponse<UserSessionData>;
-      console.log("🚀 ~ responseData:", responseData);
 
       if (response.ok) {
+        console.log("🚀 ~ responseData:", responseData);
         return responseData;
       }
 
+      console.log("🚀 ~ responseData:", {
+        message: AUTH_API_ERRORS.LOGOUT_FAILED,
+        data: [],
+      });
       return {
         message: AUTH_API_ERRORS.LOGOUT_FAILED,
         data: [],

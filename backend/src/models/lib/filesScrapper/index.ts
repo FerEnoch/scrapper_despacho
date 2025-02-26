@@ -16,13 +16,14 @@ const validateRawDataBatch = (files: RawFile[]) => {
   const validationRegex = VALIDATION_REGEX.FILE_NUMBER_COLUMN;
 
   const hasCorrectColumn = files.filter(
-    (file) => FILE_NUMBER_COLUMN_VALID_NAME in file && file["Número"].length > 0
+    (file) =>
+      FILE_NUMBER_COLUMN_VALID_NAME in file &&
+      file[FILE_NUMBER_COLUMN_VALID_NAME].trim().length > 0
   );
 
   return hasCorrectColumn.every((file) => {
     const newFile = removeKVQuotes(file);
     const fileNum = newFile[FILE_NUMBER_COLUMN_VALID_NAME].trim();
-    // Check if 'Número' property exists and matches the regex
     return validationRegex.test(fileNum);
   });
 };
@@ -35,7 +36,9 @@ const rawFileParser = (files: RawFile[]): FileId[] => {
     .map((file, index) => {
       const newRawFile = removeKVQuotes(file);
       const { Número: completeNum = "" } = newRawFile;
-      const [org = "", rep = "", num = "", digv = ""] = completeNum.split("-");
+      const [org = "", rep = "", num = "", digv = ""] = completeNum
+        .trim()
+        .split("-");
 
       if (!org || !rep || !num || !digv) return null as unknown as FileId;
 

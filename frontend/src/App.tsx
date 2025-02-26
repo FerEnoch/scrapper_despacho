@@ -281,14 +281,8 @@ export default function App() {
             variant: "default",
           });
           break;
-        case AUTH_API_ERRORS.LOGOUT_FAILED: // handle REFRESH_TOKEN_NOT_FOUND in logout context (see authApi)
+        case AUTH_API_ERRORS.LOGOUT_FAILED:
           handleActiveUser(null);
-          // toast({
-          //   title: UI_TOAST_MESSAGES.LOGOUT_ERROR.title,
-          //   description: UI_TOAST_MESSAGES.LOGOUT_ERROR.description,
-          //   variant: "default",
-          // });
-          /* Always successful logout */
           toast({
             title: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.title,
             description: UI_TOAST_MESSAGES.LOGOUT_SUCCESS.description,
