@@ -6,11 +6,12 @@ import { UserService } from "../sevices/user.service";
 import { modelTypes } from "../types";
 import { MESSAGES } from "./constants";
 import { JwtPayload } from "jsonwebtoken";
-import { setTokenCookie } from "../utils";
+import { clearCookie, setTokenCookie } from "../utils";
 import { UserAuthData } from "../models/types";
 import { ApiError } from "../errors/api-error";
 import { ERRORS } from "../errors/types";
 import chalk from "chalk";
+import { MAX_AGE_ACCESS_TOKEN_COOKIE } from "../config";
 import jwt from "jsonwebtoken";
 const { TokenExpiredError } = jwt;
 
@@ -44,7 +45,7 @@ export class AuthController implements IAuthController {
       setTokenCookie(res, {
         tokenKey: "accessToken",
         tokenValue: accessToken,
-        maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days cookie expiration time
+        maxAge: MAX_AGE_ACCESS_TOKEN_COOKIE, // 14 days cookie expiration time
       });
 
       res.status(200).json({
@@ -87,7 +88,10 @@ export class AuthController implements IAuthController {
         console.log(chalk.red(error.message));
         if (error instanceof TokenExpiredError) {
           console.log(chalk.blue("Expired REFRESH token - login again"));
-          res.clearCookie("accessToken");
+          clearCookie(res, {
+            tokenKey: "accessToken",
+            maxAge: MAX_AGE_ACCESS_TOKEN_COOKIE,
+          });
           throw new ApiError({
             statusCode: 401,
             message: ERRORS.REFRESH_TOKEN_EXPIRED,
@@ -129,7 +133,7 @@ export class AuthController implements IAuthController {
       setTokenCookie(res, {
         tokenKey: "accessToken",
         tokenValue: accessToken,
-        maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days cookie expiration time
+        maxAge: MAX_AGE_ACCESS_TOKEN_COOKIE, // 14 days cookie expiration time
       });
       res.status(201).json({
         message: MESSAGES.USER_LOGGED_IN,
@@ -154,7 +158,10 @@ export class AuthController implements IAuthController {
 
       const { userId } = access;
 
-      res.clearCookie("accessToken");
+      clearCookie(res, {
+        tokenKey: "accessToken",
+        maxAge: MAX_AGE_ACCESS_TOKEN_COOKIE,
+      });
 
       res.status(200).json({
         message: MESSAGES.USER_LOGGED_OUT,
@@ -185,7 +192,7 @@ export class AuthController implements IAuthController {
         setTokenCookie(res, {
           tokenKey: "accessToken",
           tokenValue: accessToken,
-          maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days cookie expiration time
+          maxAge: MAX_AGE_ACCESS_TOKEN_COOKIE, // 14 days cookie expiration time
         });
 
       res.status(200).json({
@@ -225,7 +232,10 @@ export class AuthController implements IAuthController {
           console.log(
             chalk.red("Expired accessToken token - needs to regenerate")
           );
-          res.clearCookie("accessToken");
+          clearCookie(res, {
+            tokenKey: "accessToken",
+            maxAge: MAX_AGE_ACCESS_TOKEN_COOKIE,
+          });
           throw new ApiError({
             statusCode: 401,
             message: ERRORS.ACCESS_TOKEN_EXPIRED,
