@@ -33,7 +33,7 @@ export const filesStats: Array<FileStats> = [
     index: 4,
     num: "DE-0509-00518726-5 (NI)",
     title: "DIRECCION EJECUTIVA DE PROGRAMA DE vIV. Y pAT. COMUNITARIO",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
 ];

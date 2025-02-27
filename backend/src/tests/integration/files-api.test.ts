@@ -23,7 +23,7 @@ import {
  * @dev Command to run this test suite:
  *  - npm run back:test
  */
-describe.skip("API-INTEGRATION > files-router", () => {
+describe("API-INTEGRATION > files-router", () => {
   /**
    * @route /files
    * @method POST
@@ -139,6 +139,8 @@ describe.skip("API-INTEGRATION > files-router", () => {
         .post("/api/v1/files/end")
         .set("Cookie", `accessToken=${getFakeWrongCredentialsCookie()}`)
         .send(filesStats);
+
+      // is returning 500 - SERVER_ERROR
 
       const lastReportScreenshot = await findLastScreenshotIfExists(
         "./src/tests/integration/login-error.jpg"
