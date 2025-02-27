@@ -38,24 +38,3 @@ export function getMessageColor(message: string) {
   }
   return messageColor;
 }
-
-// function parseJwt(token: string) {
-//   // Split the token and taken the second
-//   const base64Url = token.split(".")[1];
-
-//   // Replace "-" with "+"; "_" with "/"
-//   const base64 = base64Url.replace("-", "+").replace("_", "/");
-
-//   // return the result parsed in JSON
-//   return JSON.parse(window.atob(base64));
-// }
-
-// export function parseCookie(cookieKVString: string): {
-//   value: UserSession;
-// } {
-//   const [, cookieValue] = cookieKVString.split("=");
-
-//   const parsedValue: UserSession = parseJwt(cookieValue);
-
-//   return { value: parsedValue };
-// }

@@ -1,7 +1,6 @@
 import { Page, Route } from "@playwright/test";
 import { Auth, CompleteAuthWithId } from "../schemas/auth";
 import Database from "better-sqlite3";
-import { Request, Response, NextFunction } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import { FILE_NUMBER_COLUMN_VALID_NAME } from "../config";
 

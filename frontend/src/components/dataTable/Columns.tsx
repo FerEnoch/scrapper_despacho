@@ -54,7 +54,7 @@ export const Columns: ColumnDef<FileStats>[] = [
     },
     cell: ({ row }) => {
       const fileCompleteNum = row.getValue("num") as string;
-      const [, , fileShortNum] = fileCompleteNum.split("-");
+      const [, , fileShortNum] = (fileCompleteNum ?? "").split("-");
       return (
         <div className="grid place-content-center w-[24ch] tracking-wide">
           <a
@@ -218,7 +218,10 @@ export const Columns: ColumnDef<FileStats>[] = [
         }
 
         setIsEndingFile(false);
-        table.options.meta?.updateData(revalidateApiResponse ?? apiResponse);
+        table.options.meta?.updateData(
+          revalidateApiResponse ?? apiResponse,
+          selectedNum
+        );
       };
 
       const handleSearchFileClick = async () => {
@@ -228,7 +231,7 @@ export const Columns: ColumnDef<FileStats>[] = [
         const selectedNum = row.getValue("num") as string;
         const apiResponse = await filesApi.getFilesStats(selectedNum);
 
-        table.options.meta?.updateData(apiResponse);
+        table.options.meta?.updateData(apiResponse, selectedNum);
         setIsSearchingStats(false);
       };
 

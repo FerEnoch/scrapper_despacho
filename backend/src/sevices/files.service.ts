@@ -25,10 +25,10 @@ export class FilesService implements IFilesService {
     this.SIEM_PASSWORD = "";
 
     this.searchFilesStats.bind(this);
+    this.startFilesServiceSession.bind(this);
     this.endFiles.bind(this);
     this.endFileByNum.bind(this);
     this.siemLogin.bind(this);
-    this.populateUserCredentials.bind(this);
   }
 
   async searchFilesStats(files: FileId[]) {
@@ -81,7 +81,7 @@ export class FilesService implements IFilesService {
     return scrappedData;
   }
 
-  async populateUserCredentials({ user, pass }: Auth) {
+  async startFilesServiceSession({ user, pass }: Auth) {
     this.SIEM_USER = user;
     this.SIEM_PASSWORD = pass;
     if (!this.SIEM_USER || !this.SIEM_PASSWORD) {
@@ -93,6 +93,11 @@ export class FilesService implements IFilesService {
     await this.filesScrapperModel.createBrowserContext();
     await this.siemLogin();
     await this.filesScrapperModel.closeBrowserContext();
+  }
+
+  async endFilesServiceSession() {
+    this.SIEM_PASSWORD = "";
+    this.SIEM_USER = "";
   }
 
   async endFiles({ files }: { files: FileStats[] }) {
@@ -127,13 +132,6 @@ export class FilesService implements IFilesService {
               }
 
               const [{ num }] = parseFileStats([file]);
-
-              // const fileNewData: FileStats = await this.filesScrapperModel.collectData({
-              //   file: {
-              //     ...file,
-              //     num, // only middle long number
-              //   },
-              // });
 
               const { message, detail } = await this.endFileByNum(num);
 

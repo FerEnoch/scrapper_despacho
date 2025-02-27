@@ -51,14 +51,18 @@ export function useTable<TData, TValue>({
       pagination,
     },
     meta: {
-      updateData: (apiResponse: ApiResponse<FileStats>) => {
+      updateData: (
+        apiResponse: ApiResponse<FileStats>,
+        selectedNum: string
+      ) => {
         const apiResponseMessage = apiResponse.message;
         const updatedFileStats = apiResponse.data?.[0];
 
         setIsEndingFiles(true);
-        const newData = [...data].map((file, index) => {
+        const newData = ([...data] as FileStats[]).map((file, index) => {
           if (rowSelection[index]) {
             if (!updatedFileStats) return file;
+            if (selectedNum !== file.num) return file;
             return {
               ...updatedFileStats,
               prevStatus:

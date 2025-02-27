@@ -19,24 +19,24 @@ import { SCRAPPER_TIMEOUT } from "../config";
 import chalk from "chalk";
 
 export class FilesScrapperV1 implements IFileScrapperV1 {
-  private SIEM_BASE_URL = "";
-  private SIEM_LOGIN_PATH = "";
-  private SIEM_LOGIN_URL = "";
-  private SIEM_SEE_FILE_PATH = "";
-  private SIEM_SEE_FILE_URL = "";
-  private SIEM_SEARCH_FILE_PATH = "";
-  private SIEM_SEARCH_FILE_URL = "";
-  private SIEM_END_FILE_PATH = "";
-  private SIEM_END_FILE_URL = "";
-  private END_FILE_TEXT = "";
-  private SIEM_LOCATE_FILE_TITLE: locationType;
-  private SIEM_LOCATE_FILE_STATUS: locationType;
-  private SIEM_LOCATE_FILE_LOCATION: locationType;
-  private AUTH_DENIED_PAGE_MSG: locationType;
-  private AUTH_GRANTED_PAGE_CHECK: locationType;
-  private context: BrowserContext | null = null;
+  private readonly SIEM_BASE_URL;
+  private readonly SIEM_LOGIN_PATH;
+  private readonly SIEM_LOGIN_URL;
+  private readonly SIEM_SEE_FILE_PATH;
+  private readonly SIEM_SEE_FILE_URL;
+  private readonly SIEM_SEARCH_FILE_PATH;
+  private readonly SIEM_SEARCH_FILE_URL;
+  private readonly SIEM_END_FILE_PATH;
+  private readonly SIEM_END_FILE_URL;
+  private readonly END_FILE_TEXT;
+  private readonly SIEM_LOCATE_FILE_TITLE: locationType;
+  private readonly SIEM_LOCATE_FILE_STATUS: locationType;
+  private readonly SIEM_LOCATE_FILE_LOCATION: locationType;
+  private readonly AUTH_DENIED_PAGE_MSG: locationType;
+  private readonly AUTH_GRANTED_PAGE_CHECK: locationType;
+  private readonly timeout = SCRAPPER_TIMEOUT;
   private browser: Browser | null = null;
-  private timeout = SCRAPPER_TIMEOUT;
+  private context: BrowserContext | null = null;
 
   constructor() {
     const {
@@ -69,6 +69,7 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
     this.AUTH_GRANTED_PAGE_CHECK = AUTH_GRANTED_PAGE_CHECK;
     this.createBrowserContext.bind(this);
     this.interceptRoutes.bind(this);
+    this.closeBrowserContext.bind(this);
     this.siemLogin.bind(this);
     this.collectData.bind(this);
     this.endFileByNum.bind(this);

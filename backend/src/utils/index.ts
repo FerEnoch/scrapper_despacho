@@ -46,6 +46,11 @@ export function clearCookie(
     maxAge?: number;
   }
 ) {
+  /**
+   * Web browsers and other compliant clients will only clear the cookie if the
+   * given options is identical to those given to res.cookie(), excluding expires and maxAge
+   * https://expressjs.com/en/api.html#res.clearCookie
+   */
   const cookieMaxAge = maxAge ?? DEFAULT_MAX_AGE_ACCESS_TOKEN_COOKIE;
   res.clearCookie(tokenKey, {
     secure: NODE_ENV === "production",

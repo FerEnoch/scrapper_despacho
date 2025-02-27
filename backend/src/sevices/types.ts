@@ -8,7 +8,8 @@ import {
 import { Auth, CompleteAuthWithId } from "../schemas/auth";
 
 export interface IFilesService {
-  populateUserCredentials({ user, pass }: Auth): Promise<void>;
+  startFilesServiceSession({ user, pass }: Auth): Promise<void>;
+  endFilesServiceSession(): Promise<void>;
   searchFilesStats(files: FileId[]): Promise<FileStats[]>;
   endFiles({ files }: { files: FileStats[] }): Promise<FileEndedStats[]>;
   endFileByNum(num: string): Promise<{ message: string; detail: string }>;

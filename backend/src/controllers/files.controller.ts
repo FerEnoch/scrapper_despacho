@@ -124,9 +124,11 @@ export class FilesController implements IFilesController {
         });
       }
 
-      await this.service.populateUserCredentials({ user, pass });
+      await this.service.startFilesServiceSession({ user, pass });
 
       const endedFiles = await this.service.endFiles({ files });
+
+      await this.service.endFilesServiceSession();
 
       if (endedFiles.length === 0) {
         throw new ApiError({
