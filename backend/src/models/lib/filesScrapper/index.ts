@@ -36,7 +36,6 @@ const rawFileParser = (files: RawFile[]): FileId[] => {
     .map((file, index) => {
       const newRawFile = removeKVQuotes(file);
       const { [FILE_NUMBER_COLUMN_VALID_NAME]: completeNum = "" } = newRawFile;
-      console.log("🚀 ~ .map ~ completeNum:", completeNum);
 
       if (!completeNum) return null as unknown as FileId;
 
@@ -62,8 +61,6 @@ export async function parseRawFiles(
   const batchIsValid = validateRawDataBatch(files);
   if (!batchIsValid) {
     const invalidFiles = getInvalidFiles(files);
-    console.log("🚀 ~ invalidFiles:", invalidFiles);
-    console.log("🚀 ~ invalidFiles:", rawFileParser(invalidFiles));
 
     return Promise.resolve({
       ok: batchIsValid,
