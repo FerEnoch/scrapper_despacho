@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { parsedFilesIds } from "../sample_data/parsedFilesIds.js";
-import { parseRawFiles } from "../../models/lib/filesScrapper/index.js";
-import { getJsonSampleDataFile } from "../json-imports.js";
-
-/**
- * TODO -> test buggy files algorithm
- */
+import { parsedFilesIds } from "../sample_data/parsedFilesIds";
+import { parseRawFiles } from "../../models/lib/filesScrapper/index";
+import { getJsonSampleDataFile } from "../json-imports";
 
 /**
  * @description This test suite is for testing the API lib functions

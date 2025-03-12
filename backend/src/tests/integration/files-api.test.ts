@@ -14,10 +14,6 @@ import {
 } from "../helpers";
 
 /**
- * TODO -> test buggy files sent to api
- */
-
-/**
  * @description This test suite is for testing the v1 API files routes
  * @dev To run this test suite, you need to have a running SIEM system user and password
  * @dev Command to run this test suite:

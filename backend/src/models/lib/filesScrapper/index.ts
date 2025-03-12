@@ -39,17 +39,41 @@ const rawFileParser = (files: RawFile[]): FileId[] => {
 
       if (!completeNum) return null as unknown as FileId;
 
-      const [org = "", rep = "", num = "", digv = ""] = completeNum
-        .trim()
-        .split("-");
+      let org = "",
+        rep = "",
+        num = "",
+        digv = "";
+
+      const hasLastFinalLetters = !!completeNum.split(" ")[1]?.length;
+
+      if (hasLastFinalLetters) {
+        [org = "", rep = "", num = "", digv = ""] = completeNum
+          .trim()
+          .split("-");
+
+        const hasInitialOrgLetters = /\D/.test(org);
+
+        return {
+          index,
+          completeNum: completeNum,
+          org: hasInitialOrgLetters ? org : "",
+          rep: hasInitialOrgLetters ? rep : org,
+          num: hasInitialOrgLetters ? num : rep,
+          digv:
+            (hasInitialOrgLetters ? digv.split("")[0] : num.split("")[0]) || "",
+        };
+      }
+
+      [rep = "", num = "", digv = ""] = completeNum.trim().split("-");
+      const hasInitialOrgLetters = /\D/.test(rep);
 
       return {
         index,
         completeNum: completeNum,
-        org,
-        rep,
-        num,
-        digv: digv.split("")[0],
+        org: hasInitialOrgLetters ? rep : org,
+        rep: hasInitialOrgLetters ? num : rep,
+        num: hasInitialOrgLetters ? digv : num,
+        digv: hasInitialOrgLetters ? num.split("")[0] : digv.split("")[0] || "",
       };
     })
     .filter(Boolean);
