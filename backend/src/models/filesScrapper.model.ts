@@ -98,13 +98,8 @@ export class FilesScrapperV1 implements IFileScrapperV1 {
   }
 
   async closeBrowserContext(): Promise<void> {
-    if (this.context) {
-      await this.context.close();
-    }
-
-    if (this.browser) {
-      await this.browser.close();
-    }
+    if (this.context) await this.context.close();
+    if (this.browser) await this.browser.close();
   }
 
   async collectData({ file }: { file: FileId }): Promise<FileStats | null> {

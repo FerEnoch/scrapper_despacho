@@ -24,39 +24,27 @@ export const filesEndedWholeLotOf: Array<FileEndedStats> = [
     num: "DE-0963-01012879-1 (NI)",
     title:
       "COMPAGNUCCI ALEJANDRO MIGUEL INSCRIPCION Nº 32365-9 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
-    newStatus: {
-      status: "EN CURSO",
-      message: "ERROR",
-      detail: "El documento no se encuentra en las reparticiones del usuario.",
-    },
+    newStatus: null,
   },
   {
     index: 3,
     num: "DE-0963-01012855-1 (NI)",
     title:
       "VAZQUEZ MARIA ESTER INSCRIPCION Nº 30864-3 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
-    newStatus: {
-      status: "EN CURSO",
-      message: "ERROR",
-      detail: "El documento no se encuentra en las reparticiones del usuario.",
-    },
+    newStatus: null,
   },
   {
     index: 4,
     num: "DE-0963-01012862-7 (NI)",
     title:
       "ZANAZZI SABRINA ELSA INSCRIPCION Nº 30608-5 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
-    newStatus: {
-      status: "EN CURSO",
-      message: "ERROR",
-      detail: "El documento no se encuentra en las reparticiones del usuario.",
-    },
+    newStatus: null,
   },
   {
     index: 5,
@@ -249,13 +237,9 @@ export const filesEndedWholeLotOf: Array<FileEndedStats> = [
     num: "DE-0963-01019809-1 (NI)",
     title:
       "AGUIRRE FERNANDO OSMAR INSCRIPCION Nº 32179-3 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
-    newStatus: {
-      status: "EN CURSO",
-      message: "ERROR",
-      detail: "El documento no se encuentra en las reparticiones del usuario.",
-    },
+    newStatus: null,
   },
   {
     index: 21,
@@ -547,13 +531,9 @@ export const filesEndedWholeLotOf: Array<FileEndedStats> = [
     num: "DE-0963-01013421-1 (NI)",
     title:
       "DORATTO VERONICA VIVIANA INSCRIPCION Nº 29092-2 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
-    newStatus: {
-      status: "EN CURSO",
-      message: "ERROR",
-      detail: "El documento no se encuentra en las reparticiones del usuario.",
-    },
+    newStatus: null,
   },
   {
     index: 47,

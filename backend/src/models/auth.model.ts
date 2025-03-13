@@ -22,7 +22,6 @@ export class AuthModel implements IAuthModel {
     this.JWT_REFRESH_EXPIRES_IN = JWT_REFRESH_EXPIRES_IN as ms.StringValue;
     this.generateAccessToken = this.generateAccessToken.bind(this);
     this.generateRefreshToken = this.generateRefreshToken.bind(this);
-    // this.verifyJwtMiddleware = this.verifyJwtMiddleware.bind(this);
     this.verifyJwt = this.verifyJwt.bind(this);
   }
 

@@ -92,12 +92,14 @@ export class FilesService implements IFilesService {
     }
     await this.filesScrapperModel.createBrowserContext();
     await this.siemLogin();
-    await this.filesScrapperModel.closeBrowserContext();
+    // await this.filesScrapperModel.closeBrowserContext();
   }
 
   async endFilesServiceSession() {
     this.SIEM_PASSWORD = "";
     this.SIEM_USER = "";
+    if (this.filesScrapperModel.browser)
+      await this.filesScrapperModel.closeBrowserContext();
   }
 
   async endFiles({ files }: { files: FileStats[] }) {
