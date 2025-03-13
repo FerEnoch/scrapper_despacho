@@ -58,7 +58,7 @@ export const Columns: ColumnDef<FileStats>[] = [
       return (
         <div className="grid place-content-center w-[24ch] tracking-wide">
           <a
-            href={`${SIEM_FILE_STATS_URL}${num.length >= 5 ? num : repOrNum}`}
+            href={`${SIEM_FILE_STATS_URL}${num?.length >= 5 ? num : repOrNum}`}
             target="_blank"
             rel="noreferrer"
             className="hover:text-gray-950"
