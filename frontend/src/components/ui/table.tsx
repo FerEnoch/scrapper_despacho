@@ -13,6 +13,7 @@ const Table = React.forwardRef<
   [&::-webkit-scrollbar-track]:bg-gray-300
   [&::-webkit-scrollbar-thumb]:bg-gray-700
   [&::-webkit-scrollbar-thumb]:rounded-md
+  [&::-webkit-scrollbar-thumb]:cursor-pointer
   "
   >
     <table
