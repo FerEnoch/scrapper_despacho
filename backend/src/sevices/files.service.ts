@@ -1,6 +1,9 @@
 import { FileEndedStats, FileId, FileStats } from "../models/types";
 import { modelTypes } from "../types";
-import { getFilesBatches, parseFileStats } from "../models/lib/filesScrapper";
+import {
+  getFilesBatches,
+  parseFileToFileId,
+} from "../models/lib/filesScrapper";
 import { IFilesService, BatchOpResultType } from "./types";
 import {
   COLLECTION_ERRORS,
@@ -133,7 +136,7 @@ export class FilesService implements IFilesService {
                 };
               }
 
-              const [{ num }] = parseFileStats([file]);
+              const [{ num }] = parseFileToFileId([file]);
 
               const { message, detail } = await this.endFileByNum(num);
 

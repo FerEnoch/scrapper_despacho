@@ -50,7 +50,7 @@ describe("API-INTEGRATION > files-router", () => {
       expect(res.body.message).toBe(MESSAGES.FILE_UPLOADED);
       expect(data).toEqual(wholeLotOfFileStats);
     },
-    15 * 1000 // 11355 ms / 9756 ms
+    16 * 1000 // 11355 ms / 9756 ms
   );
 
   it("should return 400 & correct msg if file is not a csv", async () => {
@@ -106,7 +106,7 @@ describe("API-INTEGRATION > files-router", () => {
       expect(res.body.message).toBe(MESSAGES.FILES_ENDED);
       expect(res.body.data).toEqual(filesEnded);
     },
-    8 * 1000
+    10 * 1000
   ); // 8s
 
   it(

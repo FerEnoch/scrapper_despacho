@@ -3,10 +3,11 @@ import { FILE_NUMBER_COLUMN_VALID_NAME } from "../../../config";
 import { FileId, FileStats, RawFile } from "../../types";
 
 function removeKVQuotes(file: RawFile) {
-  const removeQuotesByRegex = (str: string) => str.trim().replace(/['"]+/g, "");
+  const removeQuotesByRegex = (str: string = "") =>
+    str.trim().replace(/['"]+/g, "");
   return Object.entries(file).reduce((acc, [key, value = ""]) => {
     const newKey = removeQuotesByRegex(key);
-    const newValue = removeQuotesByRegex(value);
+    const newValue = removeQuotesByRegex(value + "");
     acc[newKey] = newValue;
     return acc;
   }, {} as RawFile);
@@ -31,11 +32,86 @@ const validateRawDataBatch = (files: RawFile[]) => {
 const getInvalidFiles = (files: RawFile[]) =>
   files.filter((file) => !validateRawDataBatch([file]));
 
-const rawFileParser = (files: RawFile[]): FileId[] => {
+// const rawFileParser = (files: RawFile[]): FileId[] => {
+//   return files
+//     .map((file, index) => {
+//       const newRawFile = removeKVQuotes(file);
+//       const { [FILE_NUMBER_COLUMN_VALID_NAME]: completeNum = "" } = newRawFile;
+
+//       if (!completeNum) return null as unknown as FileId;
+
+//       let org = "",
+//         rep = "",
+//         num = "",
+//         digv = "";
+
+//       const hasLastFinalLetters = !!completeNum.split(" ")[1]?.length;
+
+//       if (hasLastFinalLetters) {
+//         [org = "", rep = "", num = "", digv = ""] = completeNum
+//           .trim()
+//           .split("-");
+
+//         const hasInitialOrgLetters = /\D/.test(org);
+
+//         return {
+//           index,
+//           completeNum: completeNum,
+//           org: hasInitialOrgLetters ? org : "",
+//           rep: hasInitialOrgLetters ? rep : org,
+//           num: hasInitialOrgLetters ? num : rep,
+//           digv:
+//             (hasInitialOrgLetters ? digv.split("")[0] : num.split("")[0]) || "",
+//         };
+//       }
+
+//       [rep = "", num = "", digv = ""] = completeNum.trim().split("-");
+//       const hasInitialOrgLetters = /\D/.test(rep);
+
+//       return {
+//         index,
+//         completeNum: completeNum,
+//         org: hasInitialOrgLetters ? rep : org,
+//         rep: hasInitialOrgLetters ? num : rep,
+//         num: hasInitialOrgLetters ? digv : num,
+//         digv: hasInitialOrgLetters ? num.split("")[0] : digv.split("")[0] || "",
+//       };
+//     })
+//     .filter(Boolean);
+// };
+
+export async function parseRawFiles(
+  files: RawFile[]
+): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
+  const batchIsValid = validateRawDataBatch(files);
+  if (!batchIsValid) {
+    const invalidFiles = getInvalidFiles(files);
+
+    return Promise.resolve({
+      ok: batchIsValid,
+      parsedData: parseFileToFileId(invalidFiles),
+    });
+  }
+
+  return Promise.resolve({
+    ok: batchIsValid,
+    parsedData: parseFileToFileId(files),
+  });
+}
+
+export function parseFileToFileId(files: Array<FileStats | RawFile>): FileId[] {
   return files
     .map((file, index) => {
-      const newRawFile = removeKVQuotes(file);
-      const { [FILE_NUMBER_COLUMN_VALID_NAME]: completeNum = "" } = newRawFile;
+      const fileWithoutQuotes = removeKVQuotes(file as unknown as RawFile);
+      let completeNum = "";
+      if (FILE_NUMBER_COLUMN_VALID_NAME in fileWithoutQuotes) {
+        const { [FILE_NUMBER_COLUMN_VALID_NAME]: fileNum = "" } =
+          fileWithoutQuotes;
+        completeNum = fileNum;
+      } else {
+        const { num: fileNum } = fileWithoutQuotes;
+        completeNum = fileNum;
+      }
 
       if (!completeNum) return null as unknown as FileId;
 
@@ -77,41 +153,6 @@ const rawFileParser = (files: RawFile[]): FileId[] => {
       };
     })
     .filter(Boolean);
-};
-
-export async function parseRawFiles(
-  files: RawFile[]
-): Promise<{ ok: boolean; parsedData: FileId[] | RawFile[] }> {
-  const batchIsValid = validateRawDataBatch(files);
-  if (!batchIsValid) {
-    const invalidFiles = getInvalidFiles(files);
-
-    return Promise.resolve({
-      ok: batchIsValid,
-      parsedData: rawFileParser(invalidFiles),
-    });
-  }
-
-  return Promise.resolve({
-    ok: batchIsValid,
-    parsedData: rawFileParser(files),
-  });
-}
-
-export function parseFileStats(files: FileStats[]): FileId[] {
-  return files.map((file) => {
-    const { num: completeNum } = file;
-    const [org, rep, num, digv, index] = completeNum.split("-");
-
-    return {
-      index: +index,
-      completeNum: completeNum,
-      org,
-      rep,
-      num,
-      digv: digv.split("")[0],
-    };
-  });
 }
 
 export function getFilesBatches<F>({

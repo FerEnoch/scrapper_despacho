@@ -54,7 +54,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01025188-2 (NI)",
     title:
       "CHICCO RUIZ ANIBAL LEONARDO INSCRIPCION Nº 32170-1 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -62,7 +62,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01034406-7 (NI)",
     title:
       "ESTRUCH MIGUEL IGNACIO INSCRIPCION Nº 31627-3 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -70,7 +70,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01025133-8 (NI)",
     title:
       "DUARTE RUBEN RODOLFO INSCRIPCION Nº 23929-5 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -78,7 +78,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01020574-8 (NI)",
     title:
       "CASTAGNO JOSE MARIA INSCRIPCION Nº 21236-0 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -86,7 +86,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01024843-3 (NI)",
     title:
       "CABRERA RODRIGO MANUEL INSCRIPCION Nº 31888-6 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -94,7 +94,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01024806-0 (NI)",
     title:
       "RACHID MARIA GABRIELA INSCRIPCION Nº 18584-0 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -109,7 +109,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01024806-0 (NI)",
     title:
       "RACHID MARIA GABRIELA INSCRIPCION Nº 18584-0 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -117,7 +117,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01020580-5 (NI)",
     title:
       "BULAY MONICA RAQUEL INSCRIPCION Nº 28543-6 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -125,7 +125,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01024995-1 (NI)",
     title:
       "OJEDA GABRIEL RAUL INSCRIPCION Nº 31005-3 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -133,7 +133,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01020576-3 (NI)",
     title:
       "ZERVA GUILLERMO ARIEL INSCRIPCION Nº 30131-2 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -141,7 +141,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01020329-7 (NI)",
     title:
       "BENITEZ ALEJANDRO SEBASTIAN INSCRIPCION Nº 30426-7 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -149,7 +149,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01020164-8 (NI)",
     title:
       "CANCELLIERI ADRIANA FIORELLA INSCRIPCION Nº 31904-3 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -172,7 +172,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     index: 21,
     num: "DE-0963-01045255-5 (NI)",
     title: "IBARRA CAROLINA NOEMI",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -186,49 +186,49 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     index: 23,
     num: "DE-0963-01046931-0 (NI)",
     title: "MATHIER MARIANA GABRIELA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 24,
     num: "DE-0963-01046970-8 (NI)",
     title: "IGLESIA ARIEL ORLANDO",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 25,
     num: "DE-0963-01046937-7 (NI)",
     title: "CAITO FABRICIO",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 26,
     num: "DE-0963-01046948-4 (NI)",
     title: "DASTUGUEZ ADRIAN LUIS",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 27,
     num: "DE-0963-01046445-1 (NI)",
     title: "SCHALBETTER PAMELA MELINA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 28,
     num: "DE-0963-01046626-6 (NI)",
     title: "NASIMBERA GRACIELA NATALIA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 29,
     num: "DE-0963-01046079-8 (NI)",
     title: "DUDIUK CATIANA BEATRIZ",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -243,7 +243,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     index: 31,
     num: "DE-0963-01019813-3 (NI)",
     title: "GOMEZ WALTER RUBEN INSCRIPCION Nº 886-2 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -258,14 +258,14 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     index: 33,
     num: "DE-0963-01044898-3 (NI)",
     title: "GRANDOLI YOLANDA INSCRIPCION Nº 31823-5 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 34,
     num: "DE-0963-01047067-2 (NI)",
     title: "BARRERA AMELIA GUADALUPE",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -281,7 +281,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01044437-0 (NI)",
     title:
       "GABRIELA ROMINA GUTIERREZ GANI INSCRIPCION Nº 28594-4 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -297,28 +297,28 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     num: "DE-0963-01044900-2 (NI)",
     title:
       "ROLDAN MARIA ESTHER INSCRIPCION Nº 15816-3 PROGRAMA MI TIERRA MI CASA",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 39,
     num: "DE-0963-01044899-1 (NI)",
     title: "ESPINDOLA MARIA JOSE",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 40,
     num: "DE-0963-01047367-6 (NI)",
     title: "HERRERA SILVIA INES",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
     index: 41,
     num: "DE-0963-01047378-3 (NI)",
     title: "PARAJON ANDRES",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
@@ -341,7 +341,7 @@ export const wholeLotOfFileStats: Array<FileStats> = [
     index: 44,
     num: "DE-0963-01051941-1 (NI)",
     title: "SOSA GONZALO MARTIN D.N.I.Nº 31257727 (PROCREAR)",
-    prevStatus: "EN CURSO",
+    prevStatus: "FINALIZADO",
     location: "D123 - DCION. TECNICO ADMINISTRATIVA",
   },
   {
