@@ -29,7 +29,7 @@ const SIEM_PAGE_DATA = {
 };
 
 const VALIDATION_REGEX = {
-  FILE_NUMBER_COLUMN: /^(\w{2}-)?\d{3,4}-\d{7,9}-\d+( \(\w{1,3}\))?$/,
+  FILE_NUMBER_COLUMN: /^(\w{2}-)?\d{3,4}-\d{6,9}-\d+( \(\w{1,3}\))?$/,
 };
 
 /**

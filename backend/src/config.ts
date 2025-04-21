@@ -27,7 +27,7 @@ const {
   PROD_DOMAIN_FRONTEND = "",
 } = process.env;
 
-const FILE_NUMBER_COLUMN_VALID_NAME = "Número";
+const FILE_NUMBER_COLUMN_VALID_NAME = "Expediente";
 const MAX_AGE_ACCESS_TOKEN_COOKIE = 14 * 24 * 60 * 60 * 1000; // 14 days
 const DEFAULT_MAX_AGE_ACCESS_TOKEN_COOKIE = 1 * 24 * 60 * 60 * 1000; // 1 day
 const CURRENT_PROD_VERSION = Number(LAST_PROD_VERSION);
